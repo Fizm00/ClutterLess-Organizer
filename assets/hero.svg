@@ -6,13 +6,11 @@
 @media (prefers-color-scheme:dark){:root{--ink:#22d3ee;--sub:#9ca3af;--dim:#6b7280}}
 text{font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,'Liberation Mono',monospace}
 .art{font-size:18px;fill:var(--ink);font-weight:500}
-@keyframes w0{0%{width:0}3.889%{width:0}15.0%{width:682.0px}100%{width:682.0px}}.w0{animation:w0 9.0s cubic-bezier(.3,.6,.3,1) infinite}@keyframes w1{0%{width:0}5.444%{width:0}16.556%{width:682.0px}100%{width:682.0px}}.w1{animation:w1 9.0s cubic-bezier(.3,.6,.3,1) infinite}@keyframes w2{0%{width:0}7.0%{width:0}18.111%{width:682.0px}100%{width:682.0px}}.w2{animation:w2 9.0s cubic-bezier(.3,.6,.3,1) infinite}@keyframes w3{0%{width:0}8.556%{width:0}19.667%{width:682.0px}100%{width:682.0px}}.w3{animation:w3 9.0s cubic-bezier(.3,.6,.3,1) infinite}@keyframes w4{0%{width:0}10.111%{width:0}21.222%{width:682.0px}100%{width:682.0px}}.w4{animation:w4 9.0s cubic-bezier(.3,.6,.3,1) infinite}@keyframes w5{0%{width:0}11.667%{width:0}22.778%{width:682.0px}100%{width:682.0px}}.w5{animation:w5 9.0s cubic-bezier(.3,.6,.3,1) infinite}
-.tag{animation:tg 9.0s linear infinite;opacity:0}
-@keyframes tg{0%{opacity:0}20.0%{opacity:0}27.778%{opacity:1}100%{opacity:1}}
-.all{animation:al 9.0s linear infinite}
-@keyframes al{0%{opacity:1}91.111%{opacity:1}97.778%{opacity:0}100%{opacity:0}}
-.cur{animation:bl 1.1s steps(1) infinite}
-@keyframes bl{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes w0{0%{width:0}11.667%{width:0}45.0%{width:682.0px}100%{width:682.0px}}.w0{animation:w0 3.0s cubic-bezier(.3,.6,.3,1) 1 forwards}@keyframes w1{0%{width:0}16.333%{width:0}49.667%{width:682.0px}100%{width:682.0px}}.w1{animation:w1 3.0s cubic-bezier(.3,.6,.3,1) 1 forwards}@keyframes w2{0%{width:0}21.0%{width:0}54.333%{width:682.0px}100%{width:682.0px}}.w2{animation:w2 3.0s cubic-bezier(.3,.6,.3,1) 1 forwards}@keyframes w3{0%{width:0}25.667%{width:0}59.0%{width:682.0px}100%{width:682.0px}}.w3{animation:w3 3.0s cubic-bezier(.3,.6,.3,1) 1 forwards}@keyframes w4{0%{width:0}30.333%{width:0}63.667%{width:682.0px}100%{width:682.0px}}.w4{animation:w4 3.0s cubic-bezier(.3,.6,.3,1) 1 forwards}@keyframes w5{0%{width:0}35.0%{width:0}68.333%{width:682.0px}100%{width:682.0px}}.w5{animation:w5 3.0s cubic-bezier(.3,.6,.3,1) 1 forwards}
+.tag{animation:tg 3.0s linear 1 forwards;opacity:0}
+@keyframes tg{0%{opacity:0}60.0%{opacity:0}83.333%{opacity:1}100%{opacity:1}}
+
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important}.w0{width:682.0px}.w1{width:682.0px}.w2{width:682.0px}.w3{width:682.0px}.w4{width:682.0px}.w5{width:682.0px}.tag{opacity:1}.cur{display:none}}
 </style>
 <defs><clipPath id="c0"><rect class="w0" x="39.0" y="34" height="27" width="0"/></clipPath><clipPath id="c1"><rect class="w1" x="39.0" y="57" height="27" width="0"/></clipPath><clipPath id="c2"><rect class="w2" x="39.0" y="80" height="27" width="0"/></clipPath><clipPath id="c3"><rect class="w3" x="39.0" y="103" height="27" width="0"/></clipPath><clipPath id="c4"><rect class="w4" x="39.0" y="126" height="27" width="0"/></clipPath><clipPath id="c5"><rect class="w5" x="39.0" y="149" height="27" width="0"/></clipPath></defs>
