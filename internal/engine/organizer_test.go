@@ -58,8 +58,8 @@ func TestOrganizer_DryRun_ZeroSideEffects(t *testing.T) {
 	cfg := config.Default()
 	// Change rules destination to non-existing subfolders in tempDir
 	destDir := filepath.Join(tempDir, "Sorted")
-	cfg.Rules[0].MoveTo = filepath.Join(destDir, "Images")
-	cfg.Rules[1].MoveTo = filepath.Join(destDir, "Docs")
+	setRuleMoveTo(cfg, "Images", filepath.Join(destDir, "Images"))
+	setRuleMoveTo(cfg, "Documents", filepath.Join(destDir, "Docs"))
 
 	organizer := NewOrganizer(cfg)
 
@@ -104,7 +104,7 @@ func TestOrganizer_RealRun_MovesFiles(t *testing.T) {
 	_ = os.WriteFile(f2, []byte("partial data"), 0600)
 
 	cfg := config.Default()
-	cfg.Rules[1].MoveTo = filepath.Join(destDir, "Docs") // Documents rule
+	setRuleMoveTo(cfg, "Documents", filepath.Join(destDir, "Docs")) // Documents rule
 
 	organizer := NewOrganizer(cfg)
 
@@ -215,5 +215,14 @@ func TestOrganizer_RecursiveScan_ExcludesDestDir(t *testing.T) {
 	// destDoc should remain completely untouched
 	if _, err := os.Stat(destDoc); err != nil {
 		t.Errorf("already_sorted.pdf was unexpectedly touched: %v", err)
+	}
+}
+
+func setRuleMoveTo(cfg *config.Config, name, moveTo string) {
+	for i := range cfg.Rules {
+		if cfg.Rules[i].Name == name {
+			cfg.Rules[i].MoveTo = moveTo
+			return
+		}
 	}
 }

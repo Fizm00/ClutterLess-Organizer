@@ -28,10 +28,16 @@ settings:
 watch:
   - path: ~/Downloads
     recursive: false
+  # Add more folders if desired, e.g.:
   # - path: ~/Desktop
   #   recursive: false
 
 rules:
+  - name: Invoices
+    match:
+      name_regex: "(?i)(invoice|faktur|receipt|kwitansi|struk|bukti.transfer|pembayaran|tagihan)"
+    move_to: ~/Documents/Finance/{year}-{month}
+
   - name: Images
     match:
       ext:
@@ -42,7 +48,37 @@ rules:
         - webp
         - bmp
         - svg
+        - ico
+        - tiff
+        - tif
+        - heic
     move_to: ~/Pictures/Sorted/{year}
+
+  - name: Videos
+    match:
+      ext:
+        - mp4
+        - mkv
+        - mov
+        - avi
+        - wmv
+        - flv
+        - webm
+        - m4v
+    move_to: ~/Videos/Sorted/{year}
+
+  - name: Audio
+    match:
+      ext:
+        - mp3
+        - wav
+        - flac
+        - aac
+        - ogg
+        - m4a
+        - wma
+        - opus
+    move_to: ~/Music/Sorted/{year}
 
   - name: Documents
     match:
@@ -53,14 +89,57 @@ rules:
         - xlsx
         - xls
         - pptx
+        - ppt
         - txt
         - md
+        - rtf
+        - odt
+        - ods
+        - odp
+        - csv
+        - tsv
     move_to: ~/Documents/Inbox/{ext}
 
-  - name: Invoices
+  - name: Books
     match:
-      name_regex: "(?i)(invoice|faktur|receipt|kwitansi)"
-    move_to: ~/Documents/Finance/{year}-{month}
+      ext:
+        - epub
+        - mobi
+        - azw3
+        - djvu
+        - cbr
+        - cbz
+    move_to: ~/Documents/Books
+
+  - name: Data
+    match:
+      ext:
+        - json
+        - xml
+        - yaml
+        - yml
+        - toml
+        - sql
+        - sqlite
+        - db
+    move_to: ~/Documents/Data/{ext}
+
+  - name: Creative
+    match:
+      ext:
+        - blend
+        - fbx
+        - obj
+        - stl
+        - gltf
+        - glb
+        - dae
+        - 3ds
+        - psd
+        - ai
+        - xd
+        - fig
+    move_to: ~/Documents/Creative_Assets
 
   - name: Installers
     match:
@@ -70,6 +149,10 @@ rules:
         - dmg
         - deb
         - pkg
+        - rpm
+        - appimage
+        - apk
+        - iso
     move_to: ~/Downloads/_Installers
 
   - name: Archives
@@ -80,7 +163,9 @@ rules:
         - 7z
         - tar
         - gz
-      min_size: 1MB
+        - bz2
+        - xz
+        - tgz
     move_to: ~/Downloads/_Archives
 
   - name: Old stuff

@@ -214,7 +214,7 @@ func TestLoad_ReadsValidFile(t *testing.T) {
 	if cfg.Version != 1 {
 		t.Errorf("expected version 1, got %d", cfg.Version)
 	}
-	if len(cfg.Rules) != 6 {
-		t.Errorf("expected 6 rules, got %d", len(cfg.Rules))
+	if len(cfg.Rules) != 11 {
+		t.Errorf("expected 11 rules, got %d", len(cfg.Rules))
 	}
 }

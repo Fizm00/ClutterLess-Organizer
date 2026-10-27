@@ -8,7 +8,7 @@ import "fmt"
 // Build information injected via ldflags during build.
 var (
 	// Version is the current version of the application.
-	Version = "0.2.0"
+	Version = "0.3.0"
 	// Commit is the git commit hash the binary was built from.
 	Commit = "none"
 	// BuildDate is the date and time when the binary was built.

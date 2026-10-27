@@ -43,6 +43,8 @@ func executeCommand(args ...string) (string, error) {
 	_ = watchCmd.Flags().Set("history-file", "")
 	_ = watchCmd.Flags().Set("dir", "")
 	_ = folderAddCmd.Flags().Set("recursive", "false")
+	_ = uninstallCmd.Flags().Set("yes", "false")
+	_ = uninstallCmd.Flags().Set("purge-config", "false")
 
 	err := rootCmd.Execute()
 	return buf.String(), err
@@ -76,6 +78,8 @@ func executeCommandContext(ctx context.Context, args ...string) (string, error) 
 	_ = watchCmd.Flags().Set("history-file", "")
 	_ = watchCmd.Flags().Set("dir", "")
 	_ = folderAddCmd.Flags().Set("recursive", "false")
+	_ = uninstallCmd.Flags().Set("yes", "false")
+	_ = uninstallCmd.Flags().Set("purge-config", "false")
 
 	err := rootCmd.ExecuteContext(ctx)
 	return buf.String(), err
@@ -410,6 +414,19 @@ func TestConfigPathCommand(t *testing.T) {
 	}
 	if !strings.Contains(out, cfgPath) {
 		t.Errorf("expected output to contain %q, got %q", cfgPath, out)
+	}
+}
+
+func TestHelpCommand(t *testing.T) {
+	out, err := executeCommand("--help")
+	if err != nil {
+		t.Fatalf("help command failed: %v", err)
+	}
+	if !strings.Contains(out, "ClutterLess Organizer") || !strings.Contains(out, "CORE COMMANDS:") {
+		t.Errorf("expected help output to contain header and commands, got: %s", out)
+	}
+	if !strings.Contains(out, "uninstall") {
+		t.Errorf("expected help output to mention uninstall, got: %s", out)
 	}
 }
 

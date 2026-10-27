@@ -48,6 +48,7 @@ func RenderHelp(w io.Writer, versionStr string, styler *Styler) {
 	fmt.Fprintf(w, "%s\n", styler.Bold("SYSTEM & HISTORY:"))
 	printCmd(w, styler, "history", "View history of past organization batches")
 	printCmd(w, styler, "version", "Show binary version, git commit, and build date")
+	printCmd(w, styler, "uninstall", "Uninstall cless binary and clean system PATH")
 	fmt.Fprintln(w)
 
 	fmt.Fprintf(w, "%s\n", styler.Bold("QUICK START EXAMPLES:"))

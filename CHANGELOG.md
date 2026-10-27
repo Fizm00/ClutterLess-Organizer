@@ -5,6 +5,33 @@ All notable changes to ClutterLess Organizer (`cless`) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-28
+
+### Added
+- **Uninstall Capabilities:**
+  - Added native `cless uninstall` command with interactive confirmation or non-interactive `-y/--yes` flag and optional `--purge-config` flag.
+  - Added dedicated one-line Windows uninstaller script (`uninstall.ps1`) that gracefully stops running instances, removes the binary directory, and removes `cless` from User `PATH`.
+  - Added dedicated one-line Linux/macOS uninstaller script (`uninstall.sh`) with multi-user permissions handling and optional config purging via `CLESS_PURGE_CONFIG=1`.
+- **Intelligent Release Resolution in Installers:**
+  - Updated `install.ps1` and `install.sh` to default to `latest` release tag.
+  - Implemented GitHub 302 redirect inspection (`/releases/latest`) to avoid unauthenticated GitHub API rate limits.
+  - Added custom version override support via `$env:CLESS_VERSION` or script parameter.
+  - Added helpful next-steps guidance pointing users to `cless help`.
+- **Substantially Expanded Default Rule Sets:**
+  - **Invoices & Finance:** Auto-detects Indonesian and English financial keywords (`invoice`, `faktur`, `receipt`, `kwitansi`, `struk`, `bukti.transfer`, `pembayaran`, `tagihan`) -> `~/Documents/Finance/{year}-{month}`.
+  - **Images:** Expanded to `jpg, jpeg, png, gif, webp, bmp, svg, ico, tiff, tif, heic` -> `~/Pictures/Sorted/{year}`.
+  - **Videos:** Added dedicated video organization (`mp4, mkv, mov, avi, wmv, flv, webm, m4v`) -> `~/Videos/Sorted/{year}`.
+  - **Audio:** Added dedicated music and audio organization (`mp3, wav, flac, aac, ogg, m4a, wma, opus`) -> `~/Music/Sorted/{year}`.
+  - **Documents:** Expanded with presentation and data tables (`pdf, docx, doc, xlsx, xls, pptx, ppt, txt, md, rtf, odt, ods, odp, csv, tsv`) -> `~/Documents/Inbox/{ext}`.
+  - **Books:** Added digital reading category (`epub, mobi, azw3, djvu, cbr, cbz`) -> `~/Documents/Books`.
+  - **Data & Config:** Added structured data category (`json, xml, yaml, yml, toml, sql, sqlite, db`) -> `~/Documents/Data/{ext}`.
+  - **Creative & 3D:** Added 3D modeling and digital design assets (`blend, fbx, obj, stl, gltf, glb, dae, 3ds, psd, ai, xd, fig`) -> `~/Documents/Creative_Assets`.
+  - **Installers:** Expanded installer packages (`exe, msi, dmg, deb, pkg, rpm, appimage, apk, iso`) -> `~/Downloads/_Installers`.
+  - **Archives:** Removed size constraint to sort all compressed packages (`zip, rar, 7z, tar, gz, bz2, xz, tgz`) -> `~/Downloads/_Archives`.
+  - **Old Files:** Re-organize files untouched for over 90 days (`older_than: 90d`) -> `~/Downloads/_Old`.
+- **Exhaustive Documentation:**
+  - Overhauled `README.md` with full badges, installation, uninstallation, detailed file category tables, command references, and architecture guides.
+
 ## [0.2.0] - 2026-10-28
 
 ### Added

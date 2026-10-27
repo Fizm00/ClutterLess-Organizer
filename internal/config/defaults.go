@@ -38,38 +38,72 @@ func Default() *Config {
 		},
 		Rules: []RuleConfig{
 			{
-				Name: "Images",
-				Match: MatchConfig{
-					Ext: []string{"jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"},
-				},
-				MoveTo: "~/Pictures/Sorted/{year}",
-			},
-			{
-				Name: "Documents",
-				Match: MatchConfig{
-					Ext: []string{"pdf", "docx", "doc", "xlsx", "xls", "pptx", "txt", "md"},
-				},
-				MoveTo: "~/Documents/Inbox/{ext}",
-			},
-			{
 				Name: "Invoices",
 				Match: MatchConfig{
-					NameRegex: "(?i)(invoice|faktur|receipt|kwitansi)",
+					NameRegex: "(?i)(invoice|faktur|receipt|kwitansi|struk|bukti.transfer|pembayaran|tagihan)",
 				},
 				MoveTo: "~/Documents/Finance/{year}-{month}",
 			},
 			{
+				Name: "Images",
+				Match: MatchConfig{
+					Ext: []string{"jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "ico", "tiff", "tif", "heic"},
+				},
+				MoveTo: "~/Pictures/Sorted/{year}",
+			},
+			{
+				Name: "Videos",
+				Match: MatchConfig{
+					Ext: []string{"mp4", "mkv", "mov", "avi", "wmv", "flv", "webm", "m4v"},
+				},
+				MoveTo: "~/Videos/Sorted/{year}",
+			},
+			{
+				Name: "Audio",
+				Match: MatchConfig{
+					Ext: []string{"mp3", "wav", "flac", "aac", "ogg", "m4a", "wma", "opus"},
+				},
+				MoveTo: "~/Music/Sorted/{year}",
+			},
+			{
+				Name: "Documents",
+				Match: MatchConfig{
+					Ext: []string{"pdf", "docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "md", "rtf", "odt", "ods", "odp", "csv", "tsv"},
+				},
+				MoveTo: "~/Documents/Inbox/{ext}",
+			},
+			{
+				Name: "Books",
+				Match: MatchConfig{
+					Ext: []string{"epub", "mobi", "azw3", "djvu", "cbr", "cbz"},
+				},
+				MoveTo: "~/Documents/Books",
+			},
+			{
+				Name: "Data",
+				Match: MatchConfig{
+					Ext: []string{"json", "xml", "yaml", "yml", "toml", "sql", "sqlite", "db"},
+				},
+				MoveTo: "~/Documents/Data/{ext}",
+			},
+			{
+				Name: "Creative",
+				Match: MatchConfig{
+					Ext: []string{"blend", "fbx", "obj", "stl", "gltf", "glb", "dae", "3ds", "psd", "ai", "xd", "fig"},
+				},
+				MoveTo: "~/Documents/Creative_Assets",
+			},
+			{
 				Name: "Installers",
 				Match: MatchConfig{
-					Ext: []string{"exe", "msi", "dmg", "deb", "pkg"},
+					Ext: []string{"exe", "msi", "dmg", "deb", "pkg", "rpm", "appimage", "apk", "iso"},
 				},
 				MoveTo: "~/Downloads/_Installers",
 			},
 			{
 				Name: "Archives",
 				Match: MatchConfig{
-					Ext:     []string{"zip", "rar", "7z", "tar", "gz"},
-					MinSize: "1MB",
+					Ext: []string{"zip", "rar", "7z", "tar", "gz", "bz2", "xz", "tgz"},
 				},
 				MoveTo: "~/Downloads/_Archives",
 			},
@@ -107,30 +141,54 @@ watch:
   #   recursive: false
 
 rules:
+  - name: Invoices
+    match:
+      name_regex: "(?i)(invoice|faktur|receipt|kwitansi|struk|bukti.transfer|pembayaran|tagihan)"
+    move_to: "~/Documents/Finance/{year}-{month}"
+
   - name: Images
     match:
-      ext: [jpg, jpeg, png, gif, webp, bmp, svg]
+      ext: [jpg, jpeg, png, gif, webp, bmp, svg, ico, tiff, tif, heic]
     move_to: ~/Pictures/Sorted/{year}
+
+  - name: Videos
+    match:
+      ext: [mp4, mkv, mov, avi, wmv, flv, webm, m4v]
+    move_to: ~/Videos/Sorted/{year}
+
+  - name: Audio
+    match:
+      ext: [mp3, wav, flac, aac, ogg, m4a, wma, opus]
+    move_to: ~/Music/Sorted/{year}
 
   - name: Documents
     match:
-      ext: [pdf, docx, doc, xlsx, xls, pptx, txt, md]
-    move_to: ~/Documents/Inbox/{ext}
+      ext: [pdf, docx, doc, xlsx, xls, pptx, ppt, txt, md, rtf, odt, ods, odp, csv, tsv]
+    move_to: "~/Documents/Inbox/{ext}"
 
-  - name: Invoices
+  - name: Books
     match:
-      name_regex: "(?i)(invoice|faktur|receipt|kwitansi)"
-    move_to: ~/Documents/Finance/{year}-{month}
+      ext: [epub, mobi, azw3, djvu, cbr, cbz]
+    move_to: ~/Documents/Books
+
+  - name: Data
+    match:
+      ext: [json, xml, yaml, yml, toml, sql, sqlite, db]
+    move_to: "~/Documents/Data/{ext}"
+
+  - name: Creative
+    match:
+      ext: [blend, fbx, obj, stl, gltf, glb, dae, 3ds, psd, ai, xd, fig]
+    move_to: ~/Documents/Creative_Assets
 
   - name: Installers
     match:
-      ext: [exe, msi, dmg, deb, pkg]
+      ext: [exe, msi, dmg, deb, pkg, rpm, appimage, apk, iso]
     move_to: ~/Downloads/_Installers
 
   - name: Archives
     match:
-      ext: [zip, rar, 7z, tar, gz]
-      min_size: 1MB
+      ext: [zip, rar, 7z, tar, gz, bz2, xz, tgz]
     move_to: ~/Downloads/_Archives
 
   - name: Old stuff

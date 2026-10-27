@@ -25,8 +25,8 @@ func TestOrganizer_RunAndUndo_RestoresOriginalState(t *testing.T) {
 	_ = os.WriteFile(f2, []byte("avatar png"), 0600)
 
 	cfg := config.Default()
-	cfg.Rules[0].MoveTo = filepath.Join(destDir, "Images")
-	cfg.Rules[1].MoveTo = filepath.Join(destDir, "Docs")
+	setRuleMoveTo(cfg, "Images", filepath.Join(destDir, "Images"))
+	setRuleMoveTo(cfg, "Documents", filepath.Join(destDir, "Docs"))
 
 	histStorage, err := history.NewStorage(histFile)
 	if err != nil {
@@ -88,7 +88,7 @@ func TestOrganizer_Undo_SourceOccupied(t *testing.T) {
 	_ = os.WriteFile(srcFile, []byte("original doc v1"), 0600)
 
 	cfg := config.Default()
-	cfg.Rules[1].MoveTo = destDir
+	setRuleMoveTo(cfg, "Documents", destDir)
 
 	histStorage, _ := history.NewStorage(histFile)
 	organizer := NewOrganizer(cfg)
@@ -138,7 +138,7 @@ func TestOrganizer_Undo_DestMissing(t *testing.T) {
 	_ = os.WriteFile(srcFile, []byte("temporary content"), 0600)
 
 	cfg := config.Default()
-	cfg.Rules[1].MoveTo = destDir
+	setRuleMoveTo(cfg, "Documents", destDir)
 
 	histStorage, _ := history.NewStorage(histFile)
 	organizer := NewOrganizer(cfg)
@@ -177,7 +177,7 @@ func TestOrganizer_Undo_DoubleUndo(t *testing.T) {
 	_ = os.WriteFile(srcFile, []byte("data"), 0600)
 
 	cfg := config.Default()
-	cfg.Rules[1].MoveTo = destDir
+	setRuleMoveTo(cfg, "Documents", destDir)
 
 	histStorage, _ := history.NewStorage(histFile)
 	organizer := NewOrganizer(cfg)
@@ -214,7 +214,7 @@ func TestOrganizer_Undo_DryRun_ZeroSideEffects(t *testing.T) {
 	_ = os.WriteFile(srcFile, []byte("data content"), 0600)
 
 	cfg := config.Default()
-	cfg.Rules[1].MoveTo = destDir
+	setRuleMoveTo(cfg, "Documents", destDir)
 
 	histStorage, _ := history.NewStorage(histFile)
 	organizer := NewOrganizer(cfg)
