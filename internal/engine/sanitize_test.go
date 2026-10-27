@@ -77,9 +77,24 @@ func TestSanitizeSegment_IllegalCharsAndTrailing(t *testing.T) {
 
 func TestSanitizePath(t *testing.T) {
 	t.Run("preserves drive letters", func(t *testing.T) {
+		if runtime.GOOS != "windows" {
+			t.Skip("skipping Windows drive letter test on non-Windows OS")
+		}
 		p := `C:\Users\test\CON\sample:file.txt`
 		sanitized := SanitizePath(p)
 		expected := `C:\Users\test\_CON\sample_file.txt`
+		if filepath.Clean(sanitized) != filepath.Clean(expected) {
+			t.Errorf("SanitizePath(%q) = %q, expected %q", p, sanitized, expected)
+		}
+	})
+
+	t.Run("unix absolute path with illegal segments", func(t *testing.T) {
+		if runtime.GOOS == "windows" {
+			t.Skip("skipping unix path test on Windows OS")
+		}
+		p := `/home/test/CON/sample:file.txt`
+		sanitized := SanitizePath(p)
+		expected := `/home/test/_CON/sample_file.txt`
 		if filepath.Clean(sanitized) != filepath.Clean(expected) {
 			t.Errorf("SanitizePath(%q) = %q, expected %q", p, sanitized, expected)
 		}
