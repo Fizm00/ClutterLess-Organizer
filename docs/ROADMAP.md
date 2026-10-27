@@ -5,7 +5,7 @@ Update the Status column at the end of every phase.
 | Phase | Name | Outcome | Status |
 |---|---|---|---|
 | 0 | Bootstrap | Repo skeleton, `go.mod`, cobra root, `version`, LICENSE, CI build | DONE |
-| 1 | Config & Rules | YAML load/validate, matcher, planner (read-only), `rules list/test`, `config validate`, `init` | TODO |
+| 1 | Config & Rules | YAML load/validate, matcher, planner (read-only), `rules list/test`, `config validate`, `init` | DONE |
 | 2 | Mover & Run | Safe move, conflict rename, cross-drive fallback, retry, `run`, `--dry-run` | TODO |
 | 3 | History & Undo | JSONL history, batches, `history`, `undo` | TODO |
 | 4 | Watch | fsnotify watcher, stability check, debounce, `watch` | TODO |
