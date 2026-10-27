@@ -48,21 +48,25 @@ Modern developer workflows generate immense file debris: daily downloads, screen
 The automated script inspects system architecture (`amd64` or `arm64`), resolves the latest verified release tag from GitHub without API rate limits, verifies the archive, installs the executable to user programs, and configures the environment `PATH`.
 
 #### Windows (PowerShell)
+
 ```powershell
 irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.ps1 | iex
 ```
 
-*To install a specific version:*
+_To install a specific version:_
+
 ```powershell
 $env:CLESS_VERSION="0.3.0"; irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.ps1 | iex
 ```
 
 #### Linux & macOS (Bash / Zsh)
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.sh | bash
 ```
 
-*To install a specific version:*
+_To install a specific version:_
+
 ```bash
 CLESS_VERSION="0.3.0" curl -fsSL https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.sh | bash
 ```
@@ -75,14 +79,14 @@ CLESS_VERSION="0.3.0" curl -fsSL https://raw.githubusercontent.com/Fizm00/Clutte
 
 Download standalone archive binaries directly from [GitHub Releases](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest):
 
-| Platform | Architecture | Archive |
-|---|---|---|
-| **Windows** | x86_64 / amd64 | [`cless_0.3.0_windows_amd64.zip`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
-| **Windows** | ARM64 | [`cless_0.3.0_windows_arm64.zip`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
-| **Linux** | x86_64 / amd64 | [`cless_0.3.0_linux_amd64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
-| **Linux** | ARM64 | [`cless_0.3.0_linux_arm64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
-| **macOS** | Apple Silicon (M-series) | [`cless_0.3.0_darwin_arm64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
-| **macOS** | Intel x86_64 | [`cless_0.3.0_darwin_amd64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
+| Platform    | Architecture             | Archive                                                                                              |
+| ----------- | ------------------------ | ---------------------------------------------------------------------------------------------------- |
+| **Windows** | x86_64 / amd64           | [`cless_0.3.0_windows_amd64.zip`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)   |
+| **Windows** | ARM64                    | [`cless_0.3.0_windows_arm64.zip`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)   |
+| **Linux**   | x86_64 / amd64           | [`cless_0.3.0_linux_amd64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)  |
+| **Linux**   | ARM64                    | [`cless_0.3.0_linux_arm64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)  |
+| **macOS**   | Apple Silicon (M-series) | [`cless_0.3.0_darwin_arm64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
+| **macOS**   | Intel x86_64             | [`cless_0.3.0_darwin_amd64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
 
 Extract the binary and place it in a folder included in system `PATH` (such as `%LOCALAPPDATA%\Programs\cless` or `/usr/local/bin`).
 
@@ -95,7 +99,8 @@ Extract the binary and place it in a folder included in system `PATH` (such as `
 ```bash
 go install github.com/Fizm00/organizer/cmd/organizer@latest
 ```
-*(Installs as `organizer`. Symlink or copy to `cless` for the shorthand alias).*
+
+_(Installs as `organizer`. Symlink or copy to `cless` for the shorthand alias)._
 
 </details>
 
@@ -104,41 +109,55 @@ go install github.com/Fizm00/organizer/cmd/organizer@latest
 ## Quick Start
 
 ### 1. Initialize Default Configuration
+
 Generate a structured configuration file with preconfigured rule sets:
+
 ```bash
 cless init
 ```
-*Platform default locations:*
+
+_Platform default locations:_
+
 - **Windows:** `%APPDATA%\organizer\config.yaml`
 - **Linux:** `~/.config/organizer/config.yaml`
 - **macOS:** `~/Library/Application Support/organizer/config.yaml`
 
 ### 2. Validate Rules Against a File
+
 Verify how rules evaluate without moving any file:
+
 ```bash
 cless rules test invoice_april_2026.pdf
 ```
 
 ### 3. Dry-Run Preview
+
 Simulate organizing watched folders with zero filesystem modifications:
+
 ```bash
 cless run --dry-run
 ```
 
 ### 4. Execute Organization
+
 Execute the planned relocations:
+
 ```bash
 cless run
 ```
 
 ### 5. Revert When Needed
+
 Roll back the previous batch back to original paths:
+
 ```bash
 cless undo
 ```
 
 ### 6. Continuous Real-Time Watcher
+
 Run as a background filesystem daemon:
+
 ```bash
 cless watch
 ```
@@ -149,19 +168,19 @@ cless watch
 
 `cless` provides 11 preconfigured default categories to route clutter into dedicated, structured hierarchies:
 
-| Rule Name | Match Condition | Destination Pattern |
-|---|---|---|
-| **Invoices** | RegEx: `(?i)(invoice\|faktur\|receipt\|kwitansi\|struk\|bukti.transfer\|pembayaran\|tagihan)` | `~/Documents/Finance/{year}-{month}` |
-| **Images** | `jpg, jpeg, png, gif, webp, bmp, svg, ico, tiff, tif, heic` | `~/Pictures/Sorted/{year}` |
-| **Videos** | `mp4, mkv, mov, avi, wmv, flv, webm, m4v` | `~/Videos/Sorted/{year}` |
-| **Audio** | `mp3, wav, flac, aac, ogg, m4a, wma, opus` | `~/Music/Sorted/{year}` |
-| **Documents** | `pdf, docx, doc, xlsx, xls, pptx, ppt, txt, md, rtf, odt, ods, odp, csv, tsv` | `~/Documents/Inbox/{ext}` |
-| **Books** | `epub, mobi, azw3, djvu, cbr, cbz` | `~/Documents/Books` |
-| **Data** | `json, xml, yaml, yml, toml, sql, sqlite, db` | `~/Documents/Data/{ext}` |
-| **Creative** | `blend, fbx, obj, stl, gltf, glb, dae, 3ds, psd, ai, xd, fig` | `~/Documents/Creative_Assets` |
-| **Installers** | `exe, msi, dmg, deb, pkg, rpm, appimage, apk, iso` | `~/Downloads/_Installers` |
-| **Archives** | `zip, rar, 7z, tar, gz, bz2, xz, tgz` | `~/Downloads/_Archives` |
-| **Old stuff** | File modification age `older_than: 90d` | `~/Downloads/_Old` |
+| Rule Name      | Match Condition                                                                               | Destination Pattern                  |
+| -------------- | --------------------------------------------------------------------------------------------- | ------------------------------------ |
+| **Invoices**   | RegEx: `(?i)(invoice\|faktur\|receipt\|kwitansi\|struk\|bukti.transfer\|pembayaran\|tagihan)` | `~/Documents/Finance/{year}-{month}` |
+| **Images**     | `jpg, jpeg, png, gif, webp, bmp, svg, ico, tiff, tif, heic`                                   | `~/Pictures/Sorted/{year}`           |
+| **Videos**     | `mp4, mkv, mov, avi, wmv, flv, webm, m4v`                                                     | `~/Videos/Sorted/{year}`             |
+| **Audio**      | `mp3, wav, flac, aac, ogg, m4a, wma, opus`                                                    | `~/Music/Sorted/{year}`              |
+| **Documents**  | `pdf, docx, doc, xlsx, xls, pptx, ppt, txt, md, rtf, odt, ods, odp, csv, tsv`                 | `~/Documents/Inbox/{ext}`            |
+| **Books**      | `epub, mobi, azw3, djvu, cbr, cbz`                                                            | `~/Documents/Books`                  |
+| **Data**       | `json, xml, yaml, yml, toml, sql, sqlite, db`                                                 | `~/Documents/Data/{ext}`             |
+| **Creative**   | `blend, fbx, obj, stl, gltf, glb, dae, 3ds, psd, ai, xd, fig`                                 | `~/Documents/Creative_Assets`        |
+| **Installers** | `exe, msi, dmg, deb, pkg, rpm, appimage, apk, iso`                                            | `~/Downloads/_Installers`            |
+| **Archives**   | `zip, rar, 7z, tar, gz, bz2, xz, tgz`                                                         | `~/Downloads/_Archives`              |
+| **Old stuff**  | File modification age `older_than: 90d`                                                       | `~/Downloads/_Old`                   |
 
 ### Path Templating Variables
 
@@ -184,28 +203,28 @@ Usage:
 
 ### Core Commands
 
-| Command | Description | Useful Flags |
-|---|---|---|
-| `cless run` | Execute organization on watched folders | `--dry-run`, `--dir <path>`, `-y, --yes` |
-| `cless watch` | Continuously monitor folders for incoming files | `--dry-run`, `--dir <path>`, `--log-file <path>`, `--initial-run` |
-| `cless undo` | Revert previous move transactions | `--batch <id>`, `--dry-run` |
-| `cless folder list` | Display all configured watch folders | None |
-| `cless folder add <path>` | Add folder to the permanent watch list | `-r, --recursive` |
-| `cless folder remove <path>` | Remove folder from the watch list | None |
+| Command                      | Description                                     | Useful Flags                                                      |
+| ---------------------------- | ----------------------------------------------- | ----------------------------------------------------------------- |
+| `cless run`                  | Execute organization on watched folders         | `--dry-run`, `--dir <path>`, `-y, --yes`                          |
+| `cless watch`                | Continuously monitor folders for incoming files | `--dry-run`, `--dir <path>`, `--log-file <path>`, `--initial-run` |
+| `cless undo`                 | Revert previous move transactions               | `--batch <id>`, `--dry-run`                                       |
+| `cless folder list`          | Display all configured watch folders            | None                                                              |
+| `cless folder add <path>`    | Add folder to the permanent watch list          | `-r, --recursive`                                                 |
+| `cless folder remove <path>` | Remove folder from the watch list               | None                                                              |
 
 ### Configuration & Utilities
 
-| Command | Description | Useful Flags |
-|---|---|---|
-| `cless init` | Create default configuration file | `--force`, `--path <custom_path>` |
-| `cless config edit` | Open active `config.yaml` in `$EDITOR` or Notepad | None |
-| `cless config path` | Print path to the active configuration file | None |
-| `cless config validate` | Validate configuration syntax and rule definitions | None |
-| `cless rules list` | Display active rules in priority order | None |
-| `cless rules test <file>` | Test which rule matches a target filename | None |
-| `cless history` | Display recent move transactions and batch IDs | `--limit <n>`, `--batch <id>` |
-| `cless uninstall` | Remove binary and clean environment `PATH` | `--purge-config`, `-y, --yes` |
-| `cless version` | Display version, commit, and build date | None |
+| Command                   | Description                                        | Useful Flags                      |
+| ------------------------- | -------------------------------------------------- | --------------------------------- |
+| `cless init`              | Create default configuration file                  | `--force`, `--path <custom_path>` |
+| `cless config edit`       | Open active `config.yaml` in `$EDITOR` or Notepad  | None                              |
+| `cless config path`       | Print path to the active configuration file        | None                              |
+| `cless config validate`   | Validate configuration syntax and rule definitions | None                              |
+| `cless rules list`        | Display active rules in priority order             | None                              |
+| `cless rules test <file>` | Test which rule matches a target filename          | None                              |
+| `cless history`           | Display recent move transactions and batch IDs     | `--limit <n>`, `--batch <id>`     |
+| `cless uninstall`         | Remove binary and clean environment `PATH`         | `--purge-config`, `-y, --yes`     |
+| `cless version`           | Display version, commit, and build date            | None                              |
 
 ### Global Flags
 
@@ -222,7 +241,7 @@ Usage:
 2. **Cross-Volume Transfer Integrity:** When source and target reside on different physical drives or partitions, `cless` writes to a temporary file, invokes `fsync` to flush disk buffers, checks exact byte counts, performs an atomic rename, and only then deletes the source file.
 3. **Write Stability Debounce:** Files in the process of downloading or unpacking are deferred until file size and modification timestamps remain static for `stable_after_seconds`.
 4. **Non-Destructive Simulation:** `--dry-run` performs full rule evaluation and destination calculation in-memory without making filesystem modifications.
-5. **Deterministic Transaction Rollback:** Operations append structured JSON Lines records to `history.jsonl`. Restoring via `cless undo` returns files to their origins while checking target occupancy to prevent conflicts.
+5. **Deterministic Transaction Rollback:** Operations append structured JSON Lines records to `history.jsonl`. Restoring via `cless undo` returns files to their origins while checking target occupancy to prevent conflicts
 
 ---
 
@@ -243,12 +262,15 @@ Complete step-by-step setup guides are provided in [docs/AUTOSTART.md](docs/AUTO
 To remove `cless` from the system:
 
 ### Option 1: Native Command
+
 ```bash
 cless uninstall
 ```
-*Optional parameters: `-y` (skip prompt), `--purge-config` (remove config files and history).*
+
+_Optional parameters: `-y` (skip prompt), `--purge-config` (remove config files and history)._
 
 ### Option 2: Automated Script
+
 - **Windows (PowerShell):**
   ```powershell
   irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/uninstall.ps1 | iex
