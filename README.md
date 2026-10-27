@@ -20,15 +20,33 @@ The tool is engineered with safety as the primary design constraint: it never ov
 
 ## Installation
 
-### Precompiled Binaries
+### Quick Install (One-Line Terminal Command)
 
-Download the appropriate binary or archive for your operating system and architecture from the [GitHub Releases](https://github.com/Fizm00/ClutterLess-Organizer/releases) page:
+#### Windows (PowerShell)
+Open PowerShell and run:
+```powershell
+irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.ps1 | iex
+```
+
+#### Linux & macOS (Bash / Zsh)
+Open terminal and run:
+```bash
+curl -fsSL https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.sh | bash
+```
+
+Both scripts automatically detect your CPU architecture, download the latest verified release from GitHub, extract the executable to your user programs directory, and add it to your `PATH`.
+
+---
+
+### Manual Download (Precompiled Binaries)
+
+Alternatively, download the archive for your operating system directly from the [GitHub Releases](https://github.com/Fizm00/ClutterLess-Organizer/releases) page:
 
 - **Windows:** `cless_0.1.0_windows_amd64.zip` / `cless_0.1.0_windows_arm64.zip`
 - **Linux:** `cless_0.1.0_linux_amd64.tar.gz` / `cless_0.1.0_linux_arm64.tar.gz`
 - **macOS:** `cless_0.1.0_darwin_amd64.tar.gz` / `cless_0.1.0_darwin_arm64.tar.gz`
 
-Extract the binary and place it in your system `PATH` (for example, `C:\Windows\System32` or `%USERPROFILE%\bin` on Windows, or `/usr/local/bin` on Linux and macOS).
+Extract the binary and place it in any folder already in your system `PATH` (such as `%USERPROFILE%\bin` on Windows or `/usr/local/bin` on Linux/macOS).
 
 ### Install via Go
 
