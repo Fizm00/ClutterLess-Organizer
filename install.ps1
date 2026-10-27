@@ -59,3 +59,5 @@ Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Open a new terminal window."
 Write-Host "  2. Run 'cless init' to create your configuration."
 Write-Host "  3. Run 'cless run --dry-run' to test safely."
+Write-Host "  4. Type 'cless help' anytime to explore all commands and practical examples."
+

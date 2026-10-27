@@ -77,3 +77,5 @@ echo ""
 echo "Next steps:"
 echo "  1. Run 'cless init' to create your configuration."
 echo "  2. Run 'cless run --dry-run' to test safely."
+echo "  3. Type 'cless help' anytime to explore all commands and practical examples."
+
