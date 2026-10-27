@@ -1,0 +1,33 @@
+# Binaries & build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+/organizer
+
+# Test & coverage artifacts
+*.out
+*.test
+coverage.txt
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# AI assistant context, rules, and prompts
+AGENT.md
+Agent.md
+agent.md
+/prompts/
+.agents/
+.gemini/
