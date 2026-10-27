@@ -27,6 +27,13 @@ func executeCommand(args ...string) (string, error) {
 	_ = runCmd.Flags().Set("dry-run", "false")
 	_ = runCmd.Flags().Set("dir", "")
 	_ = runCmd.Flags().Set("yes", "false")
+	_ = runCmd.Flags().Set("history-file", "")
+	_ = historyCmd.Flags().Set("limit", "10")
+	_ = historyCmd.Flags().Set("batch", "")
+	_ = historyCmd.Flags().Set("history-file", "")
+	_ = undoCmd.Flags().Set("batch", "")
+	_ = undoCmd.Flags().Set("dry-run", "false")
+	_ = undoCmd.Flags().Set("history-file", "")
 
 	err := rootCmd.Execute()
 	return buf.String(), err
@@ -177,4 +184,77 @@ func TestRunCommand(t *testing.T) {
 		}
 	})
 }
+
+func TestHistoryAndUndoCommands(t *testing.T) {
+	tempDir := t.TempDir()
+	cfgPath := filepath.Join(tempDir, "config.yaml")
+	histFile := filepath.Join(tempDir, "history.jsonl")
+
+	if err := os.WriteFile(cfgPath, []byte(config.DefaultYAML()), 0600); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	workDir := filepath.Join(tempDir, "work")
+	_ = os.MkdirAll(workDir, 0755)
+
+	docFile := filepath.Join(workDir, "report.pdf")
+	_ = os.WriteFile(docFile, []byte("report pdf content"), 0600)
+
+	// 1. Run real move
+	runOut, err := executeCommand("run", "--dir", workDir, "--config", cfgPath, "--history-file", histFile)
+	if err != nil {
+		t.Fatalf("unexpected run error: %v, output: %s", err, runOut)
+	}
+	if !strings.Contains(runOut, "[MOVE]") {
+		t.Fatalf("expected [MOVE] in output: %s", runOut)
+	}
+
+	// 2. Test history list
+	histOut, err := executeCommand("history", "--history-file", histFile)
+	if err != nil {
+		t.Fatalf("unexpected history error: %v, output: %s", err, histOut)
+	}
+	if !strings.Contains(histOut, "Recent Batches") || !strings.Contains(histOut, "active") {
+		t.Errorf("unexpected history output: %s", histOut)
+	}
+
+	// 3. Test undo --dry-run
+	undoDryOut, err := executeCommand("undo", "--dry-run", "--config", cfgPath, "--history-file", histFile)
+	if err != nil {
+		t.Fatalf("unexpected undo dry-run error: %v, output: %s", err, undoDryOut)
+	}
+	if !strings.Contains(undoDryOut, "[DRY-RUN]") || !strings.Contains(undoDryOut, "restored 1") {
+		t.Errorf("unexpected undo dry-run output: %s", undoDryOut)
+	}
+
+	// Verify file is still at dest
+	if _, err := os.Stat(docFile); !os.IsNotExist(err) {
+		t.Errorf("undo dry-run restored file prematurely!")
+	}
+
+	// 4. Test real undo
+	undoOut, err := executeCommand("undo", "--config", cfgPath, "--history-file", histFile)
+	if err != nil {
+		t.Fatalf("unexpected undo error: %v, output: %s", err, undoOut)
+	}
+	if !strings.Contains(undoOut, "[RESTORE]") || !strings.Contains(undoOut, "restored 1") {
+		t.Errorf("unexpected undo output: %s", undoOut)
+	}
+
+	// Verify file restored to workDir
+	content, err := os.ReadFile(docFile)
+	if err != nil || string(content) != "report pdf content" {
+		t.Errorf("file not restored properly: %v", err)
+	}
+
+	// 5. Test double undo (should be clean no-op)
+	undoOut2, err := executeCommand("undo", "--config", cfgPath, "--history-file", histFile)
+	if err != nil {
+		t.Fatalf("unexpected double undo error: %v", err)
+	}
+	if !strings.Contains(undoOut2, "no active batches") && !strings.Contains(undoOut2, "already been completely undone") {
+		t.Errorf("unexpected double undo output: %s", undoOut2)
+	}
+}
+
 

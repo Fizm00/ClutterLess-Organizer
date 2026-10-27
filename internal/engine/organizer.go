@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Fizm00/organizer/internal/config"
+	"github.com/Fizm00/organizer/internal/history"
 )
 
 // RunOptions configures an Organizer execution run.
@@ -29,23 +30,27 @@ type RunStats struct {
 	Failed    int
 }
 
-// RunResult contains the complete list of move results and overall counts.
+// RunResult contains the complete list of move results, batch ID, and overall counts.
 type RunResult struct {
-	Moves []MoveResult
-	Stats RunStats
+	BatchID string
+	Moves   []MoveResult
+	Stats   RunStats
 }
 
-// Organizer coordinates planning and execution of file organization.
+// Organizer coordinates planning, execution, history recording, and undo of file organization.
 type Organizer struct {
-	Config *config.Config
-	Mover  *Mover
+	Config  *config.Config
+	Mover   *Mover
+	History *history.Storage
 }
 
-// NewOrganizer creates an Organizer with the provided configuration.
+// NewOrganizer creates an Organizer with the provided configuration and default history storage.
 func NewOrganizer(cfg *config.Config) *Organizer {
+	hist, _ := history.NewStorage("")
 	return &Organizer{
-		Config: cfg,
-		Mover:  NewMover(cfg.Settings.Conflict),
+		Config:  cfg,
+		Mover:   NewMover(cfg.Settings.Conflict),
+		History: hist,
 	}
 }
 
@@ -150,7 +155,7 @@ func (o *Organizer) Run(ctx context.Context, opts RunOptions) (RunResult, error)
 	var results []MoveResult
 	var stats RunStats
 
-	// Dry run mode: calculate counts without executing any move
+	// Dry run mode: calculate counts without executing any move and without writing history
 	if opts.DryRun {
 		for _, pm := range allPlans {
 			res := MoveResult{
@@ -175,9 +180,12 @@ func (o *Organizer) Run(ctx context.Context, opts RunOptions) (RunResult, error)
 	}
 
 	// Real execution mode: execute each move sequentially
+	batchID := history.GenerateBatchID(now)
+	var historyRecords []history.Record
+
 	for _, pm := range allPlans {
 		if err := ctx.Err(); err != nil {
-			return RunResult{Moves: results, Stats: stats}, err
+			return RunResult{BatchID: batchID, Moves: results, Stats: stats}, err
 		}
 
 		res, err := o.Mover.Move(ctx, pm)
@@ -197,10 +205,27 @@ func (o *Organizer) Run(ctx context.Context, opts RunOptions) (RunResult, error)
 			}
 		} else {
 			stats.Moved++
+			// Record real move into batch
+			historyRecords = append(historyRecords, history.Record{
+				BatchID: batchID,
+				Time:    now.UTC(),
+				Source:  res.Source,
+				Dest:    res.Dest,
+				Rule:    res.RuleName,
+				Size:    res.Size,
+				Status:  history.StatusMoved,
+			})
 		}
 
 		results = append(results, res)
 	}
 
-	return RunResult{Moves: results, Stats: stats}, nil
+	// Persist history if any real moves were performed
+	if len(historyRecords) > 0 && o.History != nil {
+		if err := o.History.Append(historyRecords); err != nil {
+			return RunResult{BatchID: batchID, Moves: results, Stats: stats}, fmt.Errorf("failed to save history: %w", err)
+		}
+	}
+
+	return RunResult{BatchID: batchID, Moves: results, Stats: stats}, nil
 }

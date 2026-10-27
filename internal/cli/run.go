@@ -9,6 +9,7 @@ import (
 
 	"github.com/Fizm00/organizer/internal/config"
 	"github.com/Fizm00/organizer/internal/engine"
+	"github.com/Fizm00/organizer/internal/history"
 	"github.com/spf13/cobra"
 )
 
@@ -29,8 +30,15 @@ var runCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		dirOverride, _ := cmd.Flags().GetString("dir")
+		histFile, _ := cmd.Flags().GetString("history-file")
 
 		organizer := engine.NewOrganizer(cfg)
+		if histFile != "" {
+			if h, err := history.NewStorage(histFile); err == nil {
+				organizer.History = h
+			}
+		}
+
 		out := cmd.OutOrStdout()
 
 		opts := engine.RunOptions{
@@ -83,5 +91,6 @@ func init() {
 	runCmd.Flags().Bool("dry-run", false, "preview planned moves without making changes")
 	runCmd.Flags().String("dir", "", "organize this folder only (overrides config watch)")
 	runCmd.Flags().Bool("yes", false, "skip confirmation prompts")
+	runCmd.Flags().String("history-file", "", "custom path to history.jsonl file")
 	rootCmd.AddCommand(runCmd)
 }
