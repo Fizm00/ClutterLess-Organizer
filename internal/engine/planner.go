@@ -10,36 +10,11 @@ import (
 	"time"
 
 	"github.com/Fizm00/organizer/internal/config"
-	"github.com/Fizm00/organizer/internal/platform"
 )
 
-// ShouldIgnoreFile checks whether a file should be ignored based on global settings:
-// ignored extensions, ignored exact names, or hidden file attributes.
+// ShouldIgnoreFile checks whether a file should be ignored based on global settings.
 func ShouldIgnoreFile(filePath string, fileName string, settings config.Settings) (bool, string) {
-	// 1. Check ignored extensions
-	ext := ExtractExt(fileName)
-	for _, ignExt := range settings.IgnoreExt {
-		cleanIgnExt := strings.ToLower(strings.TrimPrefix(strings.TrimSpace(ignExt), "."))
-		if strings.EqualFold(ext, cleanIgnExt) {
-			return true, fmt.Sprintf("ignored extension %q", ext)
-		}
-	}
-
-	// 2. Check ignored names
-	for _, ignName := range settings.IgnoreNames {
-		if strings.EqualFold(fileName, strings.TrimSpace(ignName)) {
-			return true, fmt.Sprintf("ignored name %q", fileName)
-		}
-	}
-
-	// 3. Check hidden files
-	if settings.IgnoreHidden != nil && *settings.IgnoreHidden {
-		if platform.IsHidden(filePath) {
-			return true, "ignored hidden file"
-		}
-	}
-
-	return false, ""
+	return config.ShouldIgnoreFile(filePath, fileName, settings)
 }
 
 // PlanFile calculates the PlannedMove for a single file without modifying anything on disk.

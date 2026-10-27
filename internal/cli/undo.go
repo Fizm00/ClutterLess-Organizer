@@ -14,9 +14,9 @@ import (
 )
 
 var (
-	undoBatchID   string
-	undoDryRun    bool
-	undoHistFile  string
+	undoBatchID  string
+	undoDryRun   bool
+	undoHistFile string
 )
 
 var undoCmd = &cobra.Command{

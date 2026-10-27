@@ -4,10 +4,13 @@ package cli
 
 import (
 	"bytes"
+	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Fizm00/organizer/internal/config"
 )
@@ -34,8 +37,43 @@ func executeCommand(args ...string) (string, error) {
 	_ = undoCmd.Flags().Set("batch", "")
 	_ = undoCmd.Flags().Set("dry-run", "false")
 	_ = undoCmd.Flags().Set("history-file", "")
+	_ = watchCmd.Flags().Set("dry-run", "false")
+	_ = watchCmd.Flags().Set("log-file", "")
+	_ = watchCmd.Flags().Set("initial-run", "false")
+	_ = watchCmd.Flags().Set("history-file", "")
 
 	err := rootCmd.Execute()
+	return buf.String(), err
+}
+
+func executeCommandContext(ctx context.Context, args ...string) (string, error) {
+	buf := new(bytes.Buffer)
+	rootCmd.SetOut(buf)
+	rootCmd.SetErr(buf)
+	rootCmd.SetArgs(args)
+
+	// Reset persistent and command flags
+	_ = rootCmd.PersistentFlags().Set("config", "")
+	_ = rootCmd.PersistentFlags().Set("verbose", "false")
+	_ = rootCmd.PersistentFlags().Set("no-color", "false")
+	_ = initCmd.Flags().Set("force", "false")
+	_ = initCmd.Flags().Set("path", "")
+	_ = runCmd.Flags().Set("dry-run", "false")
+	_ = runCmd.Flags().Set("dir", "")
+	_ = runCmd.Flags().Set("yes", "false")
+	_ = runCmd.Flags().Set("history-file", "")
+	_ = historyCmd.Flags().Set("limit", "10")
+	_ = historyCmd.Flags().Set("batch", "")
+	_ = historyCmd.Flags().Set("history-file", "")
+	_ = undoCmd.Flags().Set("batch", "")
+	_ = undoCmd.Flags().Set("dry-run", "false")
+	_ = undoCmd.Flags().Set("history-file", "")
+	_ = watchCmd.Flags().Set("dry-run", "false")
+	_ = watchCmd.Flags().Set("log-file", "")
+	_ = watchCmd.Flags().Set("initial-run", "false")
+	_ = watchCmd.Flags().Set("history-file", "")
+
+	err := rootCmd.ExecuteContext(ctx)
 	return buf.String(), err
 }
 
@@ -250,11 +288,56 @@ func TestHistoryAndUndoCommands(t *testing.T) {
 	// 5. Test double undo (should be clean no-op)
 	undoOut2, err := executeCommand("undo", "--config", cfgPath, "--history-file", histFile)
 	if err != nil {
-		t.Fatalf("unexpected double undo error: %v", err)
+		t.Fatalf("unexpected double undo error: %v, output: %s", err, undoOut2)
 	}
 	if !strings.Contains(undoOut2, "no active batches") && !strings.Contains(undoOut2, "already been completely undone") {
 		t.Errorf("unexpected double undo output: %s", undoOut2)
 	}
 }
 
+func TestWatchCommand(t *testing.T) {
+	tempDir := t.TempDir()
+	watchDir := filepath.Join(tempDir, "WatchFolder")
+	_ = os.MkdirAll(watchDir, 0755)
 
+	cfgPath := filepath.Join(tempDir, "config.yaml")
+	histFile := filepath.Join(tempDir, "history.jsonl")
+	logFile := filepath.Join(tempDir, "watch.log")
+
+	// Custom config pointing to watchDir
+	cfgContent := fmt.Sprintf(`version: 1
+watch:
+  - path: %q
+    recursive: false
+rules:
+  - name: PDFs
+    match:
+      ext: [pdf]
+    move_to: %q
+`, watchDir, filepath.Join(tempDir, "Output"))
+
+	if err := os.WriteFile(cfgPath, []byte(cfgContent), 0600); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	// Create a pre-existing file in watchDir
+	initialDoc := filepath.Join(watchDir, "initial.pdf")
+	_ = os.WriteFile(initialDoc, []byte("pre-existing doc"), 0600)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 250*time.Millisecond)
+	defer cancel()
+
+	out, err := executeCommandContext(ctx, "watch", "--config", cfgPath, "--history-file", histFile, "--log-file", logFile, "--initial-run")
+	if err != nil && err != context.DeadlineExceeded && err != context.Canceled {
+		t.Fatalf("unexpected watch error: %v, output: %s", err, out)
+	}
+
+	if !strings.Contains(out, "Watching 1 configured directories") || !strings.Contains(out, "Watch stopped") {
+		t.Errorf("unexpected watch command output: %s", out)
+	}
+
+	// Verify log file was written
+	if _, err := os.Stat(logFile); err != nil {
+		t.Errorf("log file was not created: %v", err)
+	}
+}
