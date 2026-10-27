@@ -64,10 +64,10 @@ func SanitizeSegment(s string) string {
 	}
 
 	// 3. Check for Windows reserved device names (e.g., CON, PRN, NUL)
-	// Both "CON" and "CON.txt" are forbidden by Windows.
+	// Both "CON", "CON.txt", and "CON.tar.gz" are forbidden by Windows.
 	base := result
-	if ext := filepath.Ext(result); ext != "" {
-		base = strings.TrimSuffix(result, ext)
+	if dotIdx := strings.Index(result, "."); dotIdx != -1 {
+		base = result[:dotIdx]
 	}
 
 	if windowsReservedNames[strings.ToUpper(base)] {

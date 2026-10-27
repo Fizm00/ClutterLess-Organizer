@@ -138,11 +138,29 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 	}
 	srcSize := srcInfo.Size()
 
-	// 3. Resolve destination path and handle conflicts
+	// 3. Check for identical source and destination
+	if platform.PathEqual(pm.Source, pm.Dest) {
+		return MoveResult{
+			Source:   pm.Source,
+			Dest:     pm.Dest,
+			Size:     srcSize,
+			RuleName: pm.RuleName,
+			Skipped:  true,
+			Reason:   "source and destination are identical",
+		}, nil
+	}
+
+	// 4. Resolve destination path and handle conflicts
 	finalDest := pm.Dest
 	destExists := func(p string) bool {
-		_, err := os.Stat(p)
-		return err == nil
+		destInfo, err := os.Stat(p)
+		if err == nil {
+			if os.SameFile(srcInfo, destInfo) {
+				return false
+			}
+			return true
+		}
+		return false
 	}
 
 	if destExists(finalDest) {
@@ -159,7 +177,20 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 		finalDest = ResolveConflictDest(finalDest, destExists)
 	}
 
-	// 4. Ensure destination directory exists
+	// 5. Validate path length (Windows 260 MAX_PATH limit)
+	if err := platform.CheckPathLength(finalDest); err != nil {
+		return MoveResult{
+			Source:   pm.Source,
+			Dest:     finalDest,
+			Size:     srcSize,
+			RuleName: pm.RuleName,
+			Failed:   true,
+			Reason:   err.Error(),
+			Error:    err,
+		}, nil
+	}
+
+	// 6. Ensure destination directory exists
 	destDir := filepath.Dir(finalDest)
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		return MoveResult{

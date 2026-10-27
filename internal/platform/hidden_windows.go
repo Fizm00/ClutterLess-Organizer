@@ -9,12 +9,23 @@ import (
 	"syscall"
 )
 
+// GetFileAttributesHook allows mocking Windows file attributes for tests.
+var GetFileAttributesHook func(path string) (uint32, error)
+
 // IsHidden returns true if a file is considered hidden on Windows
-// (dotfile naming convention or FILE_ATTRIBUTE_HIDDEN attribute).
+// (dotfile naming convention, FILE_ATTRIBUTE_HIDDEN, or FILE_ATTRIBUTE_SYSTEM).
 func IsHidden(path string) bool {
 	base := filepath.Base(path)
 	if strings.HasPrefix(base, ".") {
 		return true
+	}
+
+	if GetFileAttributesHook != nil {
+		attrs, err := GetFileAttributesHook(path)
+		if err != nil {
+			return false
+		}
+		return (attrs & (syscall.FILE_ATTRIBUTE_HIDDEN | syscall.FILE_ATTRIBUTE_SYSTEM)) != 0
 	}
 
 	ptr, err := syscall.UTF16PtrFromString(path)
@@ -25,5 +36,5 @@ func IsHidden(path string) bool {
 	if err != nil {
 		return false
 	}
-	return (attrs & syscall.FILE_ATTRIBUTE_HIDDEN) != 0
+	return (attrs & (syscall.FILE_ATTRIBUTE_HIDDEN | syscall.FILE_ATTRIBUTE_SYSTEM)) != 0
 }

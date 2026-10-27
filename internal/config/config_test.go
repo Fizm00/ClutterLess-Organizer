@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/Fizm00/organizer/internal/platform"
 )
 
 func TestParseSize_Valid(t *testing.T) {
@@ -158,6 +160,23 @@ func TestExpandPath(t *testing.T) {
 	t.Run("tilde expansion", func(t *testing.T) {
 		expanded := ExpandPath("~/Downloads")
 		expected := filepath.Join(home, "Downloads")
+		if expanded != expected {
+			t.Errorf("expected %q, got %q", expected, expanded)
+		}
+	})
+
+	t.Run("known folder redirection expansion", func(t *testing.T) {
+		defer func() { platform.KnownFolderHook = nil }()
+		mockOneDriveDesktop := filepath.Join(home, "OneDrive", "Desktop")
+		platform.KnownFolderHook = func(f platform.FolderType) (string, error) {
+			if f == platform.FolderDesktop {
+				return mockOneDriveDesktop, nil
+			}
+			return "", nil
+		}
+
+		expanded := ExpandPath("~/Desktop/Sub")
+		expected := filepath.Join(mockOneDriveDesktop, "Sub")
 		if expanded != expected {
 			t.Errorf("expected %q, got %q", expected, expanded)
 		}
