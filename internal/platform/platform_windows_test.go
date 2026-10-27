@@ -51,3 +51,44 @@ func TestIsHidden_WindowsAttributes(t *testing.T) {
 		t.Errorf("expected mock with FILE_ATTRIBUTE_HIDDEN to be identified as hidden")
 	}
 }
+
+func TestIsFileLockedError_Windows(t *testing.T) {
+	lockedErr := &os.PathError{
+		Op:   "rename",
+		Path: "test.txt",
+		Err:  syscall.Errno(ERROR_SHARING_VIOLATION),
+	}
+	if !IsFileLockedError(lockedErr) {
+		t.Errorf("expected ERROR_SHARING_VIOLATION to be recognized as locked error on Windows")
+	}
+
+	lockViolationErr := &os.PathError{
+		Op:   "rename",
+		Path: "test.txt",
+		Err:  syscall.Errno(ERROR_LOCK_VIOLATION),
+	}
+	if !IsFileLockedError(lockViolationErr) {
+		t.Errorf("expected ERROR_LOCK_VIOLATION to be recognized as locked error on Windows")
+	}
+
+	otherErr := &os.PathError{
+		Op:   "rename",
+		Path: "test.txt",
+		Err:  syscall.ENOENT,
+	}
+	if IsFileLockedError(otherErr) {
+		t.Errorf("ENOENT should not be recognized as locked error")
+	}
+}
+
+func TestIsCrossDeviceError_Windows(t *testing.T) {
+	crossDevErr := &os.LinkError{
+		Op:  "rename",
+		Old: "C:\\file.txt",
+		New: "D:\\file.txt",
+		Err: syscall.Errno(ERROR_NOT_SAME_DEVICE),
+	}
+	if !IsCrossDeviceError(crossDevErr) {
+		t.Errorf("expected ERROR_NOT_SAME_DEVICE to be recognized as cross-device error")
+	}
+}

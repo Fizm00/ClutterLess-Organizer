@@ -9,6 +9,15 @@ import (
 	"syscall"
 )
 
+const (
+	// ERROR_NOT_SAME_DEVICE is the Windows error code for cross-volume move attempts, defined here for cross-platform compatibility.
+	ERROR_NOT_SAME_DEVICE syscall.Errno = 17
+	// ERROR_SHARING_VIOLATION indicates the file is in use by another process.
+	ERROR_SHARING_VIOLATION syscall.Errno = 32
+	// ERROR_LOCK_VIOLATION indicates a lock violation on the file.
+	ERROR_LOCK_VIOLATION syscall.Errno = 33
+)
+
 // IsCrossDeviceError checks if an error indicates EXDEV on non-Windows systems.
 func IsCrossDeviceError(err error) bool {
 	if err == nil {

@@ -74,35 +74,8 @@ func TestKnownFolder_OneDriveMock(t *testing.T) {
 	}
 }
 
-func TestIsFileLockedError(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		lockedErr := &os.PathError{
-			Op:   "rename",
-			Path: "test.txt",
-			Err:  syscall.Errno(ERROR_SHARING_VIOLATION),
-		}
-		if !IsFileLockedError(lockedErr) {
-			t.Errorf("expected ERROR_SHARING_VIOLATION to be recognized as locked error on Windows")
-		}
-
-		lockViolationErr := &os.PathError{
-			Op:   "rename",
-			Path: "test.txt",
-			Err:  syscall.Errno(ERROR_LOCK_VIOLATION),
-		}
-		if !IsFileLockedError(lockViolationErr) {
-			t.Errorf("expected ERROR_LOCK_VIOLATION to be recognized as locked error on Windows")
-		}
-
-		otherErr := &os.PathError{
-			Op:   "rename",
-			Path: "test.txt",
-			Err:  syscall.ENOENT,
-		}
-		if IsFileLockedError(otherErr) {
-			t.Errorf("ENOENT should not be recognized as locked error")
-		}
-	} else {
+func TestIsFileLockedError_NonWindows(t *testing.T) {
+	if runtime.GOOS != "windows" {
 		randomErr := errors.New("arbitrary error")
 		if IsFileLockedError(randomErr) {
 			t.Errorf("IsFileLockedError should always return false on non-Windows")
@@ -111,18 +84,6 @@ func TestIsFileLockedError(t *testing.T) {
 }
 
 func TestIsCrossDeviceError(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		crossDevErr := &os.LinkError{
-			Op:  "rename",
-			Old: "C:\\file.txt",
-			New: "D:\\file.txt",
-			Err: syscall.Errno(ERROR_NOT_SAME_DEVICE),
-		}
-		if !IsCrossDeviceError(crossDevErr) {
-			t.Errorf("expected ERROR_NOT_SAME_DEVICE to be recognized as cross-device error")
-		}
-	}
-
 	exdevErr := &os.LinkError{
 		Op:  "rename",
 		Old: "/mnt/a/file.txt",
