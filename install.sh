@@ -40,8 +40,8 @@ esac
 # 2. Get latest release from GitHub API
 REPO="Fizm00/ClutterLess-Organizer"
 API_URL="https://api.github.com/repos/${REPO}/releases/latest"
-TAG="v0.1.0"
-VERSION="0.1.0"
+TAG="v0.2.0"
+VERSION="0.2.0"
 
 LATEST_TAG=$(curl -sSL "$API_URL" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || true)
 if [ -n "$LATEST_TAG" ]; then

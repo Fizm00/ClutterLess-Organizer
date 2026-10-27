@@ -15,8 +15,8 @@ if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
 # 2. Get latest release version from GitHub API
 $repo = "Fizm00/ClutterLess-Organizer"
 $apiUrl = "https://api.github.com/repos/$repo/releases/latest"
-$tag = "v0.1.0"
-$version = "0.1.0"
+$tag = "v0.2.0"
+$version = "0.2.0"
 
 try {
     $releaseJson = Invoke-RestMethod -Uri $apiUrl -Headers @{ "User-Agent" = "cless-installer" }

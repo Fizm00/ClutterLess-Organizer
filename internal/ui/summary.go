@@ -5,6 +5,7 @@ package ui
 import (
 	"fmt"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -18,36 +19,48 @@ type SummaryStats struct {
 	DryRun    bool
 }
 
-// RenderSummaryBox prints a stylish boxed summary.
+// RenderSummaryBox prints a stylish, fully-framed boxed summary card.
 func RenderSummaryBox(w io.Writer, stats SummaryStats, styler *Styler) {
 	fmt.Fprintln(w)
-	line := "─────────────────────────────────────────────────────────────"
-	fmt.Fprintln(w, styler.Dim("┌"+line+"┐"))
-	fmt.Fprintln(w, styler.Dim("│")+" "+styler.Bold("            ClutterLess Organizer — Execution Summary        ")+" "+styler.Dim("│"))
-	fmt.Fprintln(w, styler.Dim("├"+line+"┤"))
+	const innerWidth = 59
+	borderLine := strings.Repeat("─", innerWidth+2)
 
-	durStr := fmt.Sprintf("%.3fs", stats.Duration.Seconds())
+	row := func(content string) string {
+		return styler.Dim("│") + " " + PadRight(content, innerWidth) + " " + styler.Dim("│")
+	}
+
+	header := styler.Bold("          ClutterLess Organizer — Execution Summary")
+
+	modeVal := styler.Green("Live Execution (Files successfully moved)")
 	if stats.DryRun {
-		fmt.Fprintf(w, "%s  Mode:      %s\n", styler.Dim("│"), styler.Cyan("Dry Run (Preview Only — no files were moved)"))
-	} else {
-		fmt.Fprintf(w, "%s  Mode:      %s\n", styler.Dim("│"), styler.Green("Live Execution (Files successfully moved)"))
+		modeVal = styler.Cyan("Dry Run (Preview Only — no changes made)")
 	}
-	fmt.Fprintf(w, "%s  Duration:  %s\n", styler.Dim("│"), durStr)
-	fmt.Fprintln(w, styler.Dim("├"+line+"┤"))
 
-	fmt.Fprintf(w, "%s  ✔  %-11s %s\n", styler.Dim("│"), styler.Bold("Moved:"), styler.Green(fmt.Sprintf("%d files", stats.Moved)))
-	fmt.Fprintf(w, "%s  -  %-11s %s\n", styler.Dim("│"), styler.Dim("Skipped:"), styler.Dim(fmt.Sprintf("%d files (ignored / metadata)", stats.Skipped)))
+	durVal := fmt.Sprintf("%.3fs", stats.Duration.Seconds())
+	movedVal := styler.Green(Plural(stats.Moved, "file", "files"))
+	skippedVal := styler.Dim(fmt.Sprintf("%s (ignored / metadata)", Plural(stats.Skipped, "file", "files")))
+
+	unmatchedVal := styler.Dim("0 files")
 	if stats.Unmatched > 0 {
-		fmt.Fprintf(w, "%s  ?  %-11s %s\n", styler.Dim("│"), styler.Yellow("Unmatched:"), styler.Yellow(fmt.Sprintf("%d files (left safely in place)", stats.Unmatched)))
-	} else {
-		fmt.Fprintf(w, "%s  ?  %-11s %s\n", styler.Dim("│"), styler.Dim("Unmatched:"), styler.Dim("0 files"))
+		unmatchedVal = styler.Yellow(fmt.Sprintf("%s (left safely in place)", Plural(stats.Unmatched, "file", "files")))
 	}
+
+	failedVal := styler.Dim("0 errors")
 	if stats.Failed > 0 {
-		fmt.Fprintf(w, "%s  ✖  %-11s %s\n", styler.Dim("│"), styler.Bold(styler.Red("Failed:")), styler.Red(fmt.Sprintf("%d errors", stats.Failed)))
-	} else {
-		fmt.Fprintf(w, "%s  ✖  %-11s %s\n", styler.Dim("│"), styler.Dim("Failed:"), styler.Dim("0 errors"))
+		failedVal = styler.Bold(styler.Red(Plural(stats.Failed, "error", "errors")))
 	}
-	fmt.Fprintln(w, styler.Dim("└"+line+"┘"))
+
+	fmt.Fprintln(w, styler.Dim("┌"+borderLine+"┐"))
+	fmt.Fprintln(w, row(header))
+	fmt.Fprintln(w, styler.Dim("├"+borderLine+"┤"))
+	fmt.Fprintln(w, row(styler.Dim("Mode:      ")+modeVal))
+	fmt.Fprintln(w, row(styler.Dim("Duration:  ")+durVal))
+	fmt.Fprintln(w, styler.Dim("├"+borderLine+"┤"))
+	fmt.Fprintln(w, row(styler.Green("✔ ")+styler.Bold("Moved:    ")+" "+movedVal))
+	fmt.Fprintln(w, row(styler.Dim("- ")+styler.Dim("Skipped:  ")+" "+skippedVal))
+	fmt.Fprintln(w, row(styler.Yellow("? ")+styler.Dim("Unmatched:")+" "+unmatchedVal))
+	fmt.Fprintln(w, row(styler.Red("✖ ")+styler.Dim("Failed:   ")+" "+failedVal))
+	fmt.Fprintln(w, styler.Dim("└"+borderLine+"┘"))
 
 	// Retain machine/script convention output line
 	fmt.Fprintf(w, "\nSummary: moved %d, skipped %d, unmatched %d, failed %d\n",
