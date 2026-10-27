@@ -10,7 +10,7 @@ Update the Status column at the end of every phase.
 | 3 | History & Undo | JSONL history, batches, `history`, `undo` | DONE |
 | 4 | Watch | fsnotify watcher, stability check, debounce, `watch` | DONE |
 | 5 | Platform polish | Windows known folders, hidden attr, locked-file handling, Linux/macOS verification, autostart docs | DONE |
-| 6 | Release | goreleaser, GitHub Actions, README, usage docs, v0.1.0 | TODO |
+| 6 | Release | goreleaser, GitHub Actions, README, usage docs, v0.1.0 | DONE |
 | 7 | GUI (future) | Wails or Fyne GUI over existing engine | LATER |
 
 ## Phase details and acceptance criteria

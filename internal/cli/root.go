@@ -18,8 +18,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "organizer",
-	Short: "Smart local file organizer and automator",
+	Use:     "organizer",
+	Aliases: []string{"cless"},
+	Short:   "Smart local file organizer and automator",
 	Long: `ClutterLess Organizer (organizer / cless) is a cross-platform CLI tool that
 watches messy folders and automatically organizes files based on user-defined rules.`,
 	SilenceUsage:  true,

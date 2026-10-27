@@ -1,0 +1,87 @@
+# ClutterLess Organizer (cless) - Example Configuration File
+# Copy to the default configuration location:
+#   Windows: %APPDATA%\organizer\config.yaml
+#   Linux:   ~/.config/organizer/config.yaml
+#   macOS:   ~/Library/Application Support/organizer/config.yaml
+
+version: 1
+
+settings:
+  stable_after_seconds: 3
+  ignore_ext:
+    - crdownload
+    - part
+    - tmp
+    - download
+    - partial
+    - opdownload
+  ignore_names:
+    - desktop.ini
+    - thumbs.db
+    - .DS_Store
+  ignore_hidden: true
+  conflict: rename
+  fallback_dir: ""
+
+watch:
+  - path: ~/Downloads
+    recursive: false
+  - path: ~/Desktop
+    recursive: false
+
+rules:
+  - name: Images
+    match:
+      ext:
+        - jpg
+        - jpeg
+        - png
+        - gif
+        - webp
+        - bmp
+        - svg
+    move_to: ~/Pictures/Sorted/{year}
+
+  - name: Documents
+    match:
+      ext:
+        - pdf
+        - docx
+        - doc
+        - xlsx
+        - xls
+        - pptx
+        - txt
+        - md
+    move_to: ~/Documents/Inbox/{ext}
+
+  - name: Invoices
+    match:
+      name_regex: "(?i)(invoice|faktur|receipt|kwitansi)"
+    move_to: ~/Documents/Finance/{year}-{month}
+
+  - name: Installers
+    match:
+      ext:
+        - exe
+        - msi
+        - dmg
+        - deb
+        - pkg
+    move_to: ~/Downloads/_Installers
+
+  - name: Archives
+    match:
+      ext:
+        - zip
+        - rar
+        - 7z
+        - tar
+        - gz
+      min_size: 1MB
+    move_to: ~/Downloads/_Archives
+
+  - name: Old stuff
+    match:
+      older_than: 90d
+    move_to: ~/Downloads/_Old
