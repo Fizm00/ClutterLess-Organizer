@@ -12,6 +12,7 @@ import (
 	"github.com/Fizm00/organizer/internal/config"
 	"github.com/Fizm00/organizer/internal/engine"
 	"github.com/Fizm00/organizer/internal/history"
+	"github.com/Fizm00/organizer/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -64,32 +65,36 @@ var watchCmd = &cobra.Command{
 			logWriter = io.MultiWriter(out, lf)
 		}
 
+		colorOn := ui.ShouldUseColor(noColor, out)
+		styler := ui.NewStyler(colorOn)
+
 		// Handle graceful shutdown on Ctrl+C or termination signals
 		ctx, stop := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
 		defer stop()
 
-		fmt.Fprintf(logWriter, "Watching %d configured directories (press Ctrl+C to stop)...\n", len(cfg.Watch))
+		fmt.Fprintf(logWriter, "%s Watching %d configured directories (press Ctrl+C to stop)...\n",
+			styler.Green("●"), len(cfg.Watch))
 
 		opts := engine.WatchOptions{
 			InitialRun: watchInitialRun,
 			DryRun:     watchDryRun,
 			LogFn: func(m engine.MoveResult) {
 				if m.Failed {
-					fmt.Fprintf(logWriter, "[FAIL] %s -> %s (error: %s)\n", m.Source, m.Dest, m.Reason)
+					fmt.Fprintf(logWriter, "%s %s -> %s (error: %s)\n", styler.BadgeFail(), m.Source, m.Dest, m.Reason)
 				} else if m.Skipped {
 					if m.Reason != "" && m.Reason != "unmatched" {
-						fmt.Fprintf(logWriter, "[SKIP] %s (%s)\n", m.Source, m.Reason)
+						fmt.Fprintf(logWriter, "%s %s (%s)\n", styler.BadgeSkip(), m.Source, m.Reason)
 					}
 				} else {
-					prefix := "[MOVE]"
+					badge := styler.BadgeMove()
 					if watchDryRun {
-						prefix = "[DRY-RUN]"
+						badge = styler.BadgeDryRun()
 					}
 					ruleInfo := ""
 					if m.RuleName != "" {
-						ruleInfo = fmt.Sprintf(" (rule: %s)", m.RuleName)
+						ruleInfo = " " + styler.RuleTag(m.RuleName)
 					}
-					fmt.Fprintf(logWriter, "%s %s -> %s%s\n", prefix, m.Source, m.Dest, ruleInfo)
+					fmt.Fprintf(logWriter, "%s %s -> %s%s\n", badge, m.Source, m.Dest, ruleInfo)
 				}
 			},
 		}
