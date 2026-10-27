@@ -41,6 +41,8 @@ func executeCommand(args ...string) (string, error) {
 	_ = watchCmd.Flags().Set("log-file", "")
 	_ = watchCmd.Flags().Set("initial-run", "false")
 	_ = watchCmd.Flags().Set("history-file", "")
+	_ = watchCmd.Flags().Set("dir", "")
+	_ = folderAddCmd.Flags().Set("recursive", "false")
 
 	err := rootCmd.Execute()
 	return buf.String(), err
@@ -72,6 +74,8 @@ func executeCommandContext(ctx context.Context, args ...string) (string, error) 
 	_ = watchCmd.Flags().Set("log-file", "")
 	_ = watchCmd.Flags().Set("initial-run", "false")
 	_ = watchCmd.Flags().Set("history-file", "")
+	_ = watchCmd.Flags().Set("dir", "")
+	_ = folderAddCmd.Flags().Set("recursive", "false")
 
 	err := rootCmd.ExecuteContext(ctx)
 	return buf.String(), err
@@ -341,3 +345,71 @@ rules:
 		t.Errorf("log file was not created: %v", err)
 	}
 }
+
+func TestFolderCommands(t *testing.T) {
+	tempDir := t.TempDir()
+	cfgPath := filepath.Join(tempDir, "config.yaml")
+
+	_, err := executeCommand("init", "--path", cfgPath)
+	if err != nil {
+		t.Fatalf("failed to init config: %v", err)
+	}
+
+	// 1. List folders (should only have Downloads initially)
+	out, err := executeCommand("--config", cfgPath, "folder", "list")
+	if err != nil {
+		t.Fatalf("folder list failed: %v, out: %s", err, out)
+	}
+	if !strings.Contains(out, "Downloads") {
+		t.Errorf("expected list to show Downloads, got: %s", out)
+	}
+
+	// 2. Add Desktop
+	out, err = executeCommand("--config", cfgPath, "folder", "add", "~/Desktop")
+	if err != nil {
+		t.Fatalf("folder add failed: %v, out: %s", err, out)
+	}
+	if !strings.Contains(out, "Successfully added") {
+		t.Errorf("expected success message, got: %s", out)
+	}
+
+	// 3. Verify in list
+	out, err = executeCommand("--config", cfgPath, "folder")
+	if err != nil {
+		t.Fatalf("folder default list failed: %v", err)
+	}
+	if !strings.Contains(out, "Desktop") {
+		t.Errorf("expected Desktop to be listed, got: %s", out)
+	}
+
+	// 4. Remove Desktop
+	out, err = executeCommand("--config", cfgPath, "folder", "remove", "~/Desktop")
+	if err != nil {
+		t.Fatalf("folder remove failed: %v, out: %s", err, out)
+	}
+	if !strings.Contains(out, "Successfully removed") {
+		t.Errorf("expected success message, got: %s", out)
+	}
+
+	// 5. Verify no longer in list
+	out, err = executeCommand("--config", cfgPath, "folder", "list")
+	if err != nil {
+		t.Fatalf("folder list failed: %v", err)
+	}
+	if strings.Contains(out, "Desktop") {
+		t.Errorf("expected Desktop to be removed, got: %s", out)
+	}
+}
+
+func TestConfigPathCommand(t *testing.T) {
+	tempDir := t.TempDir()
+	cfgPath := filepath.Join(tempDir, "config.yaml")
+	out, err := executeCommand("--config", cfgPath, "config", "path")
+	if err != nil {
+		t.Fatalf("config path failed: %v", err)
+	}
+	if !strings.Contains(out, cfgPath) {
+		t.Errorf("expected output to contain %q, got %q", cfgPath, out)
+	}
+}
+

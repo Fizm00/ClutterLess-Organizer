@@ -29,7 +29,17 @@ Output: one line per file: `[MOVE] Downloads\a.pdf -> Documents\Inbox\pdf\a.pdf 
 
 ### `organizer watch`
 Run continuously. Same as `run` for each newly stable file. Stops on Ctrl+C with a summary.
-Flags: `--dry-run`, `--log-file <path>`.
+Flags: `--dry-run`, `--log-file <path>`, `--dir <path>`, `--initial-run`.
+
+### `organizer folder list` (or `organizer folder`)
+List all watched folders currently configured.
+
+### `organizer folder add <path>`
+Add a folder to the watched directories list in `config.yaml`.
+Flags: `-r, --recursive`.
+
+### `organizer folder remove <path>`
+Remove a folder from the watched directories list in `config.yaml`.
 
 ### `organizer undo`
 Reverse the last batch of moves.
@@ -47,6 +57,12 @@ Show which rule would match the given file and where it would go. No changes.
 
 ### `organizer config validate`
 Validate the config; print errors with rule name and field. Exit code non-zero on failure.
+
+### `organizer config path`
+Print the path to the active configuration file.
+
+### `organizer config edit`
+Open the configuration file in the user's default text editor (`$EDITOR` or `notepad.exe`).
 
 ### `organizer version`
 Print version, commit, build date (injected via ldflags).

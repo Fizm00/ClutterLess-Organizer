@@ -14,8 +14,8 @@ const (
 	DefaultConflictStrategy = "rename"
 )
 
-// DefaultIgnoreExt lists temporary and in-progress download extensions ignored by default.
-var DefaultIgnoreExt = []string{"crdownload", "part", "tmp", "download", "partial", "opdownload"}
+// DefaultIgnoreExt lists temporary, in-progress download extensions, and desktop shortcuts ignored by default.
+var DefaultIgnoreExt = []string{"crdownload", "part", "tmp", "download", "partial", "opdownload", "lnk", "url"}
 
 // DefaultIgnoreNames lists system and desktop metadata files ignored by default.
 var DefaultIgnoreNames = []string{"desktop.ini", "thumbs.db", ".DS_Store"}
@@ -35,7 +35,6 @@ func Default() *Config {
 		},
 		Watch: []WatchEntry{
 			{Path: "~/Downloads", Recursive: false},
-			{Path: "~/Desktop", Recursive: false},
 		},
 		Rules: []RuleConfig{
 			{
@@ -94,7 +93,7 @@ version: 1
 
 settings:
   stable_after_seconds: 3        # file size/mtime must be unchanged this long before moving (watch mode)
-  ignore_ext: [crdownload, part, tmp, download, partial, opdownload]
+  ignore_ext: [crdownload, part, tmp, download, partial, opdownload, lnk, url]
   ignore_names: ["desktop.ini", "thumbs.db", ".DS_Store"]
   ignore_hidden: true
   conflict: rename               # only "rename" and "skip" are allowed. Never overwrite.
@@ -103,8 +102,9 @@ settings:
 watch:
   - path: ~/Downloads
     recursive: false
-  - path: ~/Desktop
-    recursive: false
+  # Add more folders if desired, e.g.:
+  # - path: ~/Desktop
+  #   recursive: false
 
 rules:
   - name: Images

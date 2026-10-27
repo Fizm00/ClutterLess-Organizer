@@ -142,6 +142,8 @@ settings:
     - download
     - partial
     - opdownload
+    - lnk
+    - url
   ignore_names:
     - desktop.ini
     - thumbs.db
@@ -153,8 +155,8 @@ settings:
 watch:
   - path: ~/Downloads
     recursive: false
-  - path: ~/Desktop
-    recursive: false
+  # - path: ~/Desktop
+  #   recursive: false
 
 rules:
   - name: Images
@@ -206,12 +208,17 @@ Template variables available within `move_to` destinations:
 |---|---|---|
 | `cless init` | Create default configuration file | `--force`, `--path <file>` |
 | `cless run` | Organize files in watched folders once | `--dry-run`, `--dir <folder>`, `--yes` |
-| `cless watch` | Continuously watch folders for new files | `--dry-run`, `--log-file <file>`, `--initial-run` |
+| `cless watch` | Continuously watch folders for new files | `--dry-run`, `--dir <folder>`, `--log-file <file>`, `--initial-run` |
+| `cless folder list` | List all watched folders currently configured | None |
+| `cless folder add <path>` | Add a folder to watched folders in config | `-r, --recursive` |
+| `cless folder remove <path>`| Remove a folder from watched folders in config | None |
 | `cless undo` | Revert previous move operations | `--batch <id>`, `--dry-run` |
 | `cless history` | Display recent move batches | `--limit <n>`, `--batch <id>` |
 | `cless rules list` | List all configured rules in order | None |
 | `cless rules test <file>` | Test which rule matches a given file | None |
 | `cless config validate` | Validate configuration file syntax and semantics | None |
+| `cless config path` | Print the path to active configuration file | None |
+| `cless config edit` | Open configuration file in text editor | None |
 | `cless version` | Display version, commit, and build date | None |
 
 Global flags applicable to all commands:

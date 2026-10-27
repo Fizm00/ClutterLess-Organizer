@@ -16,10 +16,11 @@ import (
 )
 
 var (
-	watchDryRun     bool
-	watchLogFile    string
-	watchInitialRun bool
-	watchHistFile   string
+	watchDryRun      bool
+	watchLogFile     string
+	watchInitialRun  bool
+	watchHistFile    string
+	watchDirOverride string
 )
 
 var watchCmd = &cobra.Command{
@@ -35,6 +36,12 @@ var watchCmd = &cobra.Command{
 		cfg, err := config.Load(path)
 		if err != nil {
 			return fmt.Errorf("failed to load config %q: %w", path, err)
+		}
+
+		if watchDirOverride != "" {
+			cfg.Watch = []config.WatchEntry{
+				{Path: watchDirOverride, Recursive: false},
+			}
 		}
 
 		organizer := engine.NewOrganizer(cfg)
@@ -104,5 +111,6 @@ func init() {
 	watchCmd.Flags().StringVar(&watchLogFile, "log-file", "", "write log output to a file in addition to stdout")
 	watchCmd.Flags().BoolVar(&watchInitialRun, "initial-run", false, "organize existing files once before watching")
 	watchCmd.Flags().StringVar(&watchHistFile, "history-file", "", "custom path to history.jsonl file")
+	watchCmd.Flags().StringVar(&watchDirOverride, "dir", "", "watch this folder only (overrides config watch)")
 	rootCmd.AddCommand(watchCmd)
 }
