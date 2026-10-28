@@ -36,3 +36,4 @@ func TestCallbackEventSink(t *testing.T) {
 	nilSink := NewCallbackEventSink(nil)
 	nilSink.Emit(EventWatchStatus, nil)
 }
+

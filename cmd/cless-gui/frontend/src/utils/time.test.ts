@@ -45,3 +45,4 @@ describe('formatAbsoluteTime', () => {
     expect(formatAbsoluteTime('')).toBe('');
   });
 });
+

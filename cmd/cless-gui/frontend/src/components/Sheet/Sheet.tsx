@@ -25,14 +25,14 @@ export const Sheet: React.FC<SheetProps> = ({
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 bg-scrim z-50" />
-        <RadixDialog.Content className="fixed top-0 right-0 bottom-0 w-sheet max-w-full h-screen bg-bg-surface border-l border-border shadow-elevation z-50 flex flex-col outline-none">
-          <div className="flex items-start justify-between p-4 border-b border-border-subtle gap-3 shrink-0">
+        <RadixDialog.Content className="fixed top-0 right-0 bottom-0 w-sheet max-w-full h-screen bg-card text-card-foreground border-l border-border shadow-elevation z-50 flex flex-col outline-none">
+          <div className="flex items-start justify-between p-5 border-b border-border-subtle gap-3 shrink-0">
             <div className="flex flex-col gap-1">
-              <RadixDialog.Title className="font-sans text-subtitle font-semibold text-text-1">
+              <RadixDialog.Title className="font-sans text-subtitle font-semibold tracking-tight text-foreground">
                 {title}
               </RadixDialog.Title>
               {description && (
-                <RadixDialog.Description className="font-sans text-small text-text-2">
+                <RadixDialog.Description className="font-sans text-small text-muted-foreground">
                   {description}
                 </RadixDialog.Description>
               )}
@@ -42,10 +42,10 @@ export const Sheet: React.FC<SheetProps> = ({
             </RadixDialog.Close>
           </div>
 
-          <div className="p-4 overflow-y-auto flex-1 font-sans text-body text-text-1">{children}</div>
+          <div className="p-5 overflow-y-auto flex-1 font-sans text-body text-foreground">{children}</div>
 
           {footer && (
-            <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border-subtle bg-bg-raised shrink-0">
+            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-border-subtle bg-muted shrink-0">
               {footer}
             </div>
           )}

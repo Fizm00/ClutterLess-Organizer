@@ -1,32 +1,49 @@
-/* ClutterLess Design Tokens (Tailwind v4 Locked Theme)
+/* ClutterLess Design Tokens (Tailwind v4 Locked Theme + shadcn/ui "New York" Zinc/Cyan)
  * Single source of truth: DESIGN.md section 4
  */
 
 @import "tailwindcss";
 
 :root {
-  /* 4.1 Color - Dark Mode (Default) */
-  --bg-app: #0b0d10;
-  --bg-sidebar: #0f1215;
-  --bg-surface: #14181c;
-  --bg-raised: #1a1f25;
-  --bg-selected: #12262b;
+  /* 4.1 Color - Dark Mode (Default: shadcn Zinc + Cyan Accent) */
+  --bg-app: #09090b;
+  --bg-sidebar: #0c0c0f;
+  --bg-surface: #121216;
+  --bg-raised: #1c1c22;
+  --bg-selected: #11282e;
 
-  --border-subtle: #1c2127;
-  --border: #2a323b;
-  --border-strong: #3a4450;
+  --border-subtle: #1e1e24;
+  --border: #27272a;
+  --border-strong: #3f3f46;
 
-  --text-1: #e8ecf0;
-  --text-2: #a3adb8;
-  --text-3: #6b7682;
+  --text-1: #fafafa;
+  --text-2: #a1a1aa;
+  --text-3: #71717a;
 
   --accent: #22d3ee;
   --accent-text: #22d3ee;
   --on-accent: #04181c;
 
-  --success: #3ea66b;
-  --warning: #d9a441;
-  --danger: #e5534b;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+
+  /* Standard shadcn/ui semantic aliases */
+  --background: var(--bg-app);
+  --foreground: var(--text-1);
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-1);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-1);
+  --primary: var(--accent);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--bg-raised);
+  --secondary-foreground: var(--text-1);
+  --muted: var(--bg-raised);
+  --muted-foreground: var(--text-2);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
 
   /* Category dots for rules (section 4.1) */
   --dot-1: #5b9bd5;
@@ -70,14 +87,17 @@
   --s-8: 32px;
   --s-12: 48px;
 
-  /* 4.3 Radius */
+  /* 4.3 Radius (shadcn New York scale) */
   --r-sm: 4px;
   --r-md: 6px;
-  --r-lg: 10px;
+  --r-lg: 8px;
+  --r-xl: 12px;
 
-  /* 4.3 Elevation & Scrim */
-  --shadow-elevation: 0 8px 24px rgb(0 0 0 / 0.35);
-  --scrim-dialog: rgb(0 0 0 / 0.5);
+  /* 4.3 Elevation & Scrim (shadcn New York tactile shadows) */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.35), 0 1px 2px -1px rgb(0 0 0 / 0.35);
+  --shadow-elevation: 0 10px 30px -5px rgb(0 0 0 / 0.5), 0 4px 12px -2px rgb(0 0 0 / 0.4);
+  --scrim-dialog: rgb(0 0 0 / 0.6);
 
   /* 4.4 Motion */
   --dur-fast: 100ms;
@@ -86,44 +106,50 @@
   --ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* Light Theme Overrides (section 4.1) */
+/* Light Theme Overrides (shadcn Zinc + Cyan Accent) */
 [data-theme="light"] {
-  --bg-app: #f7f8f9;
-  --bg-sidebar: #eff1f3;
+  --bg-app: #fafafa;
+  --bg-sidebar: #f4f4f5;
   --bg-surface: #ffffff;
-  --bg-raised: #f3f5f7;
-  --bg-selected: #e1f3f7;
+  --bg-raised: #f4f4f5;
+  --bg-selected: #e0f2fe;
 
-  --border-subtle: #e6e9ed;
-  --border: #d5dae0;
-  --border-strong: #b9c1ca;
+  --border-subtle: #f0f0f3;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
 
-  --text-1: #14181d;
-  --text-2: #4b5560;
-  --text-3: #6b7682;
+  --text-1: #09090b;
+  --text-2: #52525b;
+  --text-3: #71717a;
 
-  --accent: #0e7490;
+  --accent: #0891b2;
   --accent-text: #0e7490;
   --on-accent: #ffffff;
 
-  --success: #1f7a47;
-  --warning: #8a5a00;
-  --danger: #b3261e;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
 
-  --shadow-elevation: 0 8px 24px rgb(20 24 29 / 0.12);
-  --scrim-dialog: rgb(0 0 0 / 0.5);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-elevation: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+  --scrim-dialog: rgb(0 0 0 / 0.45);
 }
 
-/* Locked Theme: Reset all defaults to initial, define strictly DESIGN.md tokens */
+/* Locked Theme: Reset all defaults to initial, define strictly DESIGN.md & shadcn tokens */
 @theme {
   --color-*: initial;
   --radius-*: initial;
   --shadow-*: initial;
   --text-*: initial;
   --font-*: initial;
+  --font-weight-*: initial;
   --spacing-*: initial;
 
   /* Colors */
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
   --color-bg-app: var(--bg-app);
   --color-bg-sidebar: var(--bg-sidebar);
   --color-bg-surface: var(--bg-surface);
@@ -147,6 +173,23 @@
   --color-danger: var(--danger);
   --color-scrim: var(--scrim-dialog);
 
+  /* shadcn/ui semantic color utilities */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
   --color-dot-1: var(--dot-1);
   --color-dot-2: var(--dot-2);
   --color-dot-3: var(--dot-3);
@@ -160,21 +203,11 @@
   --radius-sm: var(--r-sm);
   --radius-md: var(--r-md);
   --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
 
-  /* Spacing & Dimensions */
-  --spacing-0-5: 2px;
-  --spacing-1: var(--s-1);
-  --spacing-1-5: 6px;
-  --spacing-2: var(--s-2);
-  --spacing-3: var(--s-3);
-  --spacing-4: var(--s-4);
-  --spacing-5: 20px;
-  --spacing-6: var(--s-6);
-  --spacing-7: 28px;
-  --spacing-8: var(--s-8);
-  --spacing-9: 36px;
-  --spacing-12: var(--s-12);
-  --spacing-sidebar: 208px;
+  /* Spacing (4px base grid per DESIGN.md 4.3 + named layout dimensions) */
+  --spacing: 4px;
+  --spacing-sidebar: 220px;
   --spacing-dialog: 480px;
   --spacing-dialog-wide: 640px;
   --spacing-sheet: 560px;
@@ -183,15 +216,28 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 
+  --font-weight-regular: var(--font-regular);
+  --font-weight-medium: var(--font-medium);
+  --font-weight-semibold: var(--font-semibold);
+
   --text-caption: var(--text-caption-size);
+  --text-caption--line-height: var(--text-caption-lh);
   --text-small: var(--text-small-size);
+  --text-small--line-height: var(--text-small-lh);
   --text-body: var(--text-body-size);
+  --text-body--line-height: var(--text-body-lh);
   --text-mono: var(--text-mono-size);
+  --text-mono--line-height: var(--text-mono-lh);
   --text-subtitle: var(--text-subtitle-size);
+  --text-subtitle--line-height: var(--text-subtitle-lh);
   --text-title: var(--text-title-size);
+  --text-title--line-height: var(--text-title-lh);
   --text-display: var(--text-display-size);
+  --text-display--line-height: var(--text-display-lh);
 
   /* Elevation */
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
   --shadow-elevation: var(--shadow-elevation);
 
   /* Motion */

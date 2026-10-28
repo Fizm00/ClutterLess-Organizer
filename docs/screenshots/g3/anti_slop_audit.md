@@ -16,3 +16,4 @@ Inspection of Overview screen implementation and visual output against `DESIGN.m
 | 10 | **Hover lift, scale-on-hover, bouncy springs** | Row entrance uses standard 4px translate + opacity fade (`duration-base ease`). Hover is a subtle background tint (`hover:bg-bg-raised`). Supports `prefers-reduced-motion`. | **PASS** |
 | 11 | **Decorative illustrations, hero banners inside the app** | Zero decorative graphics, illustrations, or marketing banners. Clean utility desktop ergonomics. | **PASS** |
 | 12 | **Truncating paths at the end** | Dynamic middle-ellipsis `formatMiddleEllipsis()` via `ResizeObserver` retains root drive/dir and filename extension. Verified on 70-character filenames and 120+ character paths with zero horizontal scroll at 880x560. | **PASS** |
+

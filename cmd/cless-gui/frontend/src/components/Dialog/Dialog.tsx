@@ -2,6 +2,7 @@ import React from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { IconButton } from '../IconButton';
+import { cn } from '../../lib/utils';
 import { t } from '../../i18n';
 
 export interface DialogProps {
@@ -28,17 +29,18 @@ export const Dialog: React.FC<DialogProps> = ({
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 bg-scrim z-50" />
         <RadixDialog.Content
-          className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-surface border border-border rounded-lg shadow-elevation z-50 flex flex-col outline-none overflow-hidden ${
+          className={cn(
+            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card text-card-foreground border border-border rounded-xl shadow-elevation z-50 flex flex-col outline-none overflow-hidden max-w-full',
             width === 'wide' ? 'w-dialog-wide' : 'w-dialog'
-          } max-w-full`}
+          )}
         >
-          <div className="flex items-start justify-between p-4 pb-2 gap-3">
+          <div className="flex items-start justify-between p-5 pb-3 gap-3 border-b border-border-subtle">
             <div className="flex flex-col gap-1">
-              <RadixDialog.Title className="font-sans text-subtitle font-semibold text-text-1">
+              <RadixDialog.Title className="font-sans text-subtitle font-semibold tracking-tight text-foreground">
                 {title}
               </RadixDialog.Title>
               {description && (
-                <RadixDialog.Description className="font-sans text-small text-text-2">
+                <RadixDialog.Description className="font-sans text-small text-muted-foreground">
                   {description}
                 </RadixDialog.Description>
               )}
@@ -48,10 +50,10 @@ export const Dialog: React.FC<DialogProps> = ({
             </RadixDialog.Close>
           </div>
 
-          <div className="p-4 overflow-y-auto font-sans text-body text-text-1">{children}</div>
+          <div className="p-5 overflow-y-auto font-sans text-body text-foreground">{children}</div>
 
           {footer && (
-            <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border-subtle bg-bg-raised">
+            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-border-subtle bg-muted">
               {footer}
             </div>
           )}

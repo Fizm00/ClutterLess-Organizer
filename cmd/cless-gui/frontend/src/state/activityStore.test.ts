@@ -74,3 +74,4 @@ describe('useActivityStore', () => {
     expect(useActivityStore.getState().needsAttention[0].filename).toBe('video.crdownload');
   });
 });
+

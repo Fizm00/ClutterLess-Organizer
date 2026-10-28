@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../../lib/utils';
 
 export interface EmptyStateProps {
   title: string;
@@ -13,15 +14,21 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   description,
   action,
   icon,
-  className = '',
+  className,
 }) => {
   return (
-    <div className={`flex flex-col items-start text-left py-6 gap-2 w-full max-w-dialog ${className}`}>
-      <div className="flex items-center gap-2">
-        {icon && <span className="flex items-center text-text-3">{icon}</span>}
-        <h3 className="font-sans text-subtitle font-semibold text-text-1">{title}</h3>
+    <div className={cn('flex flex-col items-start text-left py-8 px-2 gap-2.5 w-full max-w-dialog', className)}>
+      <div className="flex items-center gap-2.5">
+        {icon && (
+          <span className="flex items-center justify-center w-8 h-8 rounded-md bg-muted border border-border-subtle text-muted-foreground shadow-xs shrink-0">
+            {icon}
+          </span>
+        )}
+        <div className="flex flex-col gap-0.5">
+          <h3 className="font-sans text-subtitle font-semibold tracking-tight text-foreground">{title}</h3>
+          <p className="font-sans text-body text-muted-foreground">{description}</p>
+        </div>
       </div>
-      <p className="font-sans text-body text-text-2">{description}</p>
       {action && <div className="mt-2">{action}</div>}
     </div>
   );

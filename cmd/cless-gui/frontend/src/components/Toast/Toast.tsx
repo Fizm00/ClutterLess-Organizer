@@ -14,13 +14,14 @@ export const Toaster: React.FC = () => {
       {toasts.map(toast => (
         <div
           key={toast.id}
-          className="pointer-events-auto flex items-center gap-3 py-2 px-3 bg-bg-surface border border-border rounded-md shadow-elevation"
+          className="pointer-events-auto flex items-center gap-3 py-3 px-4 bg-popover text-popover-foreground border border-border rounded-lg shadow-elevation"
           role="status"
         >
-          <span className="font-sans text-body text-text-1 flex-1">{toast.message}</span>
+          <span className="font-sans text-body font-medium text-foreground flex-1">{toast.message}</span>
           {toast.actionLabel && toast.onAction && (
             <Button
               variant="secondary"
+              size="sm"
               onClick={() => {
                 toast.onAction?.();
                 dismissToast(toast.id);
@@ -31,11 +32,11 @@ export const Toaster: React.FC = () => {
           )}
           <button
             type="button"
-            className="inline-flex items-center justify-center w-5 h-5 rounded-sm border-none bg-transparent text-text-3 cursor-pointer p-0 transition-colors duration-fast ease hover:text-text-1 hover:bg-bg-raised"
+            className="inline-flex items-center justify-center w-6 h-6 rounded-md border-none bg-transparent text-muted-foreground cursor-pointer p-0 transition-colors duration-fast ease hover:text-foreground hover:bg-muted"
             onClick={() => dismissToast(toast.id)}
             aria-label={t('action.close')}
           >
-            <X size={12} strokeWidth={1.5} />
+            <X size={14} strokeWidth={1.5} />
           </button>
         </div>
       ))}

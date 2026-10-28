@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import React, { useState, useEffect } from 'react';
+import { Play, Pause, FolderSync } from 'lucide-react';
 import { AppShell, NavRoute } from './components/AppShell';
 import { Button } from './components/Button';
 import { toast } from './components/Toast';
@@ -100,10 +101,21 @@ export const App: React.FC = () => {
         return (
           <>
             <Button variant="primary" onClick={handleOrganizeNow}>
-              {t('action.organize_now')}
+              <FolderSync size={14} strokeWidth={1.75} />
+              <span>{t('action.organize_now')}</span>
             </Button>
             <Button variant="secondary" onClick={handleToggleWatch}>
-              {running ? t('action.pause') : t('action.resume')}
+              {running ? (
+                <>
+                  <Pause size={14} strokeWidth={1.75} />
+                  <span>{t('action.pause')}</span>
+                </>
+              ) : (
+                <>
+                  <Play size={14} strokeWidth={1.75} />
+                  <span>{t('action.resume')}</span>
+                </>
+              )}
             </Button>
           </>
         );

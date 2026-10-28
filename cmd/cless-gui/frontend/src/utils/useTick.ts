@@ -17,3 +17,4 @@ export function useTick(intervalMs = 30000): number {
 
   return tick;
 }
+

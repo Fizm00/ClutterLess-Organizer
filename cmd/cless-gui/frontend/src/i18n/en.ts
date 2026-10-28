@@ -15,11 +15,12 @@ export const en = {
   'watch.last_moved': 'last file moved {time}',
 
   // Overview Screen
+  'overview.watching_header': 'Watching',
   'overview.status.watching_with_time': 'Watching {count} folders - last file moved {time}',
   'overview.status.watching_idle': 'Watching {count} folders - waiting for new files',
   'overview.status.paused': 'Watcher paused',
   'overview.recent_activity': 'Recent activity',
-  'overview.view_all': 'View all ->',
+  'overview.view_all': 'View all',
   'overview.needs_attention': 'Needs attention',
   'overview.organize_disabled_hint': 'Interactive preview & organization will be enabled in Phase G4.',
 

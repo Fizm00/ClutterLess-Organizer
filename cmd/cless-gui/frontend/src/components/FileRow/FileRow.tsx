@@ -36,13 +36,13 @@ export const FileRow: React.FC<FileRowProps> = ({
 
   return (
     <div
-      className={`flex items-center h-9 border-b border-border-subtle px-3 bg-bg-surface hover:bg-bg-raised transition-colors duration-fast ease w-full gap-3 select-none ${className}`}
+      className={`flex items-center h-9 border-b border-border-subtle last:border-b-0 px-3.5 bg-bg-surface hover:bg-bg-raised transition-colors duration-fast ease w-full gap-3 select-none ${className}`}
     >
       <div className="font-mono text-mono text-text-1 whitespace-nowrap overflow-hidden text-ellipsis w-60 shrink-0 min-w-24" title={filename}>
         {filename}
       </div>
 
-      <div className="text-text-3 flex items-center shrink-0">
+      <div className="text-text-3 flex items-center justify-center w-4 shrink-0">
         <ArrowRight size={12} strokeWidth={1.5} />
       </div>
 
@@ -52,12 +52,14 @@ export const FileRow: React.FC<FileRowProps> = ({
 
       <div className="flex items-center gap-3 shrink-0 ml-auto">
         {ruleName && (
-          <div className="inline-flex items-center gap-1">
+          <div className="inline-flex items-center justify-end gap-1.5 w-24">
             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColorClass}`} />
-            <span className="font-sans text-small text-text-2 whitespace-nowrap">{ruleName}</span>
+            <span className="font-sans text-small text-text-2 whitespace-nowrap truncate">{ruleName}</span>
           </div>
         )}
-        {timeAgo && <span className="font-mono text-caption text-text-3 whitespace-nowrap">{timeAgo}</span>}
+        {timeAgo !== undefined && (
+          <span className="font-mono text-caption text-text-3 whitespace-nowrap w-12 text-right">{timeAgo}</span>
+        )}
       </div>
     </div>
   );

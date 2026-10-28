@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../../lib/utils';
 
 export interface SegmentOption<T extends string = string> {
   value: T;
@@ -18,10 +19,17 @@ export function SegmentedControl<T extends string = string>({
   value,
   onChange,
   ariaLabel,
-  className = '',
+  className,
 }: SegmentedControlProps<T>) {
   return (
-    <div className={`inline-flex items-center bg-bg-raised rounded-md p-0.5 gap-0.5 border border-border-subtle select-none ${className}`} role="radiogroup" aria-label={ariaLabel}>
+    <div
+      className={cn(
+        'inline-flex h-8 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground border border-border-subtle select-none gap-0.5',
+        className
+      )}
+      role="radiogroup"
+      aria-label={ariaLabel}
+    >
       {options.map(opt => {
         const isSelected = opt.value === value;
         return (
@@ -31,11 +39,12 @@ export function SegmentedControl<T extends string = string>({
             role="radio"
             aria-checked={isSelected}
             tabIndex={isSelected ? 0 : -1}
-            className={`inline-flex items-center justify-center h-6 px-2 rounded-sm border font-sans text-small whitespace-nowrap cursor-pointer transition-colors duration-fast ease ${
+            className={cn(
+              'inline-flex items-center justify-center h-6 px-3 rounded-md border font-sans text-small whitespace-nowrap cursor-pointer transition-all duration-fast ease',
               isSelected
-                ? 'bg-bg-surface text-text-1 font-semibold border-border'
-                : 'border-transparent bg-transparent text-text-2 font-regular hover:text-text-1'
-            }`}
+                ? 'bg-bg-surface text-foreground font-medium border-border shadow-xs'
+                : 'border-transparent bg-transparent text-muted-foreground font-regular hover:text-foreground'
+            )}
             onClick={() => onChange(opt.value)}
             onKeyDown={e => {
               const idx = options.findIndex(o => o.value === value);

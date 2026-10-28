@@ -253,7 +253,7 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
         records: [
           {
             batchId: id,
-            time: '2026-04-18T14:27:00Z',
+            time: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
             source: 'C:/Users/User/Downloads/' + longFilename1,
             dest: longPath1 + '/' + longFilename1,
             rule: 'Invoices',
@@ -262,7 +262,7 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
           },
           {
             batchId: id,
-            time: '2026-04-18T14:25:00Z',
+            time: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
             source: 'C:/Users/User/Downloads/IMG_2041_holiday_photo_family_camera.heic',
             dest: 'C:/Users/User/Pictures/Sorted/2026/IMG_2041.heic',
             rule: 'Images',
@@ -271,7 +271,7 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
           },
           {
             batchId: id,
-            time: '2026-04-18T13:30:00Z',
+            time: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
             source: 'C:/Users/User/Downloads/setup_v3.2_installer_x64.exe',
             dest: 'C:/Users/User/Downloads/_Installers/setup_v3.2_installer_x64.exe',
             rule: 'Installers',
@@ -280,7 +280,7 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
           },
           {
             batchId: id,
-            time: '2026-04-18T11:15:00Z',
+            time: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
             source: 'C:/Users/User/Downloads/' + longFilename2,
             dest: longPath2 + '/bundle.zip',
             rule: 'Archives',
@@ -289,7 +289,7 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
           },
           {
             batchId: id,
-            time: '2026-04-17T18:00:00Z',
+            time: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
             source: 'C:/Users/User/Downloads/annual_financial_statements_2025.xlsx',
             dest: 'C:/Users/User/Documents/Finance/2025/annual_financial_statements_2025.xlsx',
             rule: 'Documents',
@@ -298,7 +298,7 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
           },
           {
             batchId: id,
-            time: '2026-04-16T09:40:00Z',
+            time: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
             source: 'C:/Users/User/Downloads/podcast_recording_raw_take_02.wav',
             dest: 'C:/Users/User/Music/Recordings/2026/take_02.wav',
             rule: 'Audio',

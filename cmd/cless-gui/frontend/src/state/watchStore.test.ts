@@ -58,3 +58,4 @@ describe('useWatchStore', () => {
     expect(useWatchStore.getState().configError).toBeNull();
   });
 });
+

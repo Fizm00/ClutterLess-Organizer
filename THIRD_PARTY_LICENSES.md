@@ -78,3 +78,13 @@ This project depends on the third-party Go modules listed below. All dependencie
 - **Full Text:** `licenses/OFL-1.1.txt`
 - **Description:** Monospace typeface with tabular figures tailored for code, paths, and technical data.
 
+---
+
+## Frontend UI Libraries (GUI)
+
+### 12. `clsx`, `tailwind-merge`, `class-variance-authority` (shadcn/ui foundation)
+- **License:** MIT License / Apache License 2.0
+- **URL:** https://github.com/lukeed/clsx, https://github.com/dcastil/tailwind-merge, https://github.com/joe-bell/cva
+- **Description:** Class name composition and variant management utilities used by shadcn/ui components.
+
+

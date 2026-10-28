@@ -166,3 +166,4 @@ export const useWatchStore = create<WatchState>((set, get) => ({
     set({ watcherLocked: locked });
   },
 }));
+

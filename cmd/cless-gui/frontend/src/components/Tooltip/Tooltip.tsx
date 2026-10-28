@@ -20,10 +20,10 @@ export const Tooltip: React.FC<TooltipProps> = ({
         <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
         <RadixTooltip.Portal>
           <RadixTooltip.Content
-            className="bg-bg-raised border border-border rounded-sm py-1 px-2 text-text-1 font-sans text-small leading-tight shadow-elevation z-50 select-none transition-opacity duration-fast ease"
+            className="bg-popover text-popover-foreground border border-border rounded-md py-1.5 px-2.5 font-sans text-small leading-tight shadow-elevation z-50 select-none transition-opacity duration-fast ease"
             side={side}
             align={align}
-            sideOffset={4}
+            sideOffset={5}
           >
             {content}
           </RadixTooltip.Content>

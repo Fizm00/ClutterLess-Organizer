@@ -35,9 +35,9 @@ export const Styleguide: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 w-full">
-      <div className="flex items-center justify-between py-3 px-4 bg-bg-surface border border-border rounded-md w-full">
-        <div className="flex items-center gap-2">
-          <span className="font-sans text-small text-text-2">Theme:</span>
+      <div className="flex items-center justify-between py-3 px-4 bg-card border border-border rounded-xl shadow-xs w-full">
+        <div className="flex items-center gap-2.5">
+          <span className="font-sans text-small font-medium text-muted-foreground">Theme:</span>
           <SegmentedControl
             options={[
               { value: 'dark', label: 'Dark' },
@@ -71,8 +71,8 @@ export const Styleguide: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
         {/* Buttons & IconButtons */}
-        <section className="flex flex-col gap-4 p-4 bg-bg-surface border border-border rounded-md min-w-0">
-          <h2 className="font-sans text-subtitle font-semibold text-text-1 pb-1 border-b border-border-subtle">
+        <section className="flex flex-col gap-4 p-5 bg-card border border-border rounded-xl shadow-xs min-w-0">
+          <h2 className="font-sans text-subtitle font-semibold text-foreground pb-2 border-b border-border-subtle">
             Buttons & Actions
           </h2>
           <div className="flex flex-wrap items-center gap-2">
@@ -93,8 +93,8 @@ export const Styleguide: React.FC = () => {
         </section>
 
         {/* Inputs & Selects */}
-        <section className="flex flex-col gap-4 p-4 bg-bg-surface border border-border rounded-md min-w-0">
-          <h2 className="font-sans text-subtitle font-semibold text-text-1 pb-1 border-b border-border-subtle">
+        <section className="flex flex-col gap-4 p-5 bg-card border border-border rounded-xl shadow-xs min-w-0">
+          <h2 className="font-sans text-subtitle font-semibold text-foreground pb-2 border-b border-border-subtle">
             Inputs & Selects
           </h2>
           <div className="flex flex-col gap-3 w-full">
@@ -122,8 +122,8 @@ export const Styleguide: React.FC = () => {
         </section>
 
         {/* Switches & Toggles */}
-        <section className="flex flex-col gap-4 p-4 bg-bg-surface border border-border rounded-md min-w-0">
-          <h2 className="font-sans text-subtitle font-semibold text-text-1 pb-1 border-b border-border-subtle">
+        <section className="flex flex-col gap-4 p-5 bg-card border border-border rounded-xl shadow-xs min-w-0">
+          <h2 className="font-sans text-subtitle font-semibold text-foreground pb-2 border-b border-border-subtle">
             Switches & Toggles
           </h2>
           <div className="flex flex-col gap-3 w-full">
@@ -140,12 +140,12 @@ export const Styleguide: React.FC = () => {
               disabled
               onCheckedChange={() => {}}
             />
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-4">
               <Checkbox label="Selected for move" checked={checkboxState} onCheckedChange={setCheckboxState} />
               <Checkbox label="Disabled item" checked={false} disabled onCheckedChange={() => {}} />
             </div>
             <div>
-              <span className="font-sans text-small text-text-2 block mb-1">Filter Segmented Control</span>
+              <span className="font-sans text-small font-medium text-foreground block mb-1.5">Filter Segmented Control</span>
               <SegmentedControl
                 options={[
                   { value: 'all', label: 'All' },
@@ -160,8 +160,8 @@ export const Styleguide: React.FC = () => {
         </section>
 
         {/* Badges & Indicators */}
-        <section className="flex flex-col gap-4 p-4 bg-bg-surface border border-border rounded-md min-w-0">
-          <h2 className="font-sans text-subtitle font-semibold text-text-1 pb-1 border-b border-border-subtle">
+        <section className="flex flex-col gap-4 p-5 bg-card border border-border rounded-xl shadow-xs min-w-0">
+          <h2 className="font-sans text-subtitle font-semibold text-foreground pb-2 border-b border-border-subtle">
             Badges & Indicators
           </h2>
           <div className="flex flex-wrap items-center gap-2">
@@ -198,8 +198,8 @@ export const Styleguide: React.FC = () => {
         </section>
 
         {/* Paths & Middle Ellipsis */}
-        <section className="col-span-full flex flex-col gap-4 p-4 bg-bg-surface border border-border rounded-md min-w-0">
-          <h2 className="font-sans text-subtitle font-semibold text-text-1 pb-1 border-b border-border-subtle">
+        <section className="col-span-full flex flex-col gap-4 p-5 bg-card border border-border rounded-xl shadow-xs min-w-0">
+          <h2 className="font-sans text-subtitle font-semibold text-foreground pb-2 border-b border-border-subtle">
             Middle-Ellipsis Path Handling (60+ chars & 120+ paths)
           </h2>
           <div className="flex flex-col gap-3 w-full">
@@ -213,44 +213,48 @@ export const Styleguide: React.FC = () => {
         </section>
 
         {/* FileRows (Real Activity View) */}
-        <section className="col-span-full flex flex-col gap-4 p-4 bg-bg-surface border border-border rounded-md min-w-0">
-          <h2 className="font-sans text-subtitle font-semibold text-text-1 pb-1 border-b border-border-subtle">
+        <section className="col-span-full flex flex-col gap-3 p-5 bg-card border border-border rounded-xl shadow-xs min-w-0">
+          <h2 className="font-sans text-subtitle font-semibold text-foreground pb-2 border-b border-border-subtle">
             FileRows & Table Presentation
           </h2>
-          <ListRow isHeader>
-            <span className="w-60">File</span>
-            <span className="flex-1 pl-6">Destination</span>
-            <span>Rule & Time</span>
-          </ListRow>
-          <FileRow
-            filename="quarterly_audit_final_approved_signed_v2.pdf"
-            destPath={longPath}
-            ruleName="Invoices"
-            ruleCategoryIndex={0}
-            timeAgo="2m"
-            onReveal={p => toast.show(`Reveal: ${p}`)}
-          />
-          <FileRow
-            filename="IMG_2041_holiday_photo_family_camera.heic"
-            destPath="C:/Users/User/Pictures/Sorted/2026/IMG_2041.heic"
-            ruleName="Images"
-            ruleCategoryIndex={1}
-            timeAgo="5m"
-            onReveal={p => toast.show(`Reveal: ${p}`)}
-          />
-          <FileRow
-            filename="very_long_project_asset_specification_documentation_bundle_archive_2026.zip"
-            destPath="D:/Storage/Archive/Software_Engineering_Projects/Downloads/_Archives/bundle.zip"
-            ruleName="Archives"
-            ruleCategoryIndex={3}
-            timeAgo="1h"
-            onReveal={p => toast.show(`Reveal: ${p}`)}
-          />
+          <div className="flex flex-col border border-border rounded-lg overflow-hidden w-full">
+            <ListRow isHeader>
+              <span className="w-60 shrink-0">File</span>
+              <span className="w-4 shrink-0" aria-hidden="true" />
+              <span className="flex-1 min-w-0">Destination</span>
+              <span className="w-24 shrink-0 text-right">Rule</span>
+              <span className="w-12 shrink-0 text-right">Time</span>
+            </ListRow>
+            <FileRow
+              filename="quarterly_audit_final_approved_signed_v2.pdf"
+              destPath={longPath}
+              ruleName="Invoices"
+              ruleCategoryIndex={0}
+              timeAgo="2m"
+              onReveal={p => toast.show(`Reveal: ${p}`)}
+            />
+            <FileRow
+              filename="IMG_2041_holiday_photo_family_camera.heic"
+              destPath="C:/Users/User/Pictures/Sorted/2026/IMG_2041.heic"
+              ruleName="Images"
+              ruleCategoryIndex={1}
+              timeAgo="5m"
+              onReveal={p => toast.show(`Reveal: ${p}`)}
+            />
+            <FileRow
+              filename="very_long_project_asset_specification_documentation_bundle_archive_2026.zip"
+              destPath="D:/Storage/Archive/Software_Engineering_Projects/Downloads/_Archives/bundle.zip"
+              ruleName="Archives"
+              ruleCategoryIndex={3}
+              timeAgo="1h"
+              onReveal={p => toast.show(`Reveal: ${p}`)}
+            />
+          </div>
         </section>
 
         {/* Empty State */}
-        <section className="col-span-full flex flex-col gap-4 p-4 bg-bg-surface border border-border rounded-md min-w-0">
-          <h2 className="font-sans text-subtitle font-semibold text-text-1 pb-1 border-b border-border-subtle">
+        <section className="col-span-full flex flex-col gap-4 p-5 bg-card border border-border rounded-xl shadow-xs min-w-0">
+          <h2 className="font-sans text-subtitle font-semibold text-foreground pb-2 border-b border-border-subtle">
             Empty State Specification
           </h2>
           <EmptyState

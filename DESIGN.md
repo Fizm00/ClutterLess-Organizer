@@ -34,7 +34,7 @@ The most common failure of AI-generated UI is a generic "template" look. These a
 | Giant centered icon + headline + subtext empty states | Left-aligned text, one sentence, one action |
 | Vanity stats ("98% efficiency", "12.4 GB saved!") and fake charts | Real counts the user can act on (files moved today, last run time) |
 | Marketing copy, exclamation marks, "Welcome back!", "Oops!" | Plain, specific, sentence-case copy (section 8) |
-| Tailwind default look (zinc/slate palette, `rounded-xl`, `shadow-sm` on every card) or arbitrary values (`bg-[#...]`, `p-[...]`) | Tailwind v4 with locked `@theme` (all defaults cleared with `initial`) restricted strictly to tokens from section 4; arbitrary values banned by ESLint |
+| Tailwind default look (`rounded-2xl`, heavy drop shadows everywhere) or arbitrary values (`bg-[#...]`, `p-[...]`) | Tailwind v4 + **shadcn/ui ("New York" style)** with locked `@theme` (all defaults cleared with `initial`) restricted strictly to tokens from section 4; arbitrary values banned by ESLint |
 | Pill-shaped everything | Pills only for badges that represent a state |
 | Hover lift, scale-on-hover, bouncy springs | Background tint change, 100ms |
 | Decorative illustrations, hero banners inside the app | None |
@@ -149,9 +149,9 @@ Rules:
 - Content: `padding: 24px 32px`. Page header row: title left, primary actions right, 1px bottom border. Lists span full width; forms and prose max 640px, left-aligned.
 - Never center content blocks. Left alignment throughout.
 
-## 6. Components
+## 6. Components (shadcn/ui "New York" Architecture)
 
-Build these once, in `frontend/src/components/`, and reuse. Use Radix UI primitives (headless) for behavior and accessibility; all styling is ours.
+Build these once, in `frontend/src/components/`, and reuse. Use **shadcn/ui ("New York" style)** architecture: Radix UI headless primitives + `class-variance-authority` (CVA) + `cn()` (`clsx` + `tailwind-merge` in `src/lib/utils.ts`), styled strictly via locked `@theme` tokens.
 
 | Component | Spec |
 |---|---|
