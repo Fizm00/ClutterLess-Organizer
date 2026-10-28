@@ -16,7 +16,7 @@ import (
 )
 
 //go:embed all:frontend/dist
-var assets embed.FS
+	var assets embed.FS
 
 //go:embed build/appicon.png
 var appIcon []byte
@@ -32,15 +32,38 @@ func init() {
 	application.RegisterEvent[any](app.EventAppError)
 }
 
+// wailsFolderPicker implements app.FolderPicker using Wails native open directory dialog.
+type wailsFolderPicker struct {
+	app *application.App
+}
+
+func (p *wailsFolderPicker) PickFolder() (string, error) {
+	if p.app == nil {
+		return "", app.NewAppError(app.ErrInternal, "Application not initialized", "", "")
+	}
+	dialog := p.app.Dialog.OpenFile()
+	dialog.CanChooseDirectories(true)
+	dialog.CanChooseFiles(false)
+	dialog.SetTitle("Select Folder to Watch")
+	return dialog.PromptForSingleSelection()
+}
+
 func main() {
 	var mainWindow *application.WebviewWindow
 	var quitting bool
 	var wailsApp *application.App
+	var watchService *app.WatchService
 
 	// 1. Setup EventSink that bridges app events to Wails runtime events
 	eventSink := app.NewCallbackEventSink(func(name string, payload any) {
 		if wailsApp != nil {
 			wailsApp.Event.Emit(name, payload)
+		}
+		// Automatically reload watcher when configuration changes
+		if name == app.EventConfigChanged && watchService != nil && watchService.Status().Running {
+			go func() {
+				_ = watchService.Reload()
+			}()
 		}
 	})
 
@@ -61,7 +84,7 @@ func main() {
 	rulesService := app.NewRulesService(configService)
 	organizeService := app.NewOrganizeService(configService, storage, eventSink)
 	historyService := app.NewHistoryService(configService, storage, eventSink)
-	watchService := app.NewWatchService(configService, storage, eventSink, stateDir)
+	watchService = app.NewWatchService(configService, storage, eventSink, stateDir)
 
 	// 4. Initialize Wails App with all services
 	wailsApp = application.New(application.Options{
@@ -88,6 +111,9 @@ func main() {
 			},
 		},
 	})
+
+	// Inject native folder picker into system service
+	systemService.SetFolderPicker(&wailsFolderPicker{app: wailsApp})
 
 	// 5. Create Main Window (DESIGN.md section 3: default 1080x700, min 880x560)
 	mainWindow = wailsApp.Window.NewWithOptions(application.WebviewWindowOptions{

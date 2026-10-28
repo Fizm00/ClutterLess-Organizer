@@ -172,3 +172,35 @@ rules:
 		t.Errorf("expected EventAppError to be emitted when disk config is invalid")
 	}
 }
+
+func TestCheckFolderWarnings(t *testing.T) {
+	tempDir := t.TempDir()
+	watchFolder := filepath.Join(tempDir, "Downloads")
+	nestedDest := filepath.Join(watchFolder, "_Archives", "{year}")
+	outsideDest := filepath.Join(tempDir, "Pictures", "{year}")
+
+	cfg := ConfigDTO{
+		Watch: []WatchEntryDTO{
+			{Path: watchFolder, Recursive: true},
+		},
+		Rules: []RuleDTO{
+			{Name: "Archives", MoveTo: nestedDest},
+			{Name: "Pictures", MoveTo: outsideDest},
+		},
+	}
+
+	warnings := CheckFolderWarnings(cfg)
+	if len(warnings) != 1 {
+		t.Fatalf("expected 1 recursive warning, got %d: %+v", len(warnings), warnings)
+	}
+	if warnings[0].RuleName != "Archives" {
+		t.Errorf("expected warning for rule 'Archives', got %q", warnings[0].RuleName)
+	}
+
+	// When recursive is false, no warning should occur
+	cfg.Watch[0].Recursive = false
+	warnings = CheckFolderWarnings(cfg)
+	if len(warnings) != 0 {
+		t.Errorf("expected 0 warnings when folder is non-recursive, got %d", len(warnings))
+	}
+}

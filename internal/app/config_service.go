@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -382,8 +383,9 @@ func ConfigToDTO(cfg *config.Config) ConfigDTO {
 	var rules []RuleDTO
 	for _, r := range cfg.Rules {
 		rules = append(rules, RuleDTO{
-			Name:   r.Name,
-			MoveTo: r.MoveTo,
+			Name:     r.Name,
+			Disabled: r.Disabled,
+			MoveTo:   r.MoveTo,
 			Match: MatchDTO{
 				Ext:       r.Match.Ext,
 				NameGlob:  r.Match.NameGlob,
@@ -426,8 +428,9 @@ func DTOToConfig(dto ConfigDTO) (*config.Config, error) {
 	var rules []config.RuleConfig
 	for _, r := range dto.Rules {
 		rules = append(rules, config.RuleConfig{
-			Name:   r.Name,
-			MoveTo: r.MoveTo,
+			Name:     r.Name,
+			Disabled: r.Disabled,
+			MoveTo:   r.MoveTo,
 			Match: config.MatchConfig{
 				Ext:       r.Match.Ext,
 				NameGlob:  r.Match.NameGlob,
@@ -454,4 +457,48 @@ func DTOToConfig(dto ConfigDTO) (*config.Config, error) {
 		Watch: watch,
 		Rules: rules,
 	}, nil
+}
+
+// CheckFolderWarnings detects whether any rule destination sits inside a recursively monitored folder.
+func CheckFolderWarnings(cfg ConfigDTO) []FolderWarningDTO {
+	var warnings []FolderWarningDTO
+
+	for _, w := range cfg.Watch {
+		if !w.Recursive || strings.TrimSpace(w.Path) == "" {
+			continue
+		}
+		wExpanded := filepath.Clean(config.ExpandPath(w.Path))
+
+		for _, r := range cfg.Rules {
+			if strings.TrimSpace(r.MoveTo) == "" {
+				continue
+			}
+			destBase := r.MoveTo
+			if idx := strings.Index(destBase, "{"); idx != -1 {
+				destBase = destBase[:idx]
+			}
+			destBase = strings.TrimRight(destBase, `/\`)
+			if destBase == "" {
+				continue
+			}
+			destExpanded := filepath.Clean(config.ExpandPath(destBase))
+
+			rel, err := filepath.Rel(wExpanded, destExpanded)
+			if err == nil && !strings.HasPrefix(rel, "..") {
+				warnings = append(warnings, FolderWarningDTO{
+					FolderPath: w.Path,
+					RuleName:   r.Name,
+					MoveTo:     r.MoveTo,
+					Message:    fmt.Sprintf("Rule %q destination (%s) is inside this recursive folder. Files moved here will be re-scanned unless excluded.", r.Name, r.MoveTo),
+				})
+			}
+		}
+	}
+
+	return warnings
+}
+
+// GetFolderWarnings returns recursive folder warnings for the current configuration.
+func (cs *ConfigService) GetFolderWarnings() []FolderWarningDTO {
+	return CheckFolderWarnings(cs.Get())
 }

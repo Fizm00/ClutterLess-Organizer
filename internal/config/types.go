@@ -28,9 +28,10 @@ type WatchEntry struct {
 
 // RuleConfig defines a file organization rule in configuration.
 type RuleConfig struct {
-	Name   string      `yaml:"name"`
-	Match  MatchConfig `yaml:"match"`
-	MoveTo string      `yaml:"move_to"`
+	Name     string      `yaml:"name"`
+	Disabled bool        `yaml:"disabled,omitempty"`
+	Match    MatchConfig `yaml:"match"`
+	MoveTo   string      `yaml:"move_to"`
 }
 
 // MatchConfig defines matching criteria for a rule.

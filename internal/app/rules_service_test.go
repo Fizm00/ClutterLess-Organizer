@@ -112,10 +112,38 @@ func TestRulesService_Test(t *testing.T) {
 	if !res.Matched || res.RuleName != "SpecialInvoices" {
 		t.Errorf("expected custom_special_123.xyz to match SpecialInvoices rule, got %+v", res)
 	}
+	if len(res.Conditions) == 0 || !res.Conditions[0].Passed {
+		t.Errorf("expected conditions to report passed: %+v", res.Conditions)
+	}
+
+	// Test single draft rule via TestRule
+	draftRule := RuleDTO{
+		Name:   "DraftReceipts",
+		MoveTo: "~/Receipts",
+		Match: MatchDTO{
+			Ext:       []string{"pdf"},
+			NameRegex: "(?i)receipt",
+		},
+	}
+	draftRes := rs.TestRule(draftRule, "store_receipt_2026.pdf")
+	if !draftRes.Matched {
+		t.Errorf("expected draftRule to match, got %+v", draftRes)
+	}
+	if len(draftRes.Conditions) != 2 {
+		t.Fatalf("expected 2 conditions evaluated, got %d", len(draftRes.Conditions))
+	}
+	if !draftRes.Conditions[0].Passed || !draftRes.Conditions[1].Passed {
+		t.Errorf("expected all conditions to pass, got %+v", draftRes.Conditions)
+	}
+
+	// Test failing condition in draftRule
+	failRes := rs.TestRule(draftRule, "store_invoice_2026.pdf")
+	if failRes.Matched {
+		t.Errorf("expected failRes not to match receipt regex")
+	}
 
 	// Match unmatched file
 	res2 := rs.Test("completely_random_file.unknownxyz")
-	// If fallback is configured, it matches fallback; otherwise false
 	if res2.Matched && res2.RuleName != "fallback" {
 		t.Errorf("expected completely_random_file.unknownxyz to be unmatched or fallback, got %+v", res2)
 	}

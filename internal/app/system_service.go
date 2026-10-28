@@ -4,10 +4,12 @@ package app
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 
+	"github.com/Fizm00/organizer/internal/config"
 	"github.com/Fizm00/organizer/internal/version"
 )
 
@@ -118,4 +120,20 @@ func (s *SystemService) SetAutostart(enabled bool) error {
 		return NewAppError(ErrInternal, "Autostart manager not initialized", "", "")
 	}
 	return s.autostart.Set(enabled)
+}
+
+// CountFiles returns the count of regular files directly inside the given directory without blocking.
+func (s *SystemService) CountFiles(folderPath string) (int, error) {
+	expanded := config.ExpandPath(folderPath)
+	entries, err := os.ReadDir(expanded)
+	if err != nil {
+		return 0, err
+	}
+	count := 0
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			count++
+		}
+	}
+	return count, nil
 }

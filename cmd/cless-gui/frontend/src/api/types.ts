@@ -31,6 +31,7 @@ export interface MatchDTO {
 
 export interface RuleDTO {
   name: string;
+  disabled?: boolean;
   moveTo: string;
   match: MatchDTO;
 }
@@ -46,11 +47,26 @@ export interface ValidationErrorDTO {
   message: string;
 }
 
+export interface ConditionEvaluationDTO {
+  type: string;
+  pattern: string;
+  passed: boolean;
+  details?: string;
+}
+
 export interface RuleTestResultDTO {
   matched: boolean;
   ruleName?: string;
   destination?: string;
   reason: string;
+  conditions?: ConditionEvaluationDTO[];
+}
+
+export interface FolderWarningDTO {
+  folderPath: string;
+  ruleName: string;
+  moveTo: string;
+  message: string;
 }
 
 export interface PreviewOptionsDTO {
@@ -161,6 +177,7 @@ export interface ConfigApi {
   save(dto: ConfigDTO): Promise<void>;
   path(): Promise<string>;
   resetToDefaults(): Promise<void>;
+  getFolderWarnings(): Promise<FolderWarningDTO[]>;
 }
 
 export interface RulesApi {
@@ -169,6 +186,7 @@ export interface RulesApi {
   delete(name: string): Promise<void>;
   reorder(names: string[]): Promise<void>;
   test(filename: string): Promise<RuleTestResultDTO>;
+  testRule(rule: RuleDTO, filename: string): Promise<RuleTestResultDTO>;
 }
 
 export interface OrganizeApi {
@@ -198,6 +216,7 @@ export interface SystemApi {
   pickFolder(): Promise<string | null>;
   setAutostart(enabled: boolean): Promise<void>;
   getAutostart(): Promise<boolean>;
+  countFiles(folderPath: string): Promise<number>;
 }
 
 export interface Api {

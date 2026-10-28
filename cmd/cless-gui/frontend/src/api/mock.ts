@@ -3,7 +3,9 @@ import {
   Api,
   BatchDetailDTO,
   BatchSummaryDTO,
+  ConditionEvaluationDTO,
   ConfigDTO,
+  FolderWarningDTO,
   HistoryFilterDTO,
   MoveResultDTO,
   PlanDTO,
@@ -124,6 +126,23 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
     async resetToDefaults(): Promise<void> {
       // resets to default
     },
+    async getFolderWarnings(): Promise<FolderWarningDTO[]> {
+      const warnings: FolderWarningDTO[] = [];
+      for (const w of mockConfig.watch) {
+        if (!w.recursive) continue;
+        for (const r of mockConfig.rules) {
+          if (r.moveTo.startsWith(w.path)) {
+            warnings.push({
+              folderPath: w.path,
+              ruleName: r.name,
+              moveTo: r.moveTo,
+              message: `Rule "${r.name}" destination (${r.moveTo}) is inside this recursive folder. Files moved here will be re-scanned unless excluded.`,
+            });
+          }
+        }
+      }
+      return warnings;
+    },
   },
 
   rules: {
@@ -157,17 +176,60 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
       mockConfig.rules = next;
     },
     async test(filename: string): Promise<RuleTestResultDTO> {
-      if (filename.toLowerCase().endsWith('.pdf')) {
-        return {
-          matched: true,
-          ruleName: 'Documents',
-          destination: '~/Documents/Inbox/pdf/' + filename,
-          reason: 'matched extension .pdf',
-        };
+      const ext = filename.split('.').pop()?.toLowerCase() || '';
+      for (const rule of mockConfig.rules) {
+        if (rule.disabled) continue;
+        if (rule.match.nameRegex && new RegExp(rule.match.nameRegex.replace(/\(\?i\)/g, ''), 'i').test(filename)) {
+          return {
+            matched: true,
+            ruleName: rule.name,
+            destination: rule.moveTo.replace('{year}', '2026').replace('{month}', '04') + '/' + filename,
+            reason: `matched rule ${rule.name}`,
+            conditions: [
+              { type: 'name_regex', pattern: rule.match.nameRegex, passed: true },
+            ],
+          };
+        }
+        if (rule.match.ext && rule.match.ext.includes(ext)) {
+          return {
+            matched: true,
+            ruleName: rule.name,
+            destination: rule.moveTo.replace('{year}', '2026').replace('{ext}', ext) + '/' + filename,
+            reason: `matched rule ${rule.name}`,
+            conditions: [
+              { type: 'ext', pattern: `[${rule.match.ext.join(', ')}]`, passed: true },
+            ],
+          };
+        }
       }
       return {
         matched: false,
         reason: 'no rule matched the criteria',
+        conditions: [
+          { type: 'ext', pattern: '[pdf, docx]', passed: false },
+        ],
+      };
+    },
+    async testRule(rule: RuleDTO, filename: string): Promise<RuleTestResultDTO> {
+      const ext = filename.split('.').pop()?.toLowerCase() || '';
+      const conds: ConditionEvaluationDTO[] = [];
+      let allPassed = true;
+      if (rule.match.ext && rule.match.ext.length > 0) {
+        const passed = rule.match.ext.includes(ext);
+        if (!passed) allPassed = false;
+        conds.push({ type: 'ext', pattern: `[${rule.match.ext.join(', ')}]`, passed });
+      }
+      if (rule.match.nameRegex) {
+        const passed = new RegExp(rule.match.nameRegex.replace(/\(\?i\)/g, ''), 'i').test(filename);
+        if (!passed) allPassed = false;
+        conds.push({ type: 'name_regex', pattern: rule.match.nameRegex, passed });
+      }
+      return {
+        matched: allPassed,
+        ruleName: rule.name,
+        destination: allPassed ? rule.moveTo.replace('{year}', '2026').replace('{ext}', ext) + '/' + filename : '',
+        reason: allPassed ? `matched rule ${rule.name}` : 'conditions did not match',
+        conditions: conds,
       };
     },
   },
@@ -409,6 +471,11 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
     },
     async getAutostart(): Promise<boolean> {
       return false;
+    },
+    async countFiles(folderPath: string): Promise<number> {
+      if (folderPath.includes('Downloads')) return 24;
+      if (folderPath.includes('Desktop')) return 8;
+      return 12;
     },
   },
 

@@ -128,6 +128,62 @@ export const en = {
   'toast.restored': 'Restored {count} files. {conflicts} conflicts.',
   'toast.files_moved': 'Moved {count} files.',
   'toast.config_reloaded': 'Config changed on disk. Reloaded.',
+  'toast.rule_saved': 'Rule saved.',
+  'toast.rule_deleted': 'Rule deleted.',
+  'toast.folder_added': 'Folder added to watch list.',
+  'toast.folder_removed': 'Folder removed from watch list.',
+
+  // Rules (DESIGN.md 7.4)
+  'rules.caption': 'First match wins.',
+  'rules.reordered': 'Rule {name} moved to position {position} of {total}',
+  'rules.empty_title': 'No rules defined',
+  'rules.empty_desc': 'Create rules to automatically categorize and move incoming files.',
+  'rules.delete_title': 'Delete rule "{name}"?',
+  'rules.delete_desc': 'This rule will be removed from your configuration and can no longer match incoming files. This action cannot be undone.',
+  'rules.action_reorder_up': 'Move rule up',
+  'rules.action_reorder_down': 'Move rule down',
+
+  // Rule Editor (DESIGN.md 7.5)
+  'editor.title_new': 'New rule',
+  'editor.title_edit': 'Edit rule',
+  'editor.name_label': 'Rule name',
+  'editor.name_placeholder': 'e.g. Invoices, Pictures, Installers',
+  'editor.match_header': 'Match conditions',
+  'editor.match_and_notice': 'All added conditions must match (AND).',
+  'editor.add_condition': 'Add condition',
+  'editor.cond_ext': 'Extensions',
+  'editor.cond_glob': 'File name glob',
+  'editor.cond_regex': 'File name regex',
+  'editor.cond_min_size': 'Min size',
+  'editor.cond_max_size': 'Max size',
+  'editor.cond_older_than': 'Older than',
+  'editor.dest_label': 'Destination folder',
+  'editor.dest_placeholder': 'e.g. ~/Documents/Finance/{year}-{month}',
+  'editor.dest_preview': 'Sample destination: {sample}',
+  'editor.yaml_toggle': 'YAML',
+  'editor.test_button': 'Test against a file...',
+  'editor.external_change_warning': 'Configuration was changed on disk by another program. Review before saving.',
+
+  // Rule Tester (DESIGN.md 7.4 / 7.5)
+  'tester.title': 'Test a file name',
+  'tester.placeholder': 'Enter file name (e.g. invoice_2026_04.pdf)...',
+  'tester.test_button': 'Test file',
+  'tester.matched': 'Matched: Rule "{name}"',
+  'tester.unmatched': 'Unmatched',
+  'tester.destination': 'Destination: {path}',
+  'tester.conditions_header': 'Evaluated conditions:',
+
+  // Folders (DESIGN.md 7.6)
+  'folders.title': 'Watched folders',
+  'folders.caption': 'Folders actively monitored for incoming files.',
+  'folders.add': 'Add folder',
+  'folders.files_count': '{count} files',
+  'folders.counting': 'Counting files...',
+  'folders.recursive': 'Recursive',
+  'folders.recursive_tooltip': 'Monitor subdirectories inside this folder',
+  'folders.remove_title': 'Stop watching {path}?',
+  'folders.remove_desc': 'This folder will no longer be monitored. Existing files will remain in place.',
+  'folders.warn_recursive_dest': 'Warning: Rule "{rule}" destination ({dest}) is inside this recursive folder.',
 } as const;
 
 export type TranslationKey = keyof typeof en;

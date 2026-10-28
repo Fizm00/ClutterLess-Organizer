@@ -18,4 +18,7 @@ export * from './Kbd';
 export * from './StatusDot';
 export * from './Menu';
 export * from './UndoDialog';
+export * from './TagInput';
+export * from './RuleTester';
+export * from './RuleEditor';
 

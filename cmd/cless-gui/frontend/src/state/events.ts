@@ -2,6 +2,8 @@
 import { api } from '../api';
 import { useWatchStore } from './watchStore';
 import { useActivityStore } from './activityStore';
+import { useRulesStore } from './rulesStore';
+import { useFoldersStore } from './foldersStore';
 import { toast } from '../components/Toast';
 import { t } from '../i18n';
 
@@ -37,9 +39,14 @@ export function setupEventSubscriptions(): () => void {
     }
   });
 
-  const unsubConfig = api.onEvent('config:changed', payload => {
+  const unsubConfig = api.onEvent('config:changed', _payload => {
     toast.show(t('toast.config_reloaded'));
     useWatchStore.getState().init();
+    useRulesStore.getState().fetchRules();
+    useFoldersStore.getState().fetchFolders();
+    if (useRulesStore.getState().editingRule) {
+      useRulesStore.getState().setExternalChangeDetected(true);
+    }
   });
 
   const unsubError = api.onEvent('app:error', payload => {

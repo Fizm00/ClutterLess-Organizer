@@ -26,6 +26,13 @@ export const wailsApi: Api = {
     async resetToDefaults() {
       return ConfigService.ResetToDefaults();
     },
+    async getFolderWarnings() {
+      const cfg: any = ConfigService;
+      if (typeof cfg?.GetFolderWarnings === 'function') {
+        return (await cfg.GetFolderWarnings()) as any;
+      }
+      return mockApi.config.getFolderWarnings();
+    },
   },
   rules: {
     async list() {
@@ -42,6 +49,13 @@ export const wailsApi: Api = {
     },
     async test(filename) {
       return (await RulesService.Test(filename)) as any;
+    },
+    async testRule(rule, filename) {
+      const rs: any = RulesService;
+      if (typeof rs?.TestRule === 'function') {
+        return (await rs.TestRule(rule as any, filename)) as any;
+      }
+      return mockApi.rules.testRule(rule, filename);
     },
   },
   organize: {
@@ -106,7 +120,20 @@ export const wailsApi: Api = {
     async openConfig() {
       return SystemService.OpenConfig();
     },
-    pickFolder: mockApi.system.pickFolder,
+    async pickFolder() {
+      const sys: any = SystemService;
+      if (typeof sys?.PickFolder === 'function') {
+        return (await sys.PickFolder()) as any;
+      }
+      return mockApi.system.pickFolder();
+    },
+    async countFiles(folderPath: string) {
+      const sys: any = SystemService;
+      if (typeof sys?.CountFiles === 'function') {
+        return (await sys.CountFiles(folderPath)) as any;
+      }
+      return mockApi.system.countFiles(folderPath);
+    },
     setAutostart: mockApi.system.setAutostart,
     getAutostart: mockApi.system.getAutostart,
   },

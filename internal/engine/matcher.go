@@ -68,6 +68,9 @@ func CompileRule(rc config.RuleConfig) (Rule, error) {
 func CompileRules(rcs []config.RuleConfig) ([]Rule, error) {
 	var rules []Rule
 	for _, rc := range rcs {
+		if rc.Disabled {
+			continue
+		}
 		rule, err := CompileRule(rc)
 		if err != nil {
 			return nil, err

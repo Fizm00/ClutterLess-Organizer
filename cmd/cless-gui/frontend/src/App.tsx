@@ -1,16 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, FolderSync } from 'lucide-react';
+import { Play, Pause, FolderSync, Plus, FolderPlus } from 'lucide-react';
 import { AppShell, NavRoute } from './components/AppShell';
 import { Button } from './components/Button';
 import { Overview } from './screens/Overview';
 import { Activity } from './screens/Activity';
+import { Rules } from './screens/Rules';
+import { Folders } from './screens/Folders';
 import { PreviewSheet } from './screens/Preview';
 import { UndoDialog } from './components/UndoDialog';
 import { Styleguide } from './screens/Styleguide';
 import { useThemeStore } from './store/themeStore';
 import { useWatchStore } from './state/watchStore';
 import { useActivityStore } from './state/activityStore';
+import { useRulesStore } from './state/rulesStore';
+import { useFoldersStore } from './state/foldersStore';
 import { setupEventSubscriptions } from './state/events';
 import { t } from './i18n';
 
@@ -91,6 +95,65 @@ export const App: React.FC = () => {
         }));
         useActivityStore.setState({ batches: dummyBatches });
       };
+      (window as any).__setEmptyRules = () => {
+        useRulesStore.setState({ rules: [] });
+      };
+      (window as any).__setManyRules = () => {
+        const dummyRules = Array.from({ length: 25 }, (_, i) => ({
+          name: `Rule ${i + 1}`,
+          disabled: i % 5 === 0,
+          moveTo: `~/Sorted/Category_${(i % 5) + 1}/{year}`,
+          match: { ext: ['jpg', 'png', 'pdf'] },
+        }));
+        useRulesStore.setState({ rules: dummyRules });
+      };
+      (window as any).__setLongNameRule = () => {
+        useRulesStore.setState({
+          rules: [
+            {
+              name: 'Quarterly Corporate Enterprise Financial Audit Reconciliation Reports Rule 2026',
+              disabled: false,
+              moveTo:
+                'C:/Users/Administrator/Documents/Corporate_Enterprise_Financial_Records/2026/Q1_Audits/Reconciliations/Finalized/{year}-{month}',
+              match: {
+                nameRegex:
+                  '(?i)(quarterly_financial_audit_reconciliation_report_final_v2_approved_signed)',
+                ext: ['pdf', 'xlsx'],
+              },
+            },
+          ],
+        });
+      };
+      (window as any).__openNewRuleEditor = () => {
+        useRulesStore.getState().openEditor();
+      };
+      (window as any).__openEditRuleEditor = () => {
+        const rules = useRulesStore.getState().rules;
+        if (rules.length > 0) {
+          useRulesStore.getState().openEditor(rules[0]);
+        }
+      };
+      (window as any).__setRecursiveWarningFolders = () => {
+        useFoldersStore.setState({
+          folders: [
+            { path: '~/Downloads', recursive: true },
+            { path: '~/Desktop', recursive: false },
+          ],
+          warnings: [
+            {
+              folderPath: '~/Downloads',
+              ruleName: 'Archives',
+              moveTo: '~/Downloads/_Archives',
+              message:
+                'Rule "Archives" destination (~/Downloads/_Archives) is inside this recursive folder.',
+            },
+          ],
+          fileCounts: {
+            '~/Downloads': 42,
+            '~/Desktop': 8,
+          },
+        });
+      };
     }
 
     return () => {
@@ -118,17 +181,9 @@ export const App: React.FC = () => {
       case 'activity':
         return <Activity onOrganizeNow={handleOrganizeNow} />;
       case 'rules':
-        return (
-          <div className="text-text-2">
-            <p className="type-body">Rules management scaffold ready for Phase G5.</p>
-          </div>
-        );
+        return <Rules />;
       case 'folders':
-        return (
-          <div className="text-text-2">
-            <p className="type-body">Folders management scaffold ready for Phase G5.</p>
-          </div>
-        );
+        return <Folders />;
       case 'settings':
         return (
           <div className="text-text-2">
@@ -173,9 +228,19 @@ export const App: React.FC = () => {
           </Button>
         );
       case 'rules':
-        return <Button variant="primary">{t('action.new_rule')}</Button>;
+        return (
+          <Button variant="primary" size="sm" onClick={() => useRulesStore.getState().openEditor()}>
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            <span>{t('action.new_rule')}</span>
+          </Button>
+        );
       case 'folders':
-        return <Button variant="primary">{t('action.add_folder')}</Button>;
+        return (
+          <Button variant="primary" size="sm" onClick={() => void useFoldersStore.getState().addFolder()}>
+            <FolderPlus className="h-3.5 w-3.5 mr-1" />
+            <span>{t('action.add_folder')}</span>
+          </Button>
+        );
       default:
         return undefined;
     }

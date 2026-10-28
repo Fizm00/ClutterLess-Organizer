@@ -87,4 +87,9 @@ This project depends on the third-party Go modules listed below. All dependencie
 - **URL:** https://github.com/lukeed/clsx, https://github.com/dcastil/tailwind-merge, https://github.com/joe-bell/cva
 - **Description:** Class name composition and variant management utilities used by shadcn/ui components.
 
+### 13. `@dnd-kit` (`@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`)
+- **License:** MIT License
+- **URL:** https://github.com/clauderic/dnd-kit
+- **Description:** Lightweight, modular drag and drop toolkit for React with accessible keyboard reordering.
+
 

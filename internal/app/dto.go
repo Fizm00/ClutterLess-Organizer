@@ -39,9 +39,10 @@ type MatchDTO struct {
 
 // RuleDTO represents a user organization rule.
 type RuleDTO struct {
-	Name   string   `json:"name"`
-	MoveTo string   `json:"moveTo"`
-	Match  MatchDTO `json:"match"`
+	Name     string   `json:"name"`
+	Disabled bool     `json:"disabled,omitempty"`
+	MoveTo   string   `json:"moveTo"`
+	Match    MatchDTO `json:"match"`
 }
 
 // ConfigDTO represents full application configuration serializable to frontend.
@@ -57,12 +58,29 @@ type ValidationErrorDTO struct {
 	Message string `json:"message"`
 }
 
+// ConditionEvaluationDTO describes the evaluation outcome for an individual rule condition.
+type ConditionEvaluationDTO struct {
+	Type    string `json:"type"`    // "ext", "name_glob", "name_regex", "min_size", "max_size", "older_than"
+	Pattern string `json:"pattern"` // human-readable pattern e.g. "[jpg, png]" or "(?i)(invoice)"
+	Passed  bool   `json:"passed"`
+	Details string `json:"details,omitempty"`
+}
+
 // RuleTestResultDTO contains the outcome of testing a rule against a virtual file name.
 type RuleTestResultDTO struct {
-	Matched     bool   `json:"matched"`
-	RuleName    string `json:"ruleName,omitempty"`
-	Destination string `json:"destination,omitempty"`
-	Reason      string `json:"reason"`
+	Matched     bool                     `json:"matched"`
+	RuleName    string                   `json:"ruleName,omitempty"`
+	Destination string                   `json:"destination,omitempty"`
+	Reason      string                   `json:"reason"`
+	Conditions  []ConditionEvaluationDTO `json:"conditions,omitempty"`
+}
+
+// FolderWarningDTO describes a warning condition for a watched folder.
+type FolderWarningDTO struct {
+	FolderPath string `json:"folderPath"`
+	RuleName   string `json:"ruleName"`
+	MoveTo     string `json:"moveTo"`
+	Message    string `json:"message"`
 }
 
 // ---- Organize DTOs ----
