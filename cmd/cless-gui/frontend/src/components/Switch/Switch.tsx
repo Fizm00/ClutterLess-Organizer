@@ -26,7 +26,13 @@ export const Switch: React.FC<SwitchProps> = ({
   const switchId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
   return (
-    <div className={cn('flex items-center justify-between gap-4 w-full', className)}>
+    <div
+      className={cn(
+        'inline-flex items-center',
+        label || description ? 'justify-between gap-4 w-full' : 'shrink-0',
+        className
+      )}
+    >
       {(label || description) && (
         <div className="flex flex-col gap-0.5">
           {label && (

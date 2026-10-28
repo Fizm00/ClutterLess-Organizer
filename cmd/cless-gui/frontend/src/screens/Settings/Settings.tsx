@@ -141,7 +141,7 @@ export const Settings: React.FC = () => {
   const settings = config?.settings;
 
   return (
-    <div className="w-full max-w-3xl flex flex-col gap-10 pb-16" data-testid="settings-screen">
+    <div className="w-full flex flex-col gap-8 pb-16" data-testid="settings-screen">
       {/* Toast notification */}
       {toastMessage && (
         <div
@@ -164,7 +164,7 @@ export const Settings: React.FC = () => {
           <p className="text-small text-text-3">{t('settings.appearance_desc')}</p>
         </div>
 
-        <div className="flex flex-col divide-y divide-border-subtle border-y border-border-subtle">
+        <div className="flex flex-col divide-y divide-border-subtle border border-border rounded-xl bg-card px-5 shadow-xs">
           {/* Theme Row */}
           <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex flex-col gap-0.5">
@@ -213,7 +213,7 @@ export const Settings: React.FC = () => {
           <p className="text-small text-text-3">{t('settings.behavior_desc')}</p>
         </div>
 
-        <div className="flex flex-col divide-y divide-border-subtle border-y border-border-subtle">
+        <div className="flex flex-col divide-y divide-border-subtle border border-border rounded-xl bg-card px-5 shadow-xs">
           {/* Stable After Seconds Row */}
           <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex flex-col gap-0.5">
@@ -345,7 +345,7 @@ export const Settings: React.FC = () => {
           <p className="text-small text-text-3">{t('settings.system_desc')}</p>
         </div>
 
-        <div className="flex flex-col divide-y divide-border-subtle border-y border-border-subtle">
+        <div className="flex flex-col divide-y divide-border-subtle border border-border rounded-xl bg-card px-5 shadow-xs">
           {/* Autostart Row */}
           <div className="py-4 flex items-center justify-between gap-4">
             <div className="flex flex-col gap-0.5">
@@ -419,7 +419,7 @@ export const Settings: React.FC = () => {
           <p className="text-small text-text-3">{t('settings.data_desc')}</p>
         </div>
 
-        <div className="flex flex-col divide-y divide-border-subtle border-y border-border-subtle">
+        <div className="flex flex-col divide-y divide-border-subtle border border-border rounded-xl bg-card px-5 shadow-xs">
           {/* Open Config File Row */}
           <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex flex-col gap-0.5">
@@ -516,7 +516,7 @@ export const Settings: React.FC = () => {
           <p className="text-small text-text-3">{t('settings.about_desc')}</p>
         </div>
 
-        <div className="flex flex-col divide-y divide-border-subtle border-y border-border-subtle text-small">
+        <div className="flex flex-col divide-y divide-border-subtle border border-border rounded-xl bg-card px-5 shadow-xs text-small">
           {/* Version */}
           <div className="py-3 flex items-center justify-between gap-4">
             <span className="text-text-2 font-medium">{t('settings.version')}</span>

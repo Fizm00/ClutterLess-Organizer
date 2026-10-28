@@ -79,3 +79,4 @@ All screenshots captured at 1080x700 and 880x560 viewports in both Dark and Ligh
 - **Vite Production Build**: Production bundle successfully generated in `cmd/cless-gui/frontend/dist`.
 - **Go Unit Tests**: All backend packages passing (`internal/app`, `internal/cli`, `internal/config`, `internal/engine`, `internal/history`, `internal/platform`, `internal/ui`, `internal/version`, `internal/watcher`).
 - **Go Vet**: Clean pass across all Go modules.
+

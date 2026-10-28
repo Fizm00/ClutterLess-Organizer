@@ -146,8 +146,9 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate, onOrganizeNow })
             folders.map(folder => (
               <div
                 key={folder}
-                className="inline-flex items-center bg-card border border-border rounded-md px-2.5 py-1 shadow-xs max-w-full"
+                className="inline-flex items-center gap-1.5 bg-card border border-border rounded-md px-2.5 py-1 shadow-xs max-w-full"
               >
+                <Folder size={13} strokeWidth={1.75} className="text-accent shrink-0" aria-hidden="true" />
                 <Path
                   path={folder}
                   onReveal={p => api.system.revealPath(p)}
@@ -238,10 +239,10 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate, onOrganizeNow })
         ) : (
           <div className="flex flex-col w-full">
             <ListRow isHeader>
-              <span className="w-60 shrink-0">File</span>
+              <span className="w-64 shrink-0">File</span>
               <span className="w-4 shrink-0" aria-hidden="true" />
               <span className="flex-1 min-w-0">Destination</span>
-              <span className="w-24 shrink-0 text-right">Rule</span>
+              <span className="w-28 shrink-0 text-right">Rule</span>
               <span className="w-12 shrink-0 text-right">Time</span>
             </ListRow>
 

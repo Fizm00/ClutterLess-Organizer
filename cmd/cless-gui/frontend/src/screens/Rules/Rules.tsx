@@ -10,14 +10,22 @@ import {
   DragEndEvent,
 } from '@dnd-kit/core';
 import {
+  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   useSortable,
-  arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, MoreHorizontal, Edit2, Copy, Trash2, ArrowRight } from 'lucide-react';
+import {
+  GripVertical,
+  MoreHorizontal,
+  ArrowRight,
+  Edit2,
+  Copy,
+  Trash2,
+  Folder,
+} from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Switch } from '../../components/Switch';
 import { Menu } from '../../components/Menu';
@@ -26,11 +34,11 @@ import { EmptyState } from '../../components/EmptyState';
 import { RuleTester } from '../../components/RuleTester';
 import { RuleEditor } from '../../components/RuleEditor';
 import { useRulesStore } from '../../state/rulesStore';
-import type { RuleDTO } from '../../api/types';
+import { RuleDTO } from '../../api/types';
 import { t } from '../../i18n';
 import { cn } from '../../lib/utils';
 
-// Helper to extract clean condition summary
+// Helper to summarize match conditions in mono
 function getConditionSummary(rule: RuleDTO): string {
   const parts: string[] = [];
   if (rule.match.ext && rule.match.ext.length > 0) {
@@ -80,6 +88,7 @@ interface SortableRuleRowProps {
 
 const SortableRuleRow: React.FC<SortableRuleRowProps> = ({
   rule,
+  index,
   onEdit,
   onDuplicate,
   onDelete,
@@ -117,10 +126,10 @@ const SortableRuleRow: React.FC<SortableRuleRowProps> = ({
       style={style}
       onKeyDown={handleKeyDown}
       className={cn(
-        'group flex items-center justify-between rounded-md border border-border bg-bg-surface px-3 py-2.5 transition-colors',
-        'hover:bg-bg-raised/60 focus-within:ring-1 focus-within:ring-accent',
-        isDragging && 'opacity-60 shadow-lg border-accent/40 z-10',
-        rule.disabled && 'opacity-60 bg-bg-surface/50'
+        'group flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-xs transition-all duration-fast ease',
+        'hover:border-border-strong hover:bg-bg-raised/40 focus-within:ring-1 focus-within:ring-accent',
+        isDragging && 'opacity-75 shadow-elevation border-accent z-10',
+        rule.disabled && 'opacity-55 bg-card/50'
       )}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -130,14 +139,19 @@ const SortableRuleRow: React.FC<SortableRuleRowProps> = ({
           {...attributes}
           {...listeners}
           aria-label={`Drag handle for rule ${rule.name}. Press Alt+Up or Alt+Down to reorder.`}
-          className="text-text-muted hover:text-text-primary p-1 rounded-xs cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+          className="text-text-3 hover:text-text-1 p-1 rounded-sm cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent transition-colors"
         >
           <GripVertical className="h-4 w-4" />
         </button>
 
+        {/* Priority Index Pill */}
+        <span className="font-mono text-caption text-text-3 w-5 text-center shrink-0">
+          {index + 1}
+        </span>
+
         {/* Category Dot */}
         <span
-          className={cn('h-2 w-2 rounded-full shrink-0', getCategoryColor(rule.name))}
+          className={cn('h-2.5 w-2.5 rounded-full shrink-0', getCategoryColor(rule.name))}
           aria-hidden="true"
         />
 
@@ -145,32 +159,37 @@ const SortableRuleRow: React.FC<SortableRuleRowProps> = ({
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <span
             className={cn(
-              'text-sm font-medium text-text-primary truncate w-40 shrink-0',
-              rule.disabled && 'text-text-muted'
+              'text-body font-semibold text-foreground truncate w-32 shrink-0',
+              rule.disabled && 'text-muted-foreground'
             )}
             title={rule.name}
           >
             {rule.name}
           </span>
 
-          <span
-            className="font-mono text-xs text-text-muted bg-bg-raised/70 border border-border/60 rounded-xs px-2 py-0.5 truncate max-w-xs shrink-0"
-            title={getConditionSummary(rule)}
-          >
-            {getConditionSummary(rule)}
-          </span>
+          <div className="w-60 shrink-0 min-w-0">
+            <span
+              className="block font-mono text-caption text-text-2 bg-muted border border-border-subtle rounded-md px-2.5 py-1 truncate w-full"
+              title={getConditionSummary(rule)}
+            >
+              {getConditionSummary(rule)}
+            </span>
+          </div>
 
-          <div className="flex items-center gap-1.5 min-w-0 flex-1 text-xs font-mono text-text-secondary truncate">
-            <ArrowRight className="h-3 w-3 text-text-muted shrink-0" />
-            <span className="truncate" title={rule.moveTo}>
-              {rule.moveTo}
+          <div className="flex items-center gap-2.5 min-w-0 flex-1 text-small font-mono text-text-2">
+            <ArrowRight className="h-3.5 w-3.5 text-text-3 shrink-0" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-bg-app/60 border border-border-subtle truncate max-w-full">
+              <Folder className="h-3 w-3 text-accent shrink-0" aria-hidden="true" />
+              <span className="truncate text-text-1" title={rule.moveTo}>
+                {rule.moveTo}
+              </span>
             </span>
           </div>
         </div>
       </div>
 
       {/* Row Actions */}
-      <div className="flex items-center gap-2 shrink-0 ml-3">
+      <div className="flex items-center gap-2.5 shrink-0 ml-3">
         <Switch
           checked={!rule.disabled}
           onCheckedChange={onToggle}
@@ -182,7 +201,7 @@ const SortableRuleRow: React.FC<SortableRuleRowProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 p-0 text-text-muted hover:text-text-primary"
+              className="h-8 w-8 p-0 text-text-3 hover:text-text-1"
               aria-label={`Menu for rule ${rule.name}`}
             >
               <MoreHorizontal className="h-4 w-4" />
@@ -287,28 +306,35 @@ export const Rules: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-5xl mx-auto w-full">
+    <div className="flex flex-col gap-5 w-full">
       {/* Live Region for Screen Reader Reorder Announcements */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {ariaAnnouncement}
       </div>
 
       {/* Screen Subtitle / Caption */}
-      <div className="text-xs text-text-muted -mt-2">
-        {t('rules.caption')}
+      <div className="flex items-center justify-between px-1">
+        <span className="text-small text-text-2">
+          {t('rules.caption')}
+        </span>
+        <span className="font-mono text-caption text-text-3">
+          {rules.filter(r => !r.disabled).length} active / {rules.length} total
+        </span>
       </div>
 
       {/* Rules List */}
       {rules.length === 0 && !loading ? (
-        <EmptyState
-          title={t('rules.empty_title')}
-          description={t('rules.empty_desc')}
-          action={
-            <Button variant="primary" onClick={() => openEditor()}>
-              {t('action.new_rule')}
-            </Button>
-          }
-        />
+        <div className="flex flex-col bg-card border border-border rounded-xl shadow-xs overflow-hidden w-full p-6">
+          <EmptyState
+            title={t('rules.empty_title')}
+            description={t('rules.empty_desc')}
+            action={
+              <Button variant="primary" onClick={() => openEditor()}>
+                {t('action.new_rule')}
+              </Button>
+            }
+          />
+        </div>
       ) : (
         <DndContext
           id={dndId}
@@ -317,7 +343,7 @@ export const Rules: React.FC = () => {
           onDragEnd={handleDragEnd}
         >
           <SortableContext items={rules.map(r => r.name)} strategy={verticalListSortingStrategy}>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2.5 w-full">
               {rules.map((rule, idx) => (
                 <SortableRuleRow
                   key={rule.name}
@@ -338,7 +364,7 @@ export const Rules: React.FC = () => {
       )}
 
       {/* Inline Tester */}
-      <div className="pt-2">
+      <div className="pt-1 w-full">
         <RuleTester />
       </div>
 
@@ -364,7 +390,7 @@ export const Rules: React.FC = () => {
           </div>
         }
       >
-        <p className="text-sm text-text-muted">
+        <p className="text-small text-text-2">
           Files matching this rule will no longer be automatically organized into its destination.
         </p>
       </Dialog>

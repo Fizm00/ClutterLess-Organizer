@@ -46,11 +46,13 @@ export const RuleTester: React.FC<RuleTesterProps> = ({
   };
 
   return (
-    <div className={cn('rounded-md border border-border bg-bg-surface p-4 flex flex-col gap-3', className)}>
+    <div className={cn('rounded-xl border border-border bg-card shadow-xs p-5 flex flex-col gap-3.5', className)}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FileText className="h-4 w-4 text-accent" />
-          <h3 className="text-sm font-medium text-text-primary">{t('tester.title')}</h3>
+        <div className="flex items-center gap-2.5">
+          <span className="flex items-center justify-center w-6 h-6 rounded-md bg-accent/15 border border-accent/25 text-accent">
+            <FileText className="h-3.5 w-3.5" />
+          </span>
+          <h3 className="text-subtitle font-semibold text-foreground">{t('tester.title')}</h3>
         </div>
         {onClose && (
           <Button variant="ghost" size="sm" onClick={onClose} aria-label={t('action.close')}>
