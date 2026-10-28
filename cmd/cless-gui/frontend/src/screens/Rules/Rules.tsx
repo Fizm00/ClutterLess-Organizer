@@ -25,6 +25,7 @@ import {
   Copy,
   Trash2,
   Folder,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Switch } from '../../components/Switch';
@@ -62,16 +63,28 @@ function getConditionSummary(rule: RuleDTO): string {
   return parts.join(' · ') || 'any';
 }
 
-// Category dot color mapping based on rule name
-function getCategoryColor(name: string): string {
+// Category color mapping based on rule name
+function getCategoryTheme(name: string): { dot: string; badge: string } {
   const lower = name.toLowerCase();
-  if (lower.includes('invoice') || lower.includes('finance')) return 'bg-emerald-500';
-  if (lower.includes('image') || lower.includes('photo')) return 'bg-cyan-500';
-  if (lower.includes('video') || lower.includes('media')) return 'bg-purple-500';
-  if (lower.includes('archive') || lower.includes('zip')) return 'bg-amber-500';
-  if (lower.includes('doc') || lower.includes('text')) return 'bg-blue-500';
-  if (lower.includes('installer') || lower.includes('setup')) return 'bg-rose-500';
-  return 'bg-accent';
+  if (lower.includes('invoice') || lower.includes('finance')) {
+    return { dot: 'bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/25' };
+  }
+  if (lower.includes('image') || lower.includes('photo')) {
+    return { dot: 'bg-cyan-500', badge: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/25' };
+  }
+  if (lower.includes('video') || lower.includes('media')) {
+    return { dot: 'bg-purple-500', badge: 'bg-purple-500/10 text-purple-500 border-purple-500/25' };
+  }
+  if (lower.includes('archive') || lower.includes('zip')) {
+    return { dot: 'bg-amber-500', badge: 'bg-amber-500/10 text-amber-500 border-amber-500/25' };
+  }
+  if (lower.includes('doc') || lower.includes('text')) {
+    return { dot: 'bg-blue-500', badge: 'bg-blue-500/10 text-blue-500 border-blue-500/25' };
+  }
+  if (lower.includes('installer') || lower.includes('setup')) {
+    return { dot: 'bg-rose-500', badge: 'bg-rose-500/10 text-rose-500 border-rose-500/25' };
+  }
+  return { dot: 'bg-accent', badge: 'bg-accent/10 text-accent border-accent/25' };
 }
 
 interface SortableRuleRowProps {
@@ -120,6 +133,9 @@ const SortableRuleRow: React.FC<SortableRuleRowProps> = ({
     }
   };
 
+  const theme = getCategoryTheme(rule.name);
+  const exts = rule.match.ext || [];
+
   return (
     <div
       ref={setNodeRef}
@@ -144,42 +160,61 @@ const SortableRuleRow: React.FC<SortableRuleRowProps> = ({
           <GripVertical className="h-4 w-4" />
         </button>
 
-        {/* Priority Index Pill */}
-        <span className="font-mono text-caption text-text-3 w-5 text-center shrink-0">
-          {index + 1}
-        </span>
-
-        {/* Category Dot */}
+        {/* Priority Index Badge */}
         <span
-          className={cn('h-2.5 w-2.5 rounded-full shrink-0', getCategoryColor(rule.name))}
-          aria-hidden="true"
-        />
+          className={cn(
+            'inline-flex items-center justify-center font-mono text-caption font-semibold w-6 h-6 rounded-md border shrink-0',
+            theme.badge
+          )}
+        >
+          #{index + 1}
+        </span>
 
         {/* Rule Info */}
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          <span
-            className={cn(
-              'text-body font-semibold text-foreground truncate w-32 shrink-0',
-              rule.disabled && 'text-muted-foreground'
-            )}
-            title={rule.name}
-          >
-            {rule.name}
-          </span>
-
-          <div className="w-60 shrink-0 min-w-0">
+          <div className="flex items-center gap-2 w-32 shrink-0 min-w-0">
+            <span className={cn('h-2 w-2 rounded-full shrink-0', theme.dot)} aria-hidden="true" />
             <span
-              className="block font-mono text-caption text-text-2 bg-muted border border-border-subtle rounded-md px-2.5 py-1 truncate w-full"
-              title={getConditionSummary(rule)}
+              className={cn(
+                'text-body font-semibold text-foreground truncate',
+                rule.disabled && 'text-muted-foreground'
+              )}
+              title={rule.name}
             >
-              {getConditionSummary(rule)}
+              {rule.name}
             </span>
           </div>
 
+          {/* Match Conditions Column */}
+          <div className="w-64 shrink-0 min-w-0 flex items-center gap-1 overflow-hidden" title={getConditionSummary(rule)}>
+            {exts.length > 0 ? (
+              <>
+                {exts.slice(0, 4).map(ext => (
+                  <span
+                    key={ext}
+                    className="font-mono text-caption text-text-1 bg-muted border border-border-subtle rounded-md px-1.5 py-0.5 shrink-0"
+                  >
+                    .{ext}
+                  </span>
+                ))}
+                {exts.length > 4 && (
+                  <span className="font-mono text-caption text-text-3 bg-muted/60 border border-border-subtle rounded-md px-1.5 py-0.5 shrink-0">
+                    +{exts.length - 4}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="block font-mono text-caption text-text-2 bg-muted border border-border-subtle rounded-md px-2.5 py-1 truncate w-full">
+                {getConditionSummary(rule)}
+              </span>
+            )}
+          </div>
+
+          {/* Destination Column */}
           <div className="flex items-center gap-2.5 min-w-0 flex-1 text-small font-mono text-text-2">
             <ArrowRight className="h-3.5 w-3.5 text-text-3 shrink-0" />
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-bg-app/60 border border-border-subtle truncate max-w-full">
-              <Folder className="h-3 w-3 text-accent shrink-0" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/50 border border-border-subtle truncate max-w-full">
+              <Folder className="h-3.5 w-3.5 text-accent shrink-0" aria-hidden="true" />
               <span className="truncate text-text-1" title={rule.moveTo}>
                 {rule.moveTo}
               </span>
@@ -306,18 +341,28 @@ export const Rules: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5 w-full">
+    <div className="flex flex-col gap-4 w-full">
       {/* Live Region for Screen Reader Reorder Announcements */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {ariaAnnouncement}
       </div>
 
-      {/* Screen Subtitle / Caption */}
-      <div className="flex items-center justify-between px-1">
-        <span className="text-small text-text-2">
-          {t('rules.caption')}
-        </span>
-        <span className="font-mono text-caption text-text-3">
+      {/* Top Pipeline Banner Card */}
+      <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-card border border-border shadow-xs">
+        <div className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-accent/10 border border-accent/25 text-accent">
+            <SlidersHorizontal size={15} strokeWidth={1.75} />
+          </span>
+          <div className="flex flex-col">
+            <span className="font-sans text-body font-semibold text-foreground">
+              {t('rules.caption')}
+            </span>
+            <span className="font-sans text-caption text-text-3">
+              Rules are evaluated top-to-bottom. Drag handles or press Alt+Up / Alt+Down to reorder priority.
+            </span>
+          </div>
+        </div>
+        <span className="font-mono text-caption text-accent bg-accent/10 border border-accent/25 px-2.5 py-1 rounded-md">
           {rules.filter(r => !r.disabled).length} active / {rules.length} total
         </span>
       </div>
