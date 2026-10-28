@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/Fizm00/organizer/internal/history"
+	"github.com/Fizm00/organizer/internal/platform"
 )
 
 func TestWatchService_StartStopAndStatus(t *testing.T) {
@@ -96,7 +97,7 @@ func TestWatchService_LockConflictBetweenServices(t *testing.T) {
 
 	// Simulate a second distinct process by modifying lock PID to a live process (ppid)
 	parentPID := os.Getppid()
-	if parentPID > 0 {
+	if parentPID > 0 && platform.IsProcessAlive(parentPID) {
 		lockJSON := []byte(fmt.Sprintf(`{"pid": %d, "startTime": "2026-10-28T17:00:00Z"}`, parentPID))
 		_ = os.WriteFile(filepath.Join(tempDir, "watcher.lock"), lockJSON, 0644)
 

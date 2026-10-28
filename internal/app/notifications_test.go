@@ -3,6 +3,7 @@
 package app
 
 import (
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -57,9 +58,10 @@ func TestNotificationAggregator_SingleFolderCoalescing(t *testing.T) {
 	agg.SetEnabled(true)
 	defer agg.Stop()
 
-	// Simulate rapid moves in Downloads
-	agg.RecordMove(`C:\Users\User\Downloads`, 5)
-	agg.RecordMove(`C:\Users\User\Downloads`, 7)
+	// Simulate rapid moves in Downloads (using filepath.Join for cross-platform compatibility)
+	downloadsPath := filepath.Join(string(filepath.Separator)+"users", "user", "Downloads")
+	agg.RecordMove(downloadsPath, 5)
+	agg.RecordMove(downloadsPath, 7)
 
 	// Wait for debounce flush
 	time.Sleep(100 * time.Millisecond)
@@ -79,8 +81,10 @@ func TestNotificationAggregator_MultipleFolders(t *testing.T) {
 	agg.SetEnabled(true)
 	defer agg.Stop()
 
-	agg.RecordMove(`C:\Users\User\Downloads`, 3)
-	agg.RecordMove(`C:\Users\User\Desktop`, 2)
+	downloadsPath := filepath.Join(string(filepath.Separator)+"users", "user", "Downloads")
+	desktopPath := filepath.Join(string(filepath.Separator)+"users", "user", "Desktop")
+	agg.RecordMove(downloadsPath, 3)
+	agg.RecordMove(desktopPath, 2)
 
 	time.Sleep(100 * time.Millisecond)
 
@@ -100,7 +104,8 @@ func TestNotificationAggregator_SuppressedWhenWindowFocused(t *testing.T) {
 	agg.SetEnabled(true)
 	defer agg.Stop()
 
-	agg.RecordMove(`C:\Users\User\Downloads`, 4)
+	downloadsPath := filepath.Join(string(filepath.Separator)+"users", "user", "Downloads")
+	agg.RecordMove(downloadsPath, 4)
 	time.Sleep(100 * time.Millisecond)
 
 	if notifier.count() != 0 {
@@ -114,7 +119,8 @@ func TestNotificationAggregator_Disabled(t *testing.T) {
 	agg.SetEnabled(false) // disabled
 	defer agg.Stop()
 
-	agg.RecordMove(`C:\Users\User\Downloads`, 10)
+	downloadsPath := filepath.Join(string(filepath.Separator)+"users", "user", "Downloads")
+	agg.RecordMove(downloadsPath, 10)
 	time.Sleep(100 * time.Millisecond)
 
 	if notifier.count() != 0 {
@@ -141,4 +147,3 @@ func TestNotificationAggregator_ImmediateError(t *testing.T) {
 		t.Errorf("unexpected error notification payload: title=%q, body=%q, isErr=%v", title, body, isErr)
 	}
 }
-

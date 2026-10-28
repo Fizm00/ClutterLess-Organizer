@@ -29,13 +29,13 @@ builds:
 
 archives:
   - id: cless-archive
-    builds:
-      - cless
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    format: tar.gz
+    formats:
+      - tar.gz
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
     files:
       - LICENSE
       - README.md
@@ -52,3 +52,9 @@ changelog:
       - "^docs:"
       - "^test:"
       - "^chore:"
+
+release:
+  github:
+    owner: Fizm00
+    name: ClutterLess-Organizer
+  mode: replace
