@@ -3,7 +3,7 @@
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.sh | bash
 # Or specify a version:
-#   CLESS_VERSION="0.3.0" curl -fsSL https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.sh | bash
+#   CLESS_VERSION="1.0.0" curl -fsSL https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.sh | bash
 
 set -e
 
@@ -41,7 +41,7 @@ esac
 
 # 2. Resolve version tag
 REPO="Fizm00/ClutterLess-Organizer"
-TAG="v0.3.0"
+TAG="v1.0.0"
 
 if [ "$VERSION_INPUT" = "latest" ]; then
   # Try redirect location header first (fast, reliable, no API rate limits)

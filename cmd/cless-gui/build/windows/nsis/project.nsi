@@ -6,7 +6,7 @@ Unicode true
 !define INFO_PROJECTNAME    "cless-gui"
 !define INFO_COMPANYNAME    "ClutterLess"
 !define INFO_PRODUCTNAME    "ClutterLess"
-!define INFO_PRODUCTVERSION "0.3.0"
+!define INFO_PRODUCTVERSION "1.0.0"
 !define INFO_COPYRIGHT      "(c) 2026, Fizm00"
 !define PRODUCT_EXECUTABLE  "cless-gui.exe"
 !define UNINST_KEY_NAME     "ClutterLess"

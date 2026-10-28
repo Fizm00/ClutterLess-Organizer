@@ -56,7 +56,7 @@ irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.
 _To install a specific version:_
 
 ```powershell
-$env:CLESS_VERSION="0.3.0"; irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.ps1 | iex
+$env:CLESS_VERSION="1.0.0"; irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.ps1 | iex
 ```
 
 #### Linux & macOS (Bash / Zsh)
@@ -68,7 +68,7 @@ curl -fsSL https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/i
 _To install a specific version:_
 
 ```bash
-CLESS_VERSION="0.3.0" curl -fsSL https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.sh | bash
+CLESS_VERSION="1.0.0" curl -fsSL https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.sh | bash
 ```
 
 ---
@@ -81,12 +81,12 @@ Download standalone archive binaries directly from [GitHub Releases](https://git
 
 | Platform    | Architecture             | Archive                                                                                              |
 | ----------- | ------------------------ | ---------------------------------------------------------------------------------------------------- |
-| **Windows** | x86_64 / amd64           | [`cless_0.3.0_windows_amd64.zip`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)   |
-| **Windows** | ARM64                    | [`cless_0.3.0_windows_arm64.zip`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)   |
-| **Linux**   | x86_64 / amd64           | [`cless_0.3.0_linux_amd64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)  |
-| **Linux**   | ARM64                    | [`cless_0.3.0_linux_arm64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)  |
-| **macOS**   | Apple Silicon (M-series) | [`cless_0.3.0_darwin_arm64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
-| **macOS**   | Intel x86_64             | [`cless_0.3.0_darwin_amd64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
+| **Windows** | x86_64 / amd64           | [`cless_1.0.0_windows_amd64.zip`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)   |
+| **Windows** | ARM64                    | [`cless_1.0.0_windows_arm64.zip`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)   |
+| **Linux**   | x86_64 / amd64           | [`cless_1.0.0_linux_amd64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)  |
+| **Linux**   | ARM64                    | [`cless_1.0.0_linux_arm64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest)  |
+| **macOS**   | Apple Silicon (M-series) | [`cless_1.0.0_darwin_arm64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
+| **macOS**   | Intel x86_64             | [`cless_1.0.0_darwin_amd64.tar.gz`](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest) |
 
 Extract the binary and place it in a folder included in system `PATH` (such as `%LOCALAPPDATA%\Programs\cless` or `/usr/local/bin`).
 
@@ -118,10 +118,10 @@ Precompiled installers and portable archives are available on [GitHub Releases](
 
 | Package Type | Platform | Architecture | Details |
 | --- | --- | --- | --- |
-| **Windows Installer** | Windows 10/11 | x86_64 / amd64 | `cless-gui_0.3.0_windows_amd64_installer.exe`<br />Per-user install to `%LOCALAPPDATA%\Programs\ClutterLess`, Start Menu shortcut, WebView2 bootstrapper detection, and safe uninstaller. |
-| **Windows Portable** | Windows 10/11 | x86_64 / amd64 | `cless-gui_0.3.0_windows_amd64.zip`<br />Standalone executable with zero installation needed. |
-| **Linux Archive** | Linux (Ubuntu, Debian, Fedora, Arch) | x86_64 / amd64 | `cless-gui_0.3.0_linux_amd64.tar.gz`<br />Includes binary, desktop file, and application icon. (Requires WebKit2GTK). |
-| **macOS Archive** | macOS 12+ | Apple Silicon & Intel | `cless-gui_0.3.0_darwin_arm64.tar.gz` / `cless-gui_0.3.0_darwin_amd64.tar.gz`<br />Standalone native executable for macOS. |
+| **Windows Installer** | Windows 10/11 | x86_64 / amd64 | `cless-gui_1.0.0_windows_amd64_installer.exe`<br />Per-user install to `%LOCALAPPDATA%\Programs\ClutterLess`, Start Menu shortcut, WebView2 bootstrapper detection, and safe uninstaller. |
+| **Windows Portable** | Windows 10/11 | x86_64 / amd64 | `cless-gui_1.0.0_windows_amd64.zip`<br />Standalone executable with zero installation needed. |
+| **Linux Archive** | Linux (Ubuntu, Debian, Fedora, Arch) | x86_64 / amd64 | `cless-gui_1.0.0_linux_amd64.tar.gz`<br />Includes binary, desktop file, and application icon. (Requires WebKit2GTK). |
+| **macOS Archive** | macOS 12+ | Apple Silicon & Intel | `cless-gui_1.0.0_darwin_arm64.tar.gz` / `cless-gui_1.0.0_darwin_amd64.tar.gz`<br />Standalone native executable for macOS. |
 
 ### Core Screens & Workflow
 

@@ -38,7 +38,7 @@ Verify that the generated Windows binary contains authentic metadata matching CL
   wails3 generate syso -arch amd64 -icon cmd/cless-gui/build/windows/icon.ico -manifest cmd/cless-gui/build/windows/wails.exe.manifest -info cmd/cless-gui/build/windows/info.json -out cmd/cless-gui/wails_windows_amd64.syso
 
   # Build executable
-  go build -tags production -trimpath -ldflags "-s -w -H windowsgui -X github.com/Fizm00/organizer/internal/version.Version=0.3.0 -X github.com/Fizm00/organizer/internal/version.Commit=$(git rev-parse --short HEAD) -X github.com/Fizm00/organizer/internal/version.BuildDate=$(Get-Date -Format 'yyyy-MM-dd')" -o bin/cless-gui.exe ./cmd/cless-gui
+  go build -tags production -trimpath -ldflags "-s -w -H windowsgui -X github.com/Fizm00/organizer/internal/version.Version=1.0.0 -X github.com/Fizm00/organizer/internal/version.Commit=$(git rev-parse --short HEAD) -X github.com/Fizm00/organizer/internal/version.BuildDate=$(Get-Date -Format 'yyyy-MM-dd')" -o bin/cless-gui.exe ./cmd/cless-gui
 
   # Verify executable properties
   (Get-Item bin/cless-gui.exe).VersionInfo | Format-List ProductName, FileDescription, CompanyName, LegalCopyright, ProductVersion, FileVersion
@@ -48,8 +48,8 @@ Verify that the generated Windows binary contains authentic metadata matching CL
   - `FileDescription`: ClutterLess Organizer Desktop GUI
   - `CompanyName`: ClutterLess
   - `LegalCopyright`: (c) 2026, Fizm00
-  - `ProductVersion`: 0.3.0
-  - `FileVersion`: 0.3.0
+  - `ProductVersion`: 1.0.0
+  - `FileVersion`: 1.0.0
 - [ ] **Icons:**
   - Multi-resolution `.ico` (16x16, 32x32, 48x48, 64x64, 128x128, 256x256) embedded and rendering properly in Windows Explorer and Taskbar.
   - Monochrome tray template icons (`tray_active.png`, `tray_paused.png`, `tray_error.png`) present in `cmd/cless-gui/build/`.
@@ -171,3 +171,4 @@ Build and test the NSIS installer package on a Windows machine:
 | Multi-OS CI Workflows | Antigravity AI | PASS | 2026-10-29 |
 | Release Asset Pipelines | Antigravity AI | PASS | 2026-10-29 |
 | Documentation & Third-Party Licenses | Antigravity AI | PASS | 2026-10-29 |
+

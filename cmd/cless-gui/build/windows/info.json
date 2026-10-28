@@ -1,12 +1,12 @@
 {
 	"fixed": {
-		"file_version": "0.3.0.0",
-		"product_version": "0.3.0.0"
+		"file_version": "1.0.0.0",
+		"product_version": "1.0.0.0"
 	},
 	"info": {
 		"0409": {
-			"FileVersion": "0.3.0",
-			"ProductVersion": "0.3.0",
+			"FileVersion": "1.0.0",
+			"ProductVersion": "1.0.0",
 			"CompanyName": "ClutterLess",
 			"FileDescription": "ClutterLess Organizer Desktop GUI",
 			"LegalCopyright": "(c) 2026, Fizm00",
@@ -16,8 +16,8 @@
 			"Comments": "ClutterLess Organizer"
 		},
 		"0000": {
-			"FileVersion": "0.3.0",
-			"ProductVersion": "0.3.0",
+			"FileVersion": "1.0.0",
+			"ProductVersion": "1.0.0",
 			"CompanyName": "ClutterLess",
 			"FileDescription": "ClutterLess Organizer Desktop GUI",
 			"LegalCopyright": "(c) 2026, Fizm00",

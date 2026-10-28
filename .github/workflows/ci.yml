@@ -99,13 +99,13 @@ jobs:
         run: |
           go install github.com/wailsapp/wails/v3/cmd/wails3@latest
           wails3 generate syso -arch amd64 -icon cmd/cless-gui/build/windows/icon.ico -manifest cmd/cless-gui/build/windows/wails.exe.manifest -info cmd/cless-gui/build/windows/info.json -out cmd/cless-gui/wails_windows_amd64.syso
-          go build -tags production -trimpath -ldflags "-s -w -H windowsgui -X github.com/Fizm00/organizer/internal/version.Version=0.3.0 -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui.exe ./cmd/cless-gui
+          go build -tags production -trimpath -ldflags "-s -w -H windowsgui -X github.com/Fizm00/organizer/internal/version.Version=1.0.0 -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui.exe ./cmd/cless-gui
 
       - name: Build GUI executable (Linux / macOS)
         if: matrix.os != 'windows-latest'
         shell: bash
         run: |
-          go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=0.3.0 -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui ./cmd/cless-gui
+          go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=1.0.0 -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui ./cmd/cless-gui
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

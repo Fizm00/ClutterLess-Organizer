@@ -5,7 +5,7 @@ All notable changes to ClutterLess Organizer (`cless`) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0] - 2026-10-28
+## [1.0.0] - 2026-10-29
 
 ### Added
 - **ClutterLess Desktop GUI (`cless-gui`):**
@@ -17,8 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Watched Folders screen with folder browser dialog and recursive scanning controls.
   - System tray integration with live watcher status dots (active, paused, error), close-to-tray mode, single instance forwarding, and native desktop notifications.
   - Comprehensive Settings screen with Dark/Light/System theme switcher, write stability delay, conflict resolution strategy, and configuration management.
-  - Per-user Windows NSIS installer (`cless-gui_0.3.0_windows_amd64_installer.exe`) with Start Menu shortcut, WebView2 bootstrapper detection, opt-in "Start with Windows" checkbox, and clean uninstaller preserving user data unless explicitly confirmed.
+  - Per-user Windows NSIS installer (`cless-gui_1.0.0_windows_amd64_installer.exe`) with Start Menu shortcut, WebView2 bootstrapper detection, opt-in "Start with Windows" checkbox, and clean uninstaller preserving user data unless explicitly confirmed.
   - Multi-platform CI and GitHub release pipelines for Windows, Linux, and macOS.
+
+## [0.3.0] - 2026-10-28
+
+### Added
 - **Uninstall Capabilities:**
   - Added native `cless uninstall` command with interactive confirmation or non-interactive `-y/--yes` flag and optional `--purge-config` flag.
   - Added dedicated one-line Windows uninstaller script (`uninstall.ps1`) that gracefully stops running instances, removes the binary directory, and removes `cless` from User `PATH`.

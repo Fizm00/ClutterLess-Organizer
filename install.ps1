@@ -2,7 +2,7 @@
 # Usage in PowerShell:
 #   irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.ps1 | iex
 # Or specify a version:
-#   $env:CLESS_VERSION="0.3.0"; irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.ps1 | iex
+#   $env:CLESS_VERSION="1.0.0"; irm https://raw.githubusercontent.com/Fizm00/ClutterLess-Organizer/main/install.ps1 | iex
 
 param(
     [string]$Version = $env:CLESS_VERSION,
@@ -34,7 +34,7 @@ if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
 
 # 2. Resolve version and release tag
 $repo = "Fizm00/ClutterLess-Organizer"
-$tag = "v0.3.0"
+$tag = "v1.0.0"
 
 if ($Version -eq "latest") {
     Write-Host "Resolving latest release..." -ForegroundColor DarkGray
