@@ -65,7 +65,10 @@ jobs:
           cache-dependency-path: 'cmd/cless-gui/frontend/package-lock.json'
 
       - name: Install NSIS
-        run: choco install nsis -y --no-progress
+        shell: pwsh
+        run: |
+          choco install nsis -y --no-progress
+          "C:\Program Files (x86)\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
       - name: Build frontend
         run: |
@@ -93,12 +96,21 @@ jobs:
       - name: Build NSIS Installer
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Continue'
           $TAG_NAME = $env:GITHUB_REF -replace '^refs/tags/', ''
           $VERSION = $TAG_NAME -replace '^v', ''
           New-Item -ItemType Directory -Force -Path dist, bin, cmd/cless-gui/bin | Out-Null
+          $makensis = "C:\Program Files (x86)\NSIS\makensis.exe"
+          if (!(Test-Path $makensis)) {
+              $makensis = "makensis"
+          }
           Push-Location cmd/cless-gui/build/windows/nsis
-          makensis /V4 project.nsi
+          & $makensis /V4 project.nsi
+          $code = $LASTEXITCODE
           Pop-Location
+          if ($code -ne 0) {
+              throw "makensis failed with exit code $code"
+          }
           Copy-Item "dist/cless-gui-installer.exe" "dist/cless-gui_${VERSION}_windows_amd64_installer.exe"
           Get-Item dist/*
 
