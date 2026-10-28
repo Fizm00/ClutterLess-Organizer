@@ -79,7 +79,7 @@ jobs:
         run: |
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG_NAME#v}"
-          mkdir -p bin dist
+          mkdir -p bin dist cmd/cless-gui/bin
           go build -tags production -trimpath -ldflags "-s -w -H windowsgui -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui.exe ./cmd/cless-gui
 
       - name: Build NSIS Installer
@@ -87,10 +87,11 @@ jobs:
         run: |
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG_NAME#v}"
+          mkdir -p cmd/cless-gui/bin dist
           cd cmd/cless-gui/build/windows/nsis
-          makensis -DARG_WAILS_AMD64_BINARY="$(pwd)/../../../../bin/cless-gui.exe" project.nsi
+          makensis -DARG_WAILS_AMD64_BINARY="..\..\..\..\bin\cless-gui.exe" project.nsi
           cd ../../../..
-          cp bin/cless-gui-amd64-installer.exe "dist/cless-gui_${VERSION}_windows_amd64_installer.exe"
+          cp cmd/cless-gui/bin/cless-gui-amd64-installer.exe "dist/cless-gui_${VERSION}_windows_amd64_installer.exe"
 
       - name: Package Portable Windows Zip
         shell: bash
@@ -141,7 +142,7 @@ jobs:
       - name: Install Linux GUI dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+          sudo apt-get install -y pkg-config libgtk-4-dev libwebkitgtk-6.0-dev libgtk-3-dev libwebkit2gtk-4.1-dev
 
       - name: Build frontend
         run: |
@@ -153,13 +154,15 @@ jobs:
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG_NAME#v}"
           mkdir -p bin dist
-          go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui ./cmd/cless-gui
+          CGO_ENABLED=1 go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui ./cmd/cless-gui
 
       - name: Package Linux Archive
         run: |
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG_NAME#v}"
-          tar -czvf "dist/cless-gui_${VERSION}_linux_amd64.tar.gz" -C bin cless-gui -C ../ LICENSE README.md cmd/cless-gui/build/linux/desktop cmd/cless-gui/build/appicon.png
+          mkdir -p dist/staging-linux
+          cp bin/cless-gui LICENSE README.md cmd/cless-gui/build/linux/desktop cmd/cless-gui/build/appicon.png dist/staging-linux/
+          tar -czvf "dist/cless-gui_${VERSION}_linux_amd64.tar.gz" -C dist/staging-linux .
 
       - name: Generate Checksums
         working-directory: dist
@@ -209,14 +212,20 @@ jobs:
           VERSION="${TAG_NAME#v}"
           mkdir -p bin dist
           CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui-arm64 ./cmd/cless-gui
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui-amd64 ./cmd/cless-gui
+          CGO_ENABLED=1 CGO_CFLAGS="-target x86_64-apple-macos10.13" CGO_LDFLAGS="-target x86_64-apple-macos10.13" GOOS=darwin GOARCH=amd64 go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui-amd64 ./cmd/cless-gui
 
       - name: Package macOS Archives
         run: |
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG_NAME#v}"
-          cp bin/cless-gui-arm64 bin/cless-gui && tar -czvf "dist/cless-gui_${VERSION}_darwin_arm64.tar.gz" -C bin cless-gui -C ../ LICENSE README.md
-          cp bin/cless-gui-amd64 bin/cless-gui && tar -czvf "dist/cless-gui_${VERSION}_darwin_amd64.tar.gz" -C bin cless-gui -C ../ LICENSE README.md
+          mkdir -p dist/staging-macos-arm64 dist/staging-macos-amd64
+          cp bin/cless-gui-arm64 dist/staging-macos-arm64/cless-gui
+          cp LICENSE README.md dist/staging-macos-arm64/
+          tar -czvf "dist/cless-gui_${VERSION}_darwin_arm64.tar.gz" -C dist/staging-macos-arm64 .
+
+          cp bin/cless-gui-amd64 dist/staging-macos-amd64/cless-gui
+          cp LICENSE README.md dist/staging-macos-amd64/
+          tar -czvf "dist/cless-gui_${VERSION}_darwin_amd64.tar.gz" -C dist/staging-macos-amd64 .
 
       - name: Generate Checksums
         working-directory: dist

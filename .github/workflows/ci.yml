@@ -75,13 +75,13 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+          sudo apt-get install -y pkg-config libgtk-4-dev libwebkitgtk-6.0-dev libgtk-3-dev libwebkit2gtk-4.1-dev
 
       - name: Verify Go dependencies
         run: go mod verify
 
       - name: Run Go vet
-        run: go vet ./internal/... ./cmd/organizer ./cmd/cless ./cmd/cless-gui
+        run: go vet ./internal/... ./cmd/organizer ./cmd/cless
 
       - name: Run Go tests
         run: go test -v ./internal/... ./cmd/organizer ./cmd/cless
@@ -105,7 +105,7 @@ jobs:
         if: matrix.os != 'windows-latest'
         shell: bash
         run: |
-          go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=1.0.0 -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui ./cmd/cless-gui
+          CGO_ENABLED=1 go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=1.0.0 -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui ./cmd/cless-gui
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

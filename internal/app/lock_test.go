@@ -62,7 +62,7 @@ func TestWatcherLock_ActiveProcessConflict(t *testing.T) {
 	// but let's test if PID is non-existent vs alive:
 	// A live process with different PID (e.g. parent process PID or explorer PID)
 	parentPID := os.Getppid()
-	if parentPID > 0 {
+	if parentPID > 0 && platform.IsProcessAlive(parentPID) {
 		content.PID = parentPID
 		data, _ = json.Marshal(content)
 		_ = os.WriteFile(lockPath, data, 0644)
