@@ -91,15 +91,20 @@ jobs:
           go build -tags production -trimpath -ldflags "-s -w -H windowsgui -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui.exe ./cmd/cless-gui
 
       - name: Build NSIS Installer
-        shell: bash
+        shell: pwsh
         run: |
-          TAG_NAME="${GITHUB_REF#refs/tags/}"
-          VERSION="${TAG_NAME#v}"
-          mkdir -p bin dist cmd/cless-gui/bin
-          cd cmd/cless-gui/build/windows/nsis
-          makensis -DARG_WAILS_AMD64_BINARY="../../../../bin/cless-gui.exe" -DOUTPUT_INSTALLER="../../../../dist/cless-gui_${VERSION}_windows_amd64_installer.exe" project.nsi
-          cd ../../../..
-          ls -la dist/
+          $TAG_NAME = $env:GITHUB_REF -replace '^refs/tags/', ''
+          $VERSION = $TAG_NAME -replace '^v', ''
+          New-Item -ItemType Directory -Force -Path dist, bin, cmd/cless-gui/bin | Out-Null
+          $binary = [System.IO.Path]::GetFullPath("bin/cless-gui.exe")
+          $outInstaller = [System.IO.Path]::GetFullPath("dist/cless-gui_${VERSION}_windows_amd64_installer.exe")
+          Push-Location cmd/cless-gui/build/windows/nsis
+          makensis "/DARG_WAILS_AMD64_BINARY=$binary" "/DOUTPUT_INSTALLER=$outInstaller" project.nsi
+          Pop-Location
+          if (!(Test-Path $outInstaller)) {
+              throw "NSIS installer was not generated at $outInstaller"
+          }
+          Get-Item dist/*
 
       - name: Package Portable Windows Zip
         shell: bash
