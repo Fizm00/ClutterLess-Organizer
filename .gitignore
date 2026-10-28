@@ -4,9 +4,20 @@
 *.dll
 *.so
 *.dylib
+*.syso
 bin/
 dist/
 /organizer
+/cless
+/cless-gui
+cmd/cless-gui/bin/
+cmd/cless-gui/frontend/dist/
+.task/
+**/.task/
+
+# Frontend dependencies & build
+node_modules/
+**/node_modules/
 
 # Test & coverage artifacts
 *.out
@@ -31,3 +42,4 @@ agent.md
 /prompts/
 .agents/
 .gemini/
+cless-gui-docs-pack/

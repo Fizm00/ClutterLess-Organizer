@@ -29,13 +29,12 @@ jobs:
         run: go mod verify
 
       - name: Run go vet
-        run: go vet ./...
+        run: go vet ./internal/... ./cmd/organizer ./cmd/cless
 
       - name: Run tests
-        run: go test -v ./...
-
-      - name: Build all packages
-        run: go build ./...
+        run: go test -v ./internal/... ./cmd/organizer ./cmd/cless
 
       - name: Build executable
-        run: go build -o bin/organizer ./cmd/organizer
+        run: |
+          go build -o bin/organizer ./cmd/organizer
+          go build -o bin/cless ./cmd/cless

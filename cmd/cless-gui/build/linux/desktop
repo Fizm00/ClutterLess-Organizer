@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=My Product
+Comment=A temp-react application
+# The Exec line includes %u to pass the URL to the application
+Exec=/usr/local/bin/temp-react.exe %u
+Terminal=false
+Type=Application
+Icon=temp-react.exe
+Categories=Utility;
+StartupWMClass=temp-react.exe
+
+ 
