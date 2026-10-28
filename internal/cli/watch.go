@@ -12,6 +12,7 @@ import (
 	"github.com/Fizm00/organizer/internal/config"
 	"github.com/Fizm00/organizer/internal/engine"
 	"github.com/Fizm00/organizer/internal/history"
+	"github.com/Fizm00/organizer/internal/platform"
 	"github.com/Fizm00/organizer/internal/ui"
 	"github.com/spf13/cobra"
 )
@@ -51,6 +52,14 @@ var watchCmd = &cobra.Command{
 				organizer.History = h
 			}
 		}
+
+		// Acquire watcher lock to prevent concurrent watcher runs
+		stateDir, _ := platform.DefaultStateDir()
+		lock, err := platform.AcquireWatcherLock(stateDir)
+		if err != nil {
+			return fmt.Errorf("cannot start watch mode: %w", err)
+		}
+		defer lock.Release()
 
 		// Setup output destination (stdout + optional log file)
 		out := cmd.OutOrStdout()

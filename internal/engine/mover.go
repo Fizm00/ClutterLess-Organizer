@@ -17,6 +17,7 @@ import (
 
 // MoveResult contains the outcome of a PlannedMove execution.
 type MoveResult struct {
+	ID       string
 	Source   string
 	Dest     string
 	Size     int64
@@ -110,12 +111,13 @@ func ResolveConflictDest(destPath string, existsFn func(string) bool) string {
 // Move safely moves a file according to PlannedMove specifications.
 func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 	if err := ctx.Err(); err != nil {
-		return MoveResult{Source: pm.Source, Failed: true, Reason: err.Error(), Error: err}, err
+		return MoveResult{ID: pm.ID, Source: pm.Source, Failed: true, Reason: err.Error(), Error: err}, err
 	}
 
 	// 1. If already skipped by planner (ignored filter or unmatched without fallback)
 	if pm.Skipped {
 		return MoveResult{
+			ID:       pm.ID,
 			Source:   pm.Source,
 			Dest:     pm.Dest,
 			RuleName: pm.RuleName,
@@ -128,6 +130,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 	srcInfo, err := os.Stat(pm.Source)
 	if err != nil {
 		return MoveResult{
+			ID:       pm.ID,
 			Source:   pm.Source,
 			Dest:     pm.Dest,
 			RuleName: pm.RuleName,
@@ -141,6 +144,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 	// 3. Check for identical source and destination
 	if platform.PathEqual(pm.Source, pm.Dest) {
 		return MoveResult{
+			ID:       pm.ID,
 			Source:   pm.Source,
 			Dest:     pm.Dest,
 			Size:     srcSize,
@@ -166,6 +170,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 	if destExists(finalDest) {
 		if m.ConflictStrategy == "skip" {
 			return MoveResult{
+				ID:       pm.ID,
 				Source:   pm.Source,
 				Dest:     finalDest,
 				Size:     srcSize,
@@ -180,6 +185,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 	// 5. Validate path length (Windows 260 MAX_PATH limit)
 	if err := platform.CheckPathLength(finalDest); err != nil {
 		return MoveResult{
+			ID:       pm.ID,
 			Source:   pm.Source,
 			Dest:     finalDest,
 			Size:     srcSize,
@@ -194,6 +200,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 	destDir := filepath.Dir(finalDest)
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		return MoveResult{
+			ID:       pm.ID,
 			Source:   pm.Source,
 			Dest:     finalDest,
 			Size:     srcSize,
@@ -211,6 +218,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		if err := ctx.Err(); err != nil {
 			return MoveResult{
+				ID:       pm.ID,
 				Source:   pm.Source,
 				Dest:     finalDest,
 				Size:     srcSize,
@@ -225,6 +233,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 		renameErr := m.renameFn(pm.Source, finalDest)
 		if renameErr == nil {
 			return MoveResult{
+				ID:       pm.ID,
 				Source:   pm.Source,
 				Dest:     finalDest,
 				Size:     srcSize,
@@ -240,6 +249,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 			crossErr := m.copyThenDelete(ctx, pm.Source, finalDest, srcSize)
 			if crossErr != nil {
 				return MoveResult{
+					ID:       pm.ID,
 					Source:   pm.Source,
 					Dest:     finalDest,
 					Size:     srcSize,
@@ -250,6 +260,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 				}, nil
 			}
 			return MoveResult{
+				ID:       pm.ID,
 				Source:   pm.Source,
 				Dest:     finalDest,
 				Size:     srcSize,
@@ -269,6 +280,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 					continue
 				case <-ctx.Done():
 					return MoveResult{
+						ID:       pm.ID,
 						Source:   pm.Source,
 						Dest:     finalDest,
 						Size:     srcSize,
@@ -281,6 +293,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 			}
 			// Exhausted retries
 			return MoveResult{
+				ID:       pm.ID,
 				Source:   pm.Source,
 				Dest:     finalDest,
 				Size:     srcSize,
@@ -292,6 +305,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 
 		// Other non-recoverable error
 		return MoveResult{
+			ID:       pm.ID,
 			Source:   pm.Source,
 			Dest:     finalDest,
 			Size:     srcSize,
@@ -303,6 +317,7 @@ func (m *Mover) Move(ctx context.Context, pm PlannedMove) (MoveResult, error) {
 	}
 
 	return MoveResult{
+		ID:       pm.ID,
 		Source:   pm.Source,
 		Dest:     finalDest,
 		Size:     srcSize,

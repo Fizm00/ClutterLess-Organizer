@@ -26,6 +26,7 @@ type Match struct {
 
 // PlannedMove describes an intended file move operation.
 type PlannedMove struct {
+	ID       string // unique stable identifier for the planned move
 	Source   string // full path to the source file
 	Dest     string // full path to the intended destination file
 	RuleName string // name of the matching rule, or empty

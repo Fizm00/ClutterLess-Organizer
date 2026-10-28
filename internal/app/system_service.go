@@ -3,23 +3,51 @@
 package app
 
 import (
+	"fmt"
+	"os/exec"
+	"path/filepath"
+	"runtime"
+
 	"github.com/Fizm00/organizer/internal/version"
 )
 
-// VersionInfo holds version and build metadata exposed to the frontend.
-type VersionInfo struct {
-	Version   string `json:"version"`
-	Commit    string `json:"commit"`
-	BuildDate string `json:"buildDate"`
+// FolderPicker defines the interface for native folder selection dialogs (implemented in bootstrap/G6).
+type FolderPicker interface {
+	PickFolder() (string, error)
+}
+
+// AutostartManager defines the interface for platform autostart configuration (implemented in G6).
+type AutostartManager interface {
+	Get() (bool, error)
+	Set(enabled bool) error
 }
 
 // SystemService provides system-level capabilities and information.
 // It must NOT import Wails packages so that it remains purely unit-testable.
-type SystemService struct{}
+type SystemService struct {
+	configPath string
+	picker     FolderPicker
+	autostart  AutostartManager
+}
 
 // NewSystemService creates a new SystemService instance.
 func NewSystemService() *SystemService {
 	return &SystemService{}
+}
+
+// SetConfigPath sets the config path used by OpenConfig.
+func (s *SystemService) SetConfigPath(path string) {
+	s.configPath = path
+}
+
+// SetFolderPicker injects a native folder picker implementation.
+func (s *SystemService) SetFolderPicker(picker FolderPicker) {
+	s.picker = picker
+}
+
+// SetAutostartManager injects a platform autostart manager implementation.
+func (s *SystemService) SetAutostartManager(mgr AutostartManager) {
+	s.autostart = mgr
 }
 
 // Version returns application version and build metadata.
@@ -31,3 +59,63 @@ func (s *SystemService) Version() VersionInfo {
 	}
 }
 
+// RevealPath opens the operating system file manager with the specified path selected.
+func (s *SystemService) RevealPath(path string) error {
+	cleanPath := filepath.Clean(path)
+	var cmd *exec.Cmd
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("explorer", "/select,", cleanPath)
+	case "darwin":
+		cmd = exec.Command("open", "-R", cleanPath)
+	default:
+		// Linux / other
+		cmd = exec.Command("xdg-open", filepath.Dir(cleanPath))
+	}
+
+	return cmd.Start()
+}
+
+// OpenConfig opens the current configuration file in the system default text editor.
+func (s *SystemService) OpenConfig() error {
+	if s.configPath == "" {
+		return fmt.Errorf("config path is not configured")
+	}
+
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", "", s.configPath)
+	case "darwin":
+		cmd = exec.Command("open", s.configPath)
+	default:
+		cmd = exec.Command("xdg-open", s.configPath)
+	}
+
+	return cmd.Start()
+}
+
+// PickFolder invokes the injected folder picker, if available.
+func (s *SystemService) PickFolder() (string, error) {
+	if s.picker == nil {
+		return "", NewAppError(ErrInternal, "Folder picker not initialized", "Dialog will be available when running inside GUI", "")
+	}
+	return s.picker.PickFolder()
+}
+
+// GetAutostart returns whether autostart on system boot is enabled.
+func (s *SystemService) GetAutostart() (bool, error) {
+	if s.autostart == nil {
+		return false, nil
+	}
+	return s.autostart.Get()
+}
+
+// SetAutostart configures whether the app launches automatically on system boot.
+func (s *SystemService) SetAutostart(enabled bool) error {
+	if s.autostart == nil {
+		return NewAppError(ErrInternal, "Autostart manager not initialized", "", "")
+	}
+	return s.autostart.Set(enabled)
+}

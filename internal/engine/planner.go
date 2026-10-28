@@ -3,6 +3,7 @@
 package engine
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,6 +12,12 @@ import (
 
 	"github.com/Fizm00/organizer/internal/config"
 )
+
+// GeneratePlannedMoveID creates a deterministic, stable identifier for a planned move.
+func GeneratePlannedMoveID(source, dest string) string {
+	h := sha256.Sum256([]byte(source + "->" + dest))
+	return fmt.Sprintf("move-%x", h[:8])
+}
 
 // ShouldIgnoreFile checks whether a file should be ignored based on global settings.
 func ShouldIgnoreFile(filePath string, fileName string, settings config.Settings) (bool, string) {
@@ -31,6 +38,7 @@ func PlanFile(filePath string, rules []Rule, settings config.Settings, now time.
 
 	if info.IsDir() {
 		return PlannedMove{
+			ID:      GeneratePlannedMoveID(absPath, ""),
 			Source:  absPath,
 			Skipped: true,
 			Reason:  "directories are ignored",
@@ -42,6 +50,7 @@ func PlanFile(filePath string, rules []Rule, settings config.Settings, now time.
 	// Check ignore filters
 	if ignored, reason := ShouldIgnoreFile(absPath, fileName, settings); ignored {
 		return PlannedMove{
+			ID:      GeneratePlannedMoveID(absPath, ""),
 			Source:  absPath,
 			Skipped: true,
 			Reason:  reason,
@@ -64,6 +73,7 @@ func PlanFile(filePath string, rules []Rule, settings config.Settings, now time.
 		}
 		destPath := filepath.Join(destDir, fileName)
 		return PlannedMove{
+			ID:       GeneratePlannedMoveID(absPath, destPath),
 			Source:   absPath,
 			Dest:     destPath,
 			RuleName: rule.Name,
@@ -77,6 +87,7 @@ func PlanFile(filePath string, rules []Rule, settings config.Settings, now time.
 		fallbackDestDir := config.ExpandPath(settings.FallbackDir)
 		destPath := filepath.Join(fallbackDestDir, fileName)
 		return PlannedMove{
+			ID:       GeneratePlannedMoveID(absPath, destPath),
 			Source:   absPath,
 			Dest:     destPath,
 			RuleName: "fallback",
@@ -86,6 +97,7 @@ func PlanFile(filePath string, rules []Rule, settings config.Settings, now time.
 	}
 
 	return PlannedMove{
+		ID:      GeneratePlannedMoveID(absPath, ""),
 		Source:  absPath,
 		Skipped: true,
 		Reason:  "unmatched",

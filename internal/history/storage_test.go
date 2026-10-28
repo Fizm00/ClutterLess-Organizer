@@ -157,3 +157,44 @@ func TestStorage_BatchesAndMarkUndone(t *testing.T) {
 		t.Errorf("double MarkUndone failed: %v", err)
 	}
 }
+
+func TestStorage_BatchesFiltered(t *testing.T) {
+	tempDir := t.TempDir()
+	histPath := filepath.Join(tempDir, "history.jsonl")
+	storage, err := NewStorage(histPath)
+	if err != nil {
+		t.Fatalf("failed to create storage: %v", err)
+	}
+
+	b1 := "20261028-100000-0001"
+	b2 := "20261028-100001-0002"
+
+	recs := []Record{
+		{BatchID: b1, Time: time.Now().Add(-10 * time.Minute), Source: "/tmp/doc.pdf", Dest: "/tmp/docs/doc.pdf", Rule: "Documents", Status: StatusMoved},
+		{BatchID: b2, Time: time.Now(), Source: "/tmp/pic.jpg", Dest: "/tmp/pics/pic.jpg", Rule: "Images", Status: StatusMoved},
+	}
+	if err := storage.Append(recs); err != nil {
+		t.Fatalf("failed to append: %v", err)
+	}
+
+	// Filter by query "doc"
+	docSummaries, err := storage.BatchesFiltered(10, HistoryFilter{Query: "doc"})
+	if err != nil || len(docSummaries) != 1 || docSummaries[0].ID != b1 {
+		t.Errorf("expected 1 summary matching 'doc' (b1), got %v", docSummaries)
+	}
+
+	// Mark b1 as undone
+	_ = storage.MarkUndone(b1, nil)
+
+	// Filter by status "active"
+	activeSummaries, err := storage.BatchesFiltered(10, HistoryFilter{Status: "active"})
+	if err != nil || len(activeSummaries) != 1 || activeSummaries[0].ID != b2 {
+		t.Errorf("expected only active batch b2, got %v", activeSummaries)
+	}
+
+	// Filter by status "undone"
+	undoneSummaries, err := storage.BatchesFiltered(10, HistoryFilter{Status: "undone"})
+	if err != nil || len(undoneSummaries) != 1 || undoneSummaries[0].ID != b1 {
+		t.Errorf("expected only undone batch b1, got %v", undoneSummaries)
+	}
+}

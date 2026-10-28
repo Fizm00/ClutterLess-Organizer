@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 )
 
 // Storage manages persistent JSON Lines history of file moves.
@@ -131,8 +132,16 @@ func (s *Storage) Batch(id string) ([]Record, error) {
 	return batch, nil
 }
 
-// Batches returns summaries of recent batches in reverse chronological order (newest first).
-func (s *Storage) Batches(limit int) ([]BatchSummary, error) {
+// HistoryFilter defines criteria to filter history batch summaries.
+type HistoryFilter struct {
+	Query  string    // case-insensitive search substring in batch ID, source, dest, or rule
+	Status string    // "all", "active" (has moves), "undone" (all moves undone)
+	Since  time.Time // batches on or after this time
+	Until  time.Time // batches on or before this time
+}
+
+// BatchesFiltered returns summaries of batches matching the filter criteria in reverse chronological order.
+func (s *Storage) BatchesFiltered(limit int, filter HistoryFilter) ([]BatchSummary, error) {
 	all, err := s.ReadAll()
 	if err != nil {
 		return nil, err
@@ -141,6 +150,8 @@ func (s *Storage) Batches(limit int) ([]BatchSummary, error) {
 	// Group by batch ID while tracking order of appearance
 	var batchIDs []string
 	groups := make(map[string][]Record)
+
+	queryLower := strings.ToLower(strings.TrimSpace(filter.Query))
 
 	for _, rec := range all {
 		if _, exists := groups[rec.BatchID]; !exists {
@@ -157,21 +168,50 @@ func (s *Storage) Batches(limit int) ([]BatchSummary, error) {
 		total := len(recs)
 		moved := 0
 		undone := 0
+		matchesQuery := (queryLower == "") || strings.Contains(strings.ToLower(bID), queryLower)
+
 		for _, r := range recs {
 			if r.Status == StatusMoved {
 				moved++
 			} else if r.Status == StatusUndone {
 				undone++
 			}
+			if !matchesQuery {
+				if strings.Contains(strings.ToLower(r.Source), queryLower) ||
+					strings.Contains(strings.ToLower(r.Dest), queryLower) ||
+					strings.Contains(strings.ToLower(r.Rule), queryLower) {
+					matchesQuery = true
+				}
+			}
+		}
+
+		if !matchesQuery {
+			continue
+		}
+
+		batchTime := recs[0].Time
+		if !filter.Since.IsZero() && batchTime.Before(filter.Since) {
+			continue
+		}
+		if !filter.Until.IsZero() && batchTime.After(filter.Until) {
+			continue
+		}
+
+		allUndone := total > 0 && moved == 0
+		if filter.Status == "active" && allUndone {
+			continue
+		}
+		if filter.Status == "undone" && !allUndone {
+			continue
 		}
 
 		summaries = append(summaries, BatchSummary{
 			ID:        bID,
-			Time:      recs[0].Time,
+			Time:      batchTime,
 			Total:     total,
 			Moved:     moved,
 			Undone:    undone,
-			AllUndone: total > 0 && moved == 0,
+			AllUndone: allUndone,
 		})
 
 		if limit > 0 && len(summaries) >= limit {
@@ -180,6 +220,10 @@ func (s *Storage) Batches(limit int) ([]BatchSummary, error) {
 	}
 
 	return summaries, nil
+}
+// Batches returns summaries of recent batches in reverse chronological order (newest first).
+func (s *Storage) Batches(limit int) ([]BatchSummary, error) {
+	return s.BatchesFiltered(limit, HistoryFilter{})
 }
 
 // LastBatch returns the newest batch ID and its records.

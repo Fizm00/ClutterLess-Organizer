@@ -5,7 +5,7 @@ Update the Status column at the end of every phase. The CLI roadmap (`docs/ROADM
 | Phase | Name | Outcome | Status |
 |---|---|---|---|
 | G0 | Spike & scaffold | Wails v3 + React app runs on Windows; binding, event, tray, build verified; go/no-go gate | DONE |
-| G1 | Service layer | `internal/app` services with tests, events, watcher lock; no UI | TODO |
+| G1 | Service layer | `internal/app` services with tests, events, watcher lock; no UI | DONE |
 | G2 | Design system & shell | Tokens, fonts, components, app shell, theming, `/styleguide` route, mock API | TODO |
 | G3 | Overview & watch control | Overview screen, live activity, pause/resume, error banners | TODO |
 | G4 | Preview, run, activity, undo | Preview sheet, run with progress, Activity screen, undo flow | TODO |
