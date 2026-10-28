@@ -22,3 +22,4 @@ Inspection of First-Run Onboarding (3-step wizard in centered 520px panel), Clos
 - **Minimum Dimensions (880x560 Dark & Light):** All 3 onboarding steps fit comfortably without clipping, awkward wrapping, or horizontal scroll.
 - **Close-to-Tray Toast:** Discrete non-intrusive notification banner in bottom-right corner with accent dot and dismiss action.
 - **System Tray:** Monochrome template icon assets prepared (`tray_active.png`, `tray_paused.png`, `tray_error.png`) with dynamic status updates and single-instance window focusing.
+

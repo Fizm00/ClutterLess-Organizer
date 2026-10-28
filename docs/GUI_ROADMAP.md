@@ -11,7 +11,7 @@ Update the Status column at the end of every phase. The CLI roadmap (`docs/ROADM
 | G4 | Preview, run, activity, undo | Preview sheet, run with progress, Activity screen, undo flow | DONE |
 | G5 | Rules & folders | Rule list with reorder, rule editor, tester, folders screen | DONE |
 | G6 | System integration | Tray, close-to-tray, single instance, autostart, notifications, onboarding | DONE |
-| G7 | Settings & polish | Settings screen, a11y pass, edge states, performance, optional Indonesian strings | TODO |
+| G7 | Settings & polish | Settings screen, a11y pass, edge states, performance, optional Indonesian strings | DONE |
 | G8 | Packaging & release | Windows installer, CI for GUI, README and screenshots, release | TODO |
 
 ## Acceptance criteria

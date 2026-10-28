@@ -225,6 +225,7 @@ export interface SystemApi {
   version(): Promise<VersionInfo>;
   revealPath(path: string): Promise<void>;
   openConfig(): Promise<void>;
+  openHistory(): Promise<void>;
   pickFolder(): Promise<string | null>;
   setAutostart(enabled: boolean): Promise<void>;
   getAutostart(): Promise<boolean>;

@@ -129,7 +129,41 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
       return 'C:/Users/User/.config/clutterless/config.yaml';
     },
     async resetToDefaults(): Promise<void> {
-      // resets to default
+      mockConfig = {
+        settings: {
+          stableAfterSeconds: 3,
+          conflict: 'rename',
+          fallbackDir: '',
+          ignoreHidden: true,
+          ignoreExt: ['crdownload', 'part', 'tmp', 'download'],
+          ignoreNames: ['desktop.ini', 'thumbs.db', '.DS_Store'],
+          closeToTray: true,
+          notificationsEnabled: false,
+          autostart: false,
+          onboardingCompleted: true,
+        },
+        watch: [
+          { path: '~/Downloads', recursive: false },
+          { path: '~/Desktop', recursive: false },
+        ],
+        rules: [
+          {
+            name: 'Invoices',
+            moveTo: '~/Documents/Finance/{year}-{month}',
+            match: { nameRegex: '(?i)(invoice|faktur|receipt|kwitansi|struk|tax)' },
+          },
+          {
+            name: 'Images',
+            moveTo: '~/Pictures/Sorted/{year}',
+            match: { ext: ['jpg', 'jpeg', 'png', 'webp', 'svg', 'heic'] },
+          },
+          {
+            name: 'Videos',
+            moveTo: '~/Videos/Sorted/{year}',
+            match: { ext: ['mp4', 'mkv', 'mov', 'avi'] },
+          },
+        ],
+      };
     },
     async isFirstRun(): Promise<boolean> {
       return !mockConfig.settings.onboardingCompleted;
@@ -479,6 +513,9 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
     },
     async openConfig(): Promise<void> {
       console.log('[Mock] Open config file in default editor');
+    },
+    async openHistory(): Promise<void> {
+      console.log('[Mock] Open history log in default editor');
     },
     async pickFolder(): Promise<string | null> {
       return 'D:/Code/Projects';

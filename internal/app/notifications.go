@@ -162,3 +162,4 @@ func (a *NotificationAggregator) Stop() {
 		a.flushTimer = nil
 	}
 }
+

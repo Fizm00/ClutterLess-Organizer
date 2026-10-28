@@ -104,3 +104,4 @@ func TestParseWindowsCommandExe(t *testing.T) {
 		})
 	}
 }
+

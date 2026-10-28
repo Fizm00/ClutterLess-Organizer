@@ -27,9 +27,10 @@ type AutostartManager interface {
 // SystemService provides system-level capabilities and information.
 // It must NOT import Wails packages so that it remains purely unit-testable.
 type SystemService struct {
-	configPath string
-	picker     FolderPicker
-	autostart  AutostartManager
+	configPath  string
+	historyPath string
+	picker      FolderPicker
+	autostart   AutostartManager
 }
 
 // NewSystemService creates a new SystemService instance.
@@ -40,6 +41,11 @@ func NewSystemService() *SystemService {
 // SetConfigPath sets the config path used by OpenConfig.
 func (s *SystemService) SetConfigPath(path string) {
 	s.configPath = path
+}
+
+// SetHistoryPath sets the history log path used by OpenHistory.
+func (s *SystemService) SetHistoryPath(path string) {
+	s.historyPath = path
 }
 
 // SetFolderPicker injects a native folder picker implementation.
@@ -93,6 +99,25 @@ func (s *SystemService) OpenConfig() error {
 		cmd = exec.Command("open", s.configPath)
 	default:
 		cmd = exec.Command("xdg-open", s.configPath)
+	}
+
+	return cmd.Start()
+}
+
+// OpenHistory opens the history log file in the system default text editor.
+func (s *SystemService) OpenHistory() error {
+	if s.historyPath == "" {
+		return fmt.Errorf("history path is not configured")
+	}
+
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", "", s.historyPath)
+	case "darwin":
+		cmd = exec.Command("open", s.historyPath)
+	default:
+		cmd = exec.Command("xdg-open", s.historyPath)
 	}
 
 	return cmd.Start()

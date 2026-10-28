@@ -125,3 +125,4 @@ capture().catch(err => {
   console.error('Visual QA capture failed:', err);
   process.exit(1);
 });
+

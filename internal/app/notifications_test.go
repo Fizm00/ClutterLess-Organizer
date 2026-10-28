@@ -141,3 +141,4 @@ func TestNotificationAggregator_ImmediateError(t *testing.T) {
 		t.Errorf("unexpected error notification payload: title=%q, body=%q, isErr=%v", title, body, isErr)
 	}
 }
+

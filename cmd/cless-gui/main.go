@@ -208,6 +208,7 @@ func main() {
 	// 3. Instantiate services
 	systemService := app.NewSystemService()
 	systemService.SetConfigPath(configPath)
+	systemService.SetHistoryPath(filepath.Join(stateDir, "history.jsonl"))
 
 	configService, err := app.NewConfigService(configPath, eventSink)
 	if err != nil {

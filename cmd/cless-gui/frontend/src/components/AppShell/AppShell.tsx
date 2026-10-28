@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { StatusDot, WatcherState } from '../StatusDot';
 import { Toaster } from '../Toast';
+import { Kbd } from '../Kbd';
 import { useWatchStore } from '../../state/watchStore';
 import { cn } from '../../lib/utils';
 import { t } from '../../i18n';
@@ -83,6 +84,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                 <button
                   key={item.route}
                   type="button"
+                  data-testid={`nav-${item.route}`}
                   className={cn(
                     'flex items-center gap-2.5 h-8 px-2.5 rounded-md border font-sans text-body cursor-pointer text-left transition-all duration-fast ease w-full',
                     isSelected
@@ -128,8 +130,9 @@ export const AppShell: React.FC<AppShellProps> = ({
 
           <button
             type="button"
+            data-testid="nav-settings"
             className={cn(
-              'flex items-center gap-2.5 h-8 px-2.5 rounded-md border font-sans text-body cursor-pointer text-left transition-all duration-fast ease w-full',
+              'flex items-center justify-between gap-2.5 h-8 px-2.5 rounded-md border font-sans text-body cursor-pointer text-left transition-all duration-fast ease w-full',
               currentRoute === 'settings'
                 ? 'bg-bg-selected text-foreground font-medium border-accent shadow-xs'
                 : 'bg-transparent text-muted-foreground font-regular border-transparent hover:bg-muted hover:text-foreground'
@@ -137,10 +140,13 @@ export const AppShell: React.FC<AppShellProps> = ({
             onClick={() => onRouteChange('settings')}
             aria-current={currentRoute === 'settings' ? 'page' : undefined}
           >
-            <span className={cn('flex items-center shrink-0', currentRoute === 'settings' ? 'text-accent-text' : 'text-text-3')}>
-              <Settings size={16} strokeWidth={1.75} />
-            </span>
-            <span className="whitespace-nowrap overflow-hidden text-ellipsis">{t('nav.settings')}</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className={cn('flex items-center shrink-0', currentRoute === 'settings' ? 'text-accent-text' : 'text-text-3')}>
+                <Settings size={16} strokeWidth={1.75} />
+              </span>
+              <span className="whitespace-nowrap overflow-hidden text-ellipsis">{t('nav.settings')}</span>
+            </div>
+            <Kbd className="opacity-80">Ctrl+,</Kbd>
           </button>
 
           <div className="mt-1.5 px-3 py-2 rounded-lg bg-card border border-border shadow-xs flex items-center">

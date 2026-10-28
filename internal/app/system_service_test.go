@@ -50,3 +50,17 @@ func TestSystemService_CountFiles(t *testing.T) {
 		t.Errorf("expected error for non-existent directory")
 	}
 }
+
+func TestSystemService_UnconfiguredPaths(t *testing.T) {
+	service := NewSystemService()
+
+	if err := service.OpenConfig(); err == nil {
+		t.Errorf("expected error when configPath is empty")
+	}
+	if err := service.OpenHistory(); err == nil {
+		t.Errorf("expected error when historyPath is empty")
+	}
+
+	service.SetConfigPath("test_config.yaml")
+	service.SetHistoryPath("test_history.jsonl")
+}

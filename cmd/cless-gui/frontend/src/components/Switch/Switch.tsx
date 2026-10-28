@@ -10,6 +10,7 @@ export interface SwitchProps {
   description?: string;
   id?: string;
   className?: string;
+  'data-testid'?: string;
 }
 
 export const Switch: React.FC<SwitchProps> = ({
@@ -20,6 +21,7 @@ export const Switch: React.FC<SwitchProps> = ({
   description,
   id,
   className,
+  'data-testid': dataTestId,
 }) => {
   const switchId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
@@ -45,6 +47,7 @@ export const Switch: React.FC<SwitchProps> = ({
         checked={checked}
         onCheckedChange={onCheckedChange}
         disabled={disabled}
+        data-testid={dataTestId}
         className="peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent bg-border shadow-xs transition-colors duration-fast ease data-[state=checked]:bg-primary disabled:cursor-not-allowed disabled:opacity-50 p-0"
       >
         <RadixSwitch.Thumb className="pointer-events-none block h-4 w-4 rounded-full bg-bg-surface data-[state=checked]:bg-primary-foreground shadow-sm transition-transform duration-fast ease translate-x-0 data-[state=checked]:translate-x-4" />

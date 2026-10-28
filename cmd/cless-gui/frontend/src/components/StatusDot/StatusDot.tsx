@@ -16,7 +16,11 @@ const stateStyles: Record<WatcherState, string> = {
 
 export const StatusDot: React.FC<StatusDotProps> = ({ state, label, className = '' }) => {
   return (
-    <div className={`inline-flex items-center gap-2 select-none ${className}`}>
+    <div
+      role="status"
+      aria-live="polite"
+      className={`inline-flex items-center gap-2 select-none ${className}`}
+    >
       <span className={`w-2 h-2 rounded-full shrink-0 ${stateStyles[state]}`} aria-hidden="true" />
       {label && <span className="font-sans text-small text-text-2">{label}</span>}
     </div>

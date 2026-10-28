@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   SegmentedControl,
   Input,
@@ -8,6 +8,7 @@ import {
   FileRow,
   EmptyState,
   Tooltip,
+  Kbd,
 } from '../../components';
 import {
   Search,
@@ -23,13 +24,15 @@ import { BatchSummaryDTO } from '../../api/types';
 import { formatRelativeTime, formatAbsoluteTime } from '../../utils/time';
 import { api } from '../../api';
 import { cn } from '../../lib/utils';
-import { t } from '../../i18n';
+import { useLocaleStore, t } from '../../i18n';
 
 export type ActivityFilterType = 'all' | 'applied' | 'undone';
 
 export interface ActivityProps {
   onOrganizeNow?: () => void;
 }
+
+const INITIAL_PAGE_SIZE = 50;
 
 export const Activity: React.FC<ActivityProps> = ({ onOrganizeNow }) => {
   const {
@@ -40,16 +43,32 @@ export const Activity: React.FC<ActivityProps> = ({ onOrganizeNow }) => {
     toggleBatchExpanded,
     retryFile,
   } = useActivityStore();
+  const { locale } = useLocaleStore();
 
   const [filter, setFilter] = useState<ActivityFilterType>('all');
   const [search, setSearch] = useState('');
+  const [displayedLimit, setDisplayedLimit] = useState(INITIAL_PAGE_SIZE);
   const [selectedUndoBatchId, setSelectedUndoBatchId] = useState<string | null>(null);
   const [retryingPath, setRetryingPath] = useState<string | null>(null);
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Initial load
   useEffect(() => {
     loadBatches();
   }, [loadBatches]);
+
+  // Ctrl+K keyboard shortcut to focus search input (DESIGN.md section 9)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Handle retry of a single failed file
   const handleRetryFile = async (path: string) => {
@@ -91,27 +110,32 @@ export const Activity: React.FC<ActivityProps> = ({ onOrganizeNow }) => {
     });
   }, [statusFilteredBatches, search, batchDetails]);
 
+  // Progressive slicing to handle up to 5,000 batches without DOM bloat
+  const paginatedBatches = useMemo(() => {
+    return filteredBatches.slice(0, displayedLimit);
+  }, [filteredBatches, displayedLimit]);
+
   // Group batches by calendar date
   const groupedBatches = useMemo(() => {
     const groups: Array<{ dateLabel: string; items: BatchSummaryDTO[] }> = [];
     const dateMap = new Map<string, BatchSummaryDTO[]>();
 
-    filteredBatches.forEach(batch => {
+    paginatedBatches.forEach(batch => {
       const d = new Date(batch.time);
       const today = new Date();
       const yesterday = new Date();
       yesterday.setDate(today.getDate() - 1);
 
-      let label = d.toLocaleDateString(undefined, {
+      let label = d.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
 
       if (d.toDateString() === today.toDateString()) {
-        label = 'Today';
+        label = locale === 'id' ? 'Hari ini' : 'Today';
       } else if (d.toDateString() === yesterday.toDateString()) {
-        label = 'Yesterday';
+        label = locale === 'id' ? 'Kemarin' : 'Yesterday';
       }
 
       if (!dateMap.has(label)) {
@@ -122,7 +146,7 @@ export const Activity: React.FC<ActivityProps> = ({ onOrganizeNow }) => {
     });
 
     return groups;
-  }, [filteredBatches]);
+  }, [paginatedBatches, locale]);
 
   return (
     <div className="flex flex-col gap-5 w-full">
@@ -135,21 +159,36 @@ export const Activity: React.FC<ActivityProps> = ({ onOrganizeNow }) => {
             { value: 'undone', label: t('activity.filter.undone') },
           ]}
           value={filter}
-          onChange={setFilter}
+          onChange={val => {
+            setFilter(val);
+            setDisplayedLimit(INITIAL_PAGE_SIZE);
+          }}
           ariaLabel="Activity Status Filter"
         />
 
         <div className="relative flex-1 max-w-sm">
           <Input
+            ref={searchInputRef}
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => {
+              setSearch(e.target.value);
+              setDisplayedLimit(INITIAL_PAGE_SIZE);
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Escape') {
+                setSearch('');
+              }
+            }}
             placeholder={t('activity.search_placeholder')}
-            className="pl-8"
+            className="pl-8 pr-16"
           />
           <Search
             size={14}
             className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
           />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Kbd>Ctrl+K</Kbd>
+          </div>
         </div>
       </div>
 
@@ -247,7 +286,7 @@ export const Activity: React.FC<ActivityProps> = ({ onOrganizeNow }) => {
                           {isUndone ? (
                             <Tooltip content={t('activity.already_undone_tooltip')}>
                               <span>
-                                <Button variant="secondary" size="sm" disabled>
+                                <Button variant="secondary" size="sm" disabled aria-label={t('action.undo_batch')}>
                                   <RotateCcw size={13} strokeWidth={1.5} />
                                   <span>{t('action.undo_batch')}</span>
                                 </Button>
@@ -257,6 +296,7 @@ export const Activity: React.FC<ActivityProps> = ({ onOrganizeNow }) => {
                             <Button
                               variant="secondary"
                               size="sm"
+                              aria-label={t('action.undo_batch')}
                               onClick={() => setSelectedUndoBatchId(batch.id)}
                             >
                               <RotateCcw size={13} strokeWidth={1.5} />
@@ -297,6 +337,7 @@ export const Activity: React.FC<ActivityProps> = ({ onOrganizeNow }) => {
                                     <Button
                                       variant="danger"
                                       size="sm"
+                                      aria-label={t('action.retry')}
                                       disabled={retryingPath === rec.source}
                                       onClick={() => handleRetryFile(rec.source)}
                                     >
@@ -319,6 +360,25 @@ export const Activity: React.FC<ActivityProps> = ({ onOrganizeNow }) => {
               </div>
             </div>
           ))}
+
+          {/* Progressive Loading Button for 5000+ batches */}
+          {filteredBatches.length > displayedLimit && (
+            <div className="flex flex-col items-center justify-center pt-2 pb-4 gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setDisplayedLimit(prev => prev + INITIAL_PAGE_SIZE)}
+                data-testid="btn-load-more-batches"
+              >
+                <span>{t('activity.load_more')}</span>
+              </Button>
+              <span className="font-mono text-caption text-text-3">
+                {t('activity.showing_batches', {
+                  shown: Math.min(displayedLimit, filteredBatches.length),
+                  total: filteredBatches.length,
+                })}
+              </span>
+            </div>
+          )}
         </div>
       )}
 

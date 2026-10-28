@@ -128,3 +128,4 @@ func MacOSLaunchAgentFilePath(label string) (string, error) {
 	}
 	return filepath.Join(home, "Library", "LaunchAgents", fmt.Sprintf("%s.plist", label)), nil
 }
+

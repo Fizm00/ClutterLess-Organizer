@@ -134,6 +134,13 @@ export const wailsApi: Api = {
     async openConfig() {
       return SystemService.OpenConfig();
     },
+    async openHistory() {
+      const sys: any = SystemService;
+      if (typeof sys?.OpenHistory === 'function') {
+        return sys.OpenHistory();
+      }
+      return mockApi.system.openHistory();
+    },
     async pickFolder() {
       const sys: any = SystemService;
       if (typeof sys?.PickFolder === 'function') {

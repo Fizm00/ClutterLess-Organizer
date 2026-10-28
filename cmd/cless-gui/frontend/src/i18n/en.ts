@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 // English string dictionary (Single source of truth for UI copy: DESIGN.md section 8)
 export const en = {
   // Navigation & Shell
@@ -56,12 +57,17 @@ export const en = {
   'action.add_folder': 'Add folder',
   'action.new_rule': 'New rule',
   'action.test_file': 'Test a file name...',
+  'action.export': 'Export',
+  'action.open_file': 'Open file',
 
   // Activity Screen (DESIGN.md 7.2)
   'activity.filter.all': 'All',
   'activity.filter.applied': 'Applied',
   'activity.filter.undone': 'Undone',
   'activity.search_placeholder': 'Filter by filename or destination...',
+  'activity.search_kbd_hint': 'Press {key} to search',
+  'activity.load_more': 'Show more batches',
+  'activity.showing_batches': 'Showing {shown} of {total} batches',
   'activity.empty_title': 'No activity history',
   'activity.empty_desc': 'Files moved by automatic watching or manual runs will appear here.',
   'activity.empty_filter_title': 'No matching records',
@@ -117,12 +123,72 @@ export const en = {
   'dialog.undo_desc': 'The following files will be restored to their original locations. This action is final.',
   'dialog.confirm_title': 'Confirm Action',
 
-  // Settings
+  // Settings Screen (DESIGN.md 7.7)
   'settings.appearance': 'Appearance',
+  'settings.appearance_desc': 'Customize the visual theme and interface language.',
   'settings.theme': 'Theme',
+  'settings.theme_desc': 'Select between dark, light, or automatic system appearance.',
   'settings.theme.dark': 'Dark',
   'settings.theme.light': 'Light',
   'settings.theme.system': 'System',
+  'settings.language': 'Language',
+  'settings.language_desc': 'Select interface language.',
+  'settings.language.en': 'English',
+  'settings.language.id': 'Bahasa Indonesia',
+
+  'settings.behavior': 'Behavior',
+  'settings.behavior_desc': 'Configure automatic watching debounce, conflict resolution, and file exclusions.',
+  'settings.stable_after': 'File stability delay',
+  'settings.stable_after_desc': 'Wait for active file writes to finish before organizing (seconds).',
+  'settings.conflict': 'Conflict handling',
+  'settings.conflict_desc': 'Action when a destination file with the same name already exists.',
+  'settings.conflict.rename': 'Rename (add number)',
+  'settings.conflict.skip': 'Skip (leave untouched)',
+  'settings.ignore_hidden': 'Ignore hidden files',
+  'settings.ignore_hidden_desc': 'Skip files and folders starting with a dot or marked hidden.',
+  'settings.ignore_ext': 'Ignored extensions',
+  'settings.ignore_ext_desc': 'File extensions that ClutterLess will never touch.',
+  'settings.ignore_names': 'Ignored file names',
+  'settings.ignore_names_desc': 'Specific file names or patterns to ignore.',
+
+  'settings.system_title': 'System',
+  'settings.system_desc': 'Configure background execution, system tray integration, and desktop alerts.',
+  'settings.autostart': 'Start on login',
+  'settings.autostart_desc': 'Launch ClutterLess minimized to the system tray at login.',
+  'settings.notifications': 'Show notifications',
+  'settings.notifications_desc': 'Display summary alerts when batches of files are organized.',
+  'settings.close_to_tray': 'Close button hides to tray',
+  'settings.close_to_tray_desc': 'Keep running in the background when the window is closed.',
+
+  'settings.data': 'Data',
+  'settings.data_desc': 'Manage configuration files, activity logs, and application state.',
+  'settings.open_config': 'Open configuration file',
+  'settings.open_config_desc': 'Reveal config.yaml in your system file manager.',
+  'settings.open_history': 'Open history log',
+  'settings.open_history_desc': 'Reveal history.jsonl in your system file manager.',
+  'settings.export_config': 'Export configuration',
+  'settings.export_config_desc': 'Save a backup copy of your configuration to disk.',
+  'settings.reset_defaults': 'Reset configuration',
+  'settings.reset_defaults_desc': 'Restore all settings, watched folders, and rules to defaults.',
+  'settings.reset_confirm_title': 'Reset configuration to defaults?',
+  'settings.reset_confirm_desc': 'This will reset all watched folders, custom rules, and settings back to default values. Your actual files on disk will not be moved or deleted. This action cannot be undone.',
+  'settings.reset_confirm_button': 'Reset configuration',
+
+  'settings.about': 'About',
+  'settings.about_desc': 'ClutterLess version and open source licenses.',
+  'settings.version': 'Version',
+  'settings.commit': 'Commit',
+  'settings.build_date': 'Build date',
+  'settings.license': 'License',
+  'settings.license_name': 'AGPL-3.0-only',
+  'settings.links': 'Links',
+  'settings.link_repo': 'GitHub repository',
+  'settings.link_licenses': 'Third-party licenses',
+
+  // Tooltips & Shortcuts (DESIGN.md 9)
+  'tooltip.organize_shortcut': 'Organize now ({key})',
+  'tooltip.settings_shortcut': 'Settings ({key})',
+  'tooltip.undo_shortcut': 'Undo last batch ({key})',
 
   // Toasts
   'toast.restored': 'Restored {count} files. {conflicts} conflicts.',
@@ -132,6 +198,10 @@ export const en = {
   'toast.rule_deleted': 'Rule deleted.',
   'toast.folder_added': 'Folder added to watch list.',
   'toast.folder_removed': 'Folder removed from watch list.',
+  'toast.close_to_tray': 'Still running in the tray.',
+  'toast.config_exported': 'Configuration exported.',
+  'toast.config_reset': 'Configuration reset to defaults.',
+  'toast.settings_saved': 'Settings saved.',
 
   // Rules (DESIGN.md 7.4)
   'rules.caption': 'First match wins.',
@@ -211,17 +281,6 @@ export const en = {
   'onboarding.btn_organize_now': 'Organize files',
   'onboarding.btn_skip_for_now': 'Skip for now',
   'onboarding.done_toast': 'Setup completed. Watching started.',
-
-  // Phase G6: System integration & Tray (DESIGN.md 7.7, 7.9)
-  'toast.close_to_tray': 'Still running in the tray.',
-  'settings.system_title': 'System',
-  'settings.autostart': 'Start on login',
-  'settings.autostart_desc': 'Launch ClutterLess minimized to the system tray at login',
-  'settings.notifications': 'Show notifications',
-  'settings.notifications_desc': 'Display summary alerts when batches of files are organized',
-  'settings.close_to_tray': 'Close button hides to tray',
-  'settings.close_to_tray_desc': 'Keep running in the background when the window is closed',
 } as const;
 
 export type TranslationKey = keyof typeof en;
-

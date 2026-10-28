@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Play, Pause, FolderSync, Plus, FolderPlus } from 'lucide-react';
 import { AppShell, NavRoute } from './components/AppShell';
 import { Button } from './components/Button';
+import { Tooltip } from './components/Tooltip';
+import { Kbd } from './components/Kbd';
 import { Overview } from './screens/Overview';
 import { Activity } from './screens/Activity';
 import { Rules } from './screens/Rules';
@@ -11,7 +13,7 @@ import { PreviewSheet } from './screens/Preview';
 import { UndoDialog } from './components/UndoDialog';
 import { Styleguide } from './screens/Styleguide';
 import { Onboarding } from './screens/Onboarding';
-import { SystemSettings } from './screens/Settings';
+import { Settings } from './screens/Settings';
 import { useThemeStore } from './store/themeStore';
 import { useWatchStore } from './state/watchStore';
 import { useActivityStore } from './state/activityStore';
@@ -19,7 +21,7 @@ import { useRulesStore } from './state/rulesStore';
 import { useFoldersStore } from './state/foldersStore';
 import { useOnboardingStore } from './state/onboardingStore';
 import { setupEventSubscriptions } from './state/events';
-import { t } from './i18n';
+import { useLocaleStore, t } from './i18n';
 
 export const App: React.FC = () => {
   const [route, setRoute] = useState<NavRoute>('overview');
@@ -27,6 +29,7 @@ export const App: React.FC = () => {
   const [undoBatchId, setUndoBatchId] = useState<string | null>(null);
   const [closeToTrayToast, setCloseToTrayToast] = useState(false);
   const { initTheme } = useThemeStore();
+  useLocaleStore(s => s.locale);
   const { running, start, stop } = useWatchStore();
   const { isFirstRun } = useOnboardingStore();
 
@@ -200,7 +203,7 @@ export const App: React.FC = () => {
       case 'folders':
         return <Folders />;
       case 'settings':
-        return <SystemSettings />;
+        return <Settings />;
       case 'styleguide':
       default:
         return <Styleguide />;
@@ -212,11 +215,27 @@ export const App: React.FC = () => {
       case 'overview':
         return (
           <>
-            <Button variant="primary" onClick={handleOrganizeNow}>
-              <FolderSync size={14} strokeWidth={1.75} />
-              <span>{t('action.organize_now')}</span>
-            </Button>
-            <Button variant="secondary" onClick={handleToggleWatch}>
+            <Tooltip
+              content={
+                <span className="flex items-center gap-1.5">
+                  {t('action.organize_now')} <Kbd>Ctrl+Shift+O</Kbd>
+                </span>
+              }
+            >
+              <Button
+                variant="primary"
+                onClick={handleOrganizeNow}
+                aria-label={t('action.organize_now')}
+              >
+                <FolderSync size={14} strokeWidth={1.75} />
+                <span>{t('action.organize_now')}</span>
+              </Button>
+            </Tooltip>
+            <Button
+              variant="secondary"
+              onClick={handleToggleWatch}
+              aria-label={running ? t('action.pause') : t('action.resume')}
+            >
               {running ? (
                 <>
                   <Pause size={14} strokeWidth={1.75} />
@@ -233,10 +252,22 @@ export const App: React.FC = () => {
         );
       case 'activity':
         return (
-          <Button variant="secondary" onClick={handleOrganizeNow}>
-            <FolderSync size={14} strokeWidth={1.75} />
-            <span>{t('action.organize_now')}</span>
-          </Button>
+          <Tooltip
+            content={
+              <span className="flex items-center gap-1.5">
+                {t('action.organize_now')} <Kbd>Ctrl+Shift+O</Kbd>
+              </span>
+            }
+          >
+            <Button
+              variant="secondary"
+              onClick={handleOrganizeNow}
+              aria-label={t('action.organize_now')}
+            >
+              <FolderSync size={14} strokeWidth={1.75} />
+              <span>{t('action.organize_now')}</span>
+            </Button>
+          </Tooltip>
         );
       case 'rules':
         return (
