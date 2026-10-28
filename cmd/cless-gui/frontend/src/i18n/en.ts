@@ -32,10 +32,14 @@ export const en = {
 
   // Actions
   'action.organize_now': 'Organize now',
+  'action.move_files': 'Move {count} files',
+  'action.move_file': 'Move 1 file',
   'action.pause': 'Pause',
   'action.resume': 'Resume',
   'action.undo': 'Undo',
   'action.undo_batch': 'Undo batch',
+  'action.restore_files': 'Restore {count} files',
+  'action.restore_file': 'Restore 1 file',
   'action.cancel': 'Cancel',
   'action.save': 'Save',
   'action.save_rule': 'Save rule',
@@ -47,10 +51,38 @@ export const en = {
   'action.reveal': 'Show in file manager',
   'action.close': 'Close',
   'action.retry': 'Retry',
+  'action.retry_file': 'Retry file',
   'action.reset_defaults': 'Reset to defaults',
   'action.add_folder': 'Add folder',
   'action.new_rule': 'New rule',
   'action.test_file': 'Test a file name...',
+
+  // Activity Screen (DESIGN.md 7.2)
+  'activity.filter.all': 'All',
+  'activity.filter.applied': 'Applied',
+  'activity.filter.undone': 'Undone',
+  'activity.search_placeholder': 'Filter by filename or destination...',
+  'activity.empty_title': 'No activity history',
+  'activity.empty_desc': 'Files moved by automatic watching or manual runs will appear here.',
+  'activity.empty_filter_title': 'No matching records',
+  'activity.empty_filter_desc': 'Try clearing the search query or changing the status filter.',
+  'activity.batch_files': '{count} files',
+  'activity.batch_file': '1 file',
+  'activity.status.applied': 'Applied',
+  'activity.status.undone': 'Undone',
+  'activity.status.partially_undone': 'Partially undone',
+  'activity.already_undone_tooltip': 'Already undone',
+
+  // Preview & Run (DESIGN.md 7.3)
+  'preview.section.will_move': 'Will move ({count})',
+  'preview.section.skipped': 'Skipped ({count})',
+  'preview.section.unmatched': 'Unmatched ({count})',
+  'preview.running_progress': 'Moving {done} of {total} files...',
+  'preview.cancelled': 'Organization cancelled by user',
+  'preview.summary_title': 'Organization complete',
+  'preview.summary_desc': '{moved} moved · {skipped} skipped · {failed} failed',
+  'preview.empty_title': 'No files to organize',
+  'preview.empty_desc': 'All files in your watched folders already match their destinations or are ignored.',
 
   // Screen Titles
   'title.overview': 'Overview',
@@ -81,6 +113,8 @@ export const en = {
   'dialog.preview_title': 'Preview',
   'dialog.preview_counts': '{moveCount} will move - {skipCount} skipped - {unmatchedCount} unmatched',
   'dialog.preview_notice': 'Nothing has been moved yet.',
+  'dialog.undo_title': 'Undo batch {id}?',
+  'dialog.undo_desc': 'The following files will be restored to their original locations. This action is final.',
   'dialog.confirm_title': 'Confirm Action',
 
   // Settings
@@ -92,6 +126,7 @@ export const en = {
 
   // Toasts
   'toast.restored': 'Restored {count} files. {conflicts} conflicts.',
+  'toast.files_moved': 'Moved {count} files.',
   'toast.config_reloaded': 'Config changed on disk. Reloaded.',
 } as const;
 

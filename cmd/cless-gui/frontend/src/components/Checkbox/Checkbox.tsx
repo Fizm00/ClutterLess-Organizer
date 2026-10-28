@@ -10,6 +10,7 @@ export interface CheckboxProps {
   label?: string;
   id?: string;
   className?: string;
+  'aria-label'?: string;
 }
 
 export const Checkbox: React.FC<CheckboxProps> = ({
@@ -19,6 +20,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   label,
   id,
   className,
+  'aria-label': ariaLabel,
 }) => {
   const checkboxId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
@@ -29,6 +31,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         checked={checked}
         onCheckedChange={onCheckedChange}
         disabled={disabled}
+        aria-label={ariaLabel}
         className="peer flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border border-input bg-bg-surface shadow-xs cursor-pointer p-0 transition-colors duration-fast ease hover:border-border-strong data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
       >
         <RadixCheckbox.Indicator className="flex items-center justify-center text-current">

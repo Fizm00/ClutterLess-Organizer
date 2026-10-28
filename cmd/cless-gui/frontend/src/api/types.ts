@@ -174,12 +174,13 @@ export interface RulesApi {
 export interface OrganizeApi {
   preview(opts?: PreviewOptionsDTO): Promise<PlanDTO>;
   run(req: RunRequestDTO): Promise<RunResultDTO>;
+  retryFile(sourcePath: string): Promise<MoveResultDTO>;
 }
 
 export interface HistoryApi {
   batches(limit?: number, filter?: HistoryFilterDTO): Promise<BatchSummaryDTO[]>;
   batch(id: string): Promise<BatchDetailDTO>;
-  undoPreview(batchId: string): Promise<UndoResultDTO>;
+  undoPreview(batchId: string): Promise<PlanDTO>;
   undo(batchId: string): Promise<UndoResultDTO>;
 }
 

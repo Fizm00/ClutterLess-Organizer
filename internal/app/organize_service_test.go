@@ -240,3 +240,53 @@ func TestOrganizeService_ContextCancellation(t *testing.T) {
 		t.Errorf("expected ErrOperationCancelled, got %v", err)
 	}
 }
+
+func TestOrganizeService_RetryFile(t *testing.T) {
+	tempDir := t.TempDir()
+	sourceDir := filepath.Join(tempDir, "source")
+	destDir := filepath.Join(tempDir, "dest")
+	_ = os.MkdirAll(sourceDir, 0755)
+	_ = os.MkdirAll(destDir, 0755)
+
+	f1 := filepath.Join(sourceDir, "retry_me.pdf")
+	_ = os.WriteFile(f1, []byte("retry content"), 0644)
+
+	configPath := filepath.Join(tempDir, "config.yaml")
+	cs, err := NewConfigService(configPath, nil)
+	if err != nil {
+		t.Fatalf("failed to create ConfigService: %v", err)
+	}
+	defer cs.Close()
+
+	if err := cs.Save(ConfigDTO{
+		Watch:    []WatchEntryDTO{{Path: sourceDir}},
+		Settings: SettingsDTO{StableAfterSeconds: 1, Conflict: "rename"},
+		Rules: []RuleDTO{
+			{Name: "PDFs", MoveTo: destDir, Match: MatchDTO{Ext: []string{"pdf"}}},
+		},
+	}); err != nil {
+		t.Fatalf("failed to save test config: %v", err)
+	}
+
+	hist, _ := history.NewStorage(filepath.Join(tempDir, "history.jsonl"))
+	sink := NewMemoryEventSink()
+	osvc := NewOrganizeService(cs, hist, sink)
+
+	res, err := osvc.RetryFile(context.Background(), f1)
+	if err != nil {
+		t.Fatalf("retry failed: %v", err)
+	}
+
+	if res.Failed || res.Skipped {
+		t.Errorf("expected successful move, got failed=%v, skipped=%v, reason=%s", res.Failed, res.Skipped, res.Reason)
+	}
+
+	expectedDest := filepath.Join(destDir, "retry_me.pdf")
+	if _, err := os.Stat(expectedDest); err != nil {
+		t.Errorf("expected file to exist at %s: %v", expectedDest, err)
+	}
+
+	if sink.Count(EventFileMoved) == 0 {
+		t.Errorf("expected EventFileMoved on retry")
+	}
+}

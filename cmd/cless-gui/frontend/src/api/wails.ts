@@ -51,6 +51,13 @@ export const wailsApi: Api = {
     async run(req) {
       return (await OrganizeService.Run(req as any)) as any;
     },
+    async retryFile(sourcePath) {
+      const org: any = OrganizeService;
+      if (typeof org?.RetryFile === 'function') {
+        return (await org.RetryFile(sourcePath)) as any;
+      }
+      return mockApi.organize.retryFile(sourcePath);
+    },
   },
   history: {
     async batches(limit = 50, filter = {}) {

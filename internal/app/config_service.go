@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/Fizm00/organizer/internal/config"
 	"github.com/fsnotify/fsnotify"
@@ -26,6 +27,7 @@ type ConfigService struct {
 	fsWatcher       *fsnotify.Watcher
 	stopWatcher     chan struct{}
 	lastWrittenHash [32]byte
+	recentHashes    map[[32]byte]time.Time
 }
 
 // NewConfigService creates and initializes a ConfigService.
@@ -43,16 +45,19 @@ func NewConfigService(configPath string, sink EventSink) (*ConfigService, error)
 	}
 
 	cs := &ConfigService{
-		configPath:  configPath,
-		eventSink:   sink,
-		stopWatcher: make(chan struct{}),
+		configPath:   configPath,
+		eventSink:    sink,
+		stopWatcher:  make(chan struct{}),
+		recentHashes: make(map[[32]byte]time.Time),
 	}
 
 	// Try loading initial config; if missing, initialize defaults
 	var cfg *config.Config
 	expandedPath := config.ExpandPath(configPath)
 	if data, readErr := os.ReadFile(expandedPath); readErr == nil {
-		cs.lastWrittenHash = sha256.Sum256(data)
+		h := sha256.Sum256(data)
+		cs.lastWrittenHash = h
+		cs.recentHashes[h] = time.Now()
 	}
 
 	if _, statErr := os.Stat(expandedPath); os.IsNotExist(statErr) {
@@ -164,7 +169,15 @@ func (cs *ConfigService) Save(dto ConfigDTO) error {
 		return NewAppError(ErrConfigSaveFailed, "Failed to finalize config file", "", err.Error())
 	}
 
-	cs.lastWrittenHash = sha256.Sum256(data)
+	h := sha256.Sum256(data)
+	cs.lastWrittenHash = h
+	cs.recentHashes[h] = time.Now()
+	now := time.Now()
+	for k, t := range cs.recentHashes {
+		if now.Sub(t) > 10*time.Second {
+			delete(cs.recentHashes, k)
+		}
+	}
 	cs.currentCfg = cfg
 	cs.eventSink.Emit(EventConfigChanged, ConfigChangedPayload{Path: cs.configPath})
 
@@ -231,11 +244,12 @@ func (cs *ConfigService) handleDiskFileChanged() {
 	}
 
 	// If this disk change was produced by our own Save(), skip reloading
+	h := sha256.Sum256(rawBytes)
 	cs.mu.RLock()
-	lastHash := cs.lastWrittenHash
+	_, isSelf := cs.recentHashes[h]
 	cs.mu.RUnlock()
 
-	if sha256.Sum256(rawBytes) == lastHash {
+	if isSelf {
 		return
 	}
 

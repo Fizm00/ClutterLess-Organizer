@@ -17,4 +17,5 @@ export * from './EmptyState';
 export * from './Kbd';
 export * from './StatusDot';
 export * from './Menu';
+export * from './UndoDialog';
 

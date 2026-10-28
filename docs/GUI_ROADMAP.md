@@ -8,7 +8,7 @@ Update the Status column at the end of every phase. The CLI roadmap (`docs/ROADM
 | G1 | Service layer | `internal/app` services with tests, events, watcher lock; no UI | DONE |
 | G2 | Design system & shell | Tokens, fonts, components, app shell, theming, `/styleguide` route, mock API | DONE |
 | G3 | Overview & watch control | Overview screen, live activity, pause/resume, error banners | DONE |
-| G4 | Preview, run, activity, undo | Preview sheet, run with progress, Activity screen, undo flow | TODO |
+| G4 | Preview, run, activity, undo | Preview sheet, run with progress, Activity screen, undo flow | DONE |
 | G5 | Rules & folders | Rule list with reorder, rule editor, tester, folders screen | TODO |
 | G6 | System integration | Tray, close-to-tray, single instance, autostart, notifications, onboarding | TODO |
 | G7 | Settings & polish | Settings screen, a11y pass, edge states, performance, optional Indonesian strings | TODO |

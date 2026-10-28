@@ -181,3 +181,85 @@ func (os *OrganizeService) Run(ctx context.Context, req RunRequestDTO) (RunResul
 		Unmatched: res.Stats.Unmatched,
 	}, nil
 }
+
+// RetryFile re-evaluates rules and attempts to move an individual file that previously failed or needs retry.
+func (os *OrganizeService) RetryFile(ctx context.Context, sourcePath string) (MoveResultDTO, error) {
+	rawCfg := os.configService.GetConfig()
+	organizer := engine.NewOrganizer(rawCfg)
+	if os.history != nil {
+		organizer.History = os.history
+	}
+
+	rules, err := engine.CompileRules(rawCfg.Rules)
+	if err != nil {
+		return MoveResultDTO{}, NewAppError(ErrConfigInvalid, "Failed to compile rules", "", err.Error())
+	}
+
+	pm, err := engine.PlanFile(sourcePath, rules, rawCfg.Settings, time.Now())
+	if err != nil {
+		return MoveResultDTO{}, NewAppError(ErrInternal, "Failed to plan retry move", "", err.Error())
+	}
+
+	if pm.Skipped {
+		return MoveResultDTO{
+			ID:       pm.ID,
+			Source:   pm.Source,
+			Dest:     pm.Dest,
+			RuleName: pm.RuleName,
+			Skipped:  true,
+			Reason:   pm.Reason,
+		}, nil
+	}
+
+	res, err := organizer.Mover.Move(ctx, pm)
+	if err != nil {
+		res.Failed = true
+		res.Reason = err.Error()
+	}
+
+	if !res.Failed && !res.Skipped && os.history != nil {
+		batchID := history.GenerateBatchID(time.Now())
+		_ = os.history.Append([]history.Record{{
+			BatchID: batchID,
+			Time:    time.Now().UTC(),
+			Source:  res.Source,
+			Dest:    res.Dest,
+			Rule:    res.RuleName,
+			Size:    res.Size,
+			Status:  history.StatusMoved,
+		}})
+	}
+
+	dto := MoveResultDTO{
+		ID:       res.ID,
+		Source:   res.Source,
+		Dest:     res.Dest,
+		Size:     res.Size,
+		RuleName: res.RuleName,
+		Skipped:  res.Skipped,
+		Failed:   res.Failed,
+		Reason:   res.Reason,
+	}
+
+	if res.Failed {
+		os.eventSink.Emit(EventFileFailed, FileFailedPayload{
+			Path:  res.Source,
+			Error: res.Reason,
+		})
+	} else if res.Skipped {
+		os.eventSink.Emit(EventFileSkipped, FileSkippedPayload{
+			Path:   res.Source,
+			Reason: res.Reason,
+		})
+	} else {
+		os.eventSink.Emit(EventFileMoved, FileMovedPayload{
+			Source: res.Source,
+			Dest:   res.Dest,
+			Rule:   res.RuleName,
+			Size:   res.Size,
+			Time:   time.Now().UTC().Format(time.RFC3339),
+		})
+	}
+
+	return dto, nil
+}

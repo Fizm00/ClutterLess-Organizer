@@ -5,6 +5,7 @@ import {
   BatchSummaryDTO,
   ConfigDTO,
   HistoryFilterDTO,
+  MoveResultDTO,
   PlanDTO,
   PreviewOptionsDTO,
   RuleDTO,
@@ -234,6 +235,18 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
         unmatched: 0,
       };
     },
+    async retryFile(sourcePath: string): Promise<MoveResultDTO> {
+      return {
+        id: 'retry-' + Date.now(),
+        source: sourcePath,
+        dest: 'C:/Users/User/Documents/Finance/2026-04/' + sourcePath.split(/[/\\]/).pop(),
+        size: 1024 * 1024 * 2.5,
+        ruleName: 'Invoices',
+        skipped: false,
+        failed: false,
+        reason: '',
+      };
+    },
   },
 
   history: {
@@ -308,23 +321,38 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
         ],
       };
     },
-    async undoPreview(batchId: string): Promise<UndoResultDTO> {
+    async undoPreview(batchId: string): Promise<PlanDTO> {
       return {
-        batchId,
-        moves: [
+        planId: 'undo-preview-' + batchId,
+        items: [
           {
-            originalSource: 'C:/Users/User/Downloads/invoice_april_2026.pdf',
-            currentDest: 'C:/Users/User/Documents/Finance/2026-04/invoice_april_2026.pdf',
-            restoredTo: 'C:/Users/User/Downloads/invoice_april_2026.pdf',
+            id: 'undo-item-1',
+            source: longPath1 + '/' + longFilename1,
+            dest: 'C:/Users/User/Downloads/' + longFilename1,
+            ruleName: 'undo',
             skipped: false,
-            failed: false,
+            reason: '',
+          },
+          {
+            id: 'undo-item-2',
+            source: 'C:/Users/User/Pictures/Sorted/2026/IMG_2041.heic',
+            dest: 'C:/Users/User/Downloads/IMG_2041_holiday_photo_family_camera.heic',
+            ruleName: 'undo',
+            skipped: false,
+            reason: '',
+          },
+          {
+            id: 'undo-item-3',
+            source: 'C:/Users/User/Downloads/_Installers/setup_v3.2_installer_x64.exe',
+            dest: 'C:/Users/User/Downloads/setup_v3.2_installer_x64.exe',
+            ruleName: 'undo',
+            skipped: false,
             reason: '',
           },
         ],
-        restored: 1,
-        skipped: 0,
-        failed: 0,
-        message: 'Ready to undo',
+        total: 3,
+        moveCount: 3,
+        skipCount: 0,
       };
     },
     async undo(batchId: string): Promise<UndoResultDTO> {
