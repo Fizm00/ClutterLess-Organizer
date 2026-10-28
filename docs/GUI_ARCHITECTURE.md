@@ -84,7 +84,7 @@ All service errors return a typed `AppError{Code, Message, Hint, Details}` seria
 
 - `api/` is the only place that imports generated bindings. It exports a typed `api` object. A **mock implementation** (`api/mock.ts`, realistic sample data including edge cases like 70-char filenames) is selected when running the frontend in a plain browser (`npm run dev:mock`), so screens can be built and screenshot-tested without the Go runtime.
 - State: Zustand stores per domain (`watchStore`, `activityStore`, `rulesStore`, `settingsStore`). No global mutable singletons outside stores.
-- Styling: CSS Modules (or one CSS file per component) consuming tokens from `tokens.css`. No inline hex values, no utility-class frameworks.
+- Styling: Tailwind CSS v4 with a locked `@theme` block where all defaults are cleared (`--color-*: initial`, `--radius-*: initial`, etc.) and populated strictly with `DESIGN.md` tokens. Arbitrary values (`bg-[#...]`, `p-[...]`) are strictly forbidden and enforced by ESLint. Component primitives are hand-built once in `frontend/src/components/` using Radix headless primitives; screens only compose them. Pre-made component kits (shadcn, MUI, Chakra, Mantine) remain strictly banned.
 - Components are presentational; screens compose them and talk to stores.
 - Tests: Vitest + Testing Library for components and stores; Go tests for `internal/app`; Playwright (dev dependency) against the mock build for screenshots and keyboard-navigation checks.
 
@@ -92,7 +92,7 @@ All service errors return a typed `AppError{Code, Message, Hint, Details}` seria
 
 Go: `github.com/wailsapp/wails/v3` (and its transitive deps). Anything else: ask first.
 
-Frontend: `react`, `react-dom`, `typescript`, `vite`, `@vitejs/plugin-react`, `zustand`, `lucide-react`, `@radix-ui/react-dialog`, `-dropdown-menu`, `-tooltip`, `-switch`, `-tabs`, `-popover`, `-select`, `-checkbox`, `@dnd-kit/core`, `@dnd-kit/sortable` (Phase G5 only), `@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono`; dev: `vitest`, `@testing-library/react`, `jsdom`, `playwright`, `eslint`, `prettier`. Anything else: ask first. Never add Tailwind, a component kit (shadcn, MUI, Chakra, Mantine), a CSS-in-JS runtime, or an animation library.
+Frontend: `react`, `react-dom`, `typescript`, `vite`, `@vitejs/plugin-react`, `tailwindcss`, `@tailwindcss/vite`, `zustand`, `lucide-react`, `@radix-ui/react-dialog`, `-dropdown-menu`, `-tooltip`, `-switch`, `-tabs`, `-popover`, `-select`, `-checkbox`, `@dnd-kit/core`, `@dnd-kit/sortable` (Phase G5 only), `@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono`; dev: `vitest`, `@testing-library/react`, `jsdom`, `playwright`, `eslint`, `prettier`. Anything else: ask first. Pre-made component kits (shadcn, MUI, Chakra, Mantine), CSS-in-JS runtimes, or animation libraries remain strictly banned.
 
 ## 9. Build and release notes
 

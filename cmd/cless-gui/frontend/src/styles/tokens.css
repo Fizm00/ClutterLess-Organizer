@@ -1,0 +1,202 @@
+/* ClutterLess Design Tokens (Tailwind v4 Locked Theme)
+ * Single source of truth: DESIGN.md section 4
+ */
+
+@import "tailwindcss";
+
+:root {
+  /* 4.1 Color - Dark Mode (Default) */
+  --bg-app: #0b0d10;
+  --bg-sidebar: #0f1215;
+  --bg-surface: #14181c;
+  --bg-raised: #1a1f25;
+  --bg-selected: #12262b;
+
+  --border-subtle: #1c2127;
+  --border: #2a323b;
+  --border-strong: #3a4450;
+
+  --text-1: #e8ecf0;
+  --text-2: #a3adb8;
+  --text-3: #6b7682;
+
+  --accent: #22d3ee;
+  --accent-text: #22d3ee;
+  --on-accent: #04181c;
+
+  --success: #3ea66b;
+  --warning: #d9a441;
+  --danger: #e5534b;
+
+  /* Category dots for rules (section 4.1) */
+  --dot-1: #5b9bd5;
+  --dot-2: #6fb98f;
+  --dot-3: #d9a441;
+  --dot-4: #c27ba0;
+  --dot-5: #8d8fd6;
+  --dot-6: #5fb5b0;
+  --dot-7: #d1805a;
+  --dot-8: #9aa5b1;
+
+  /* 4.2 Typography */
+  --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', Consolas, Monaco, monospace;
+
+  --text-caption-size: 11px;
+  --text-caption-lh: 16px;
+  --text-small-size: 12px;
+  --text-small-lh: 16px;
+  --text-body-size: 13px;
+  --text-body-lh: 20px;
+  --text-mono-size: 12.5px;
+  --text-mono-lh: 18px;
+  --text-subtitle-size: 14px;
+  --text-subtitle-lh: 20px;
+  --text-title-size: 18px;
+  --text-title-lh: 24px;
+  --text-display-size: 28px;
+  --text-display-lh: 34px;
+
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+
+  /* 4.3 Spacing */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-12: 48px;
+
+  /* 4.3 Radius */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 10px;
+
+  /* 4.3 Elevation & Scrim */
+  --shadow-elevation: 0 8px 24px rgb(0 0 0 / 0.35);
+  --scrim-dialog: rgb(0 0 0 / 0.5);
+
+  /* 4.4 Motion */
+  --dur-fast: 100ms;
+  --dur-base: 160ms;
+  --dur-slow: 240ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Light Theme Overrides (section 4.1) */
+[data-theme="light"] {
+  --bg-app: #f7f8f9;
+  --bg-sidebar: #eff1f3;
+  --bg-surface: #ffffff;
+  --bg-raised: #f3f5f7;
+  --bg-selected: #e1f3f7;
+
+  --border-subtle: #e6e9ed;
+  --border: #d5dae0;
+  --border-strong: #b9c1ca;
+
+  --text-1: #14181d;
+  --text-2: #4b5560;
+  --text-3: #6b7682;
+
+  --accent: #0e7490;
+  --accent-text: #0e7490;
+  --on-accent: #ffffff;
+
+  --success: #1f7a47;
+  --warning: #8a5a00;
+  --danger: #b3261e;
+
+  --shadow-elevation: 0 8px 24px rgb(20 24 29 / 0.12);
+  --scrim-dialog: rgb(0 0 0 / 0.5);
+}
+
+/* Locked Theme: Reset all defaults to initial, define strictly DESIGN.md tokens */
+@theme {
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --text-*: initial;
+  --font-*: initial;
+  --spacing-*: initial;
+
+  /* Colors */
+  --color-bg-app: var(--bg-app);
+  --color-bg-sidebar: var(--bg-sidebar);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-selected: var(--bg-selected);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-text-1: var(--text-1);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-on-accent: var(--on-accent);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-scrim: var(--scrim-dialog);
+
+  --color-dot-1: var(--dot-1);
+  --color-dot-2: var(--dot-2);
+  --color-dot-3: var(--dot-3);
+  --color-dot-4: var(--dot-4);
+  --color-dot-5: var(--dot-5);
+  --color-dot-6: var(--dot-6);
+  --color-dot-7: var(--dot-7);
+  --color-dot-8: var(--dot-8);
+
+  /* Radius */
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+
+  /* Spacing & Dimensions */
+  --spacing-0-5: 2px;
+  --spacing-1: var(--s-1);
+  --spacing-1-5: 6px;
+  --spacing-2: var(--s-2);
+  --spacing-3: var(--s-3);
+  --spacing-4: var(--s-4);
+  --spacing-5: 20px;
+  --spacing-6: var(--s-6);
+  --spacing-7: 28px;
+  --spacing-8: var(--s-8);
+  --spacing-9: 36px;
+  --spacing-12: var(--s-12);
+  --spacing-sidebar: 208px;
+  --spacing-dialog: 480px;
+  --spacing-dialog-wide: 640px;
+  --spacing-sheet: 560px;
+
+  /* Typography */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --text-caption: var(--text-caption-size);
+  --text-small: var(--text-small-size);
+  --text-body: var(--text-body-size);
+  --text-mono: var(--text-mono-size);
+  --text-subtitle: var(--text-subtitle-size);
+  --text-title: var(--text-title-size);
+  --text-display: var(--text-display-size);
+
+  /* Elevation */
+  --shadow-elevation: var(--shadow-elevation);
+
+  /* Motion */
+  --duration-fast: var(--dur-fast);
+  --duration-base: var(--dur-base);
+  --duration-slow: var(--dur-slow);
+  --ease: var(--ease);
+}

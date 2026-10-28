@@ -61,3 +61,20 @@ This project depends on the third-party Go modules listed below. All dependencie
 - **License:** Simplified BSD License (BSD-2-Clause)
 - **URL:** https://github.com/go-check/check
 - **Description:** Rich testing extension for the Go language.
+
+---
+
+## Fonts (GUI Bundled)
+
+### 10. `Inter Variable` (`@fontsource-variable/inter`)
+- **Copyright:** (c) 2016-2024 The Inter Project Authors (https://github.com/rsms/inter)
+- **License:** SIL Open Font License 1.1 (`OFL-1.1`)
+- **Full Text:** `licenses/OFL-1.1.txt`
+- **Description:** Clean, variable sans-serif typeface designed for user interfaces and high legibility.
+
+### 11. `JetBrains Mono Variable` (`@fontsource-variable/jetbrains-mono`)
+- **Copyright:** (c) 2020 JetBrains s.r.o. (https://github.com/JetBrains/JetBrainsMono)
+- **License:** SIL Open Font License 1.1 (`OFL-1.1`)
+- **Full Text:** `licenses/OFL-1.1.txt`
+- **Description:** Monospace typeface with tabular figures tailored for code, paths, and technical data.
+

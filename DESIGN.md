@@ -34,7 +34,7 @@ The most common failure of AI-generated UI is a generic "template" look. These a
 | Giant centered icon + headline + subtext empty states | Left-aligned text, one sentence, one action |
 | Vanity stats ("98% efficiency", "12.4 GB saved!") and fake charts | Real counts the user can act on (files moved today, last run time) |
 | Marketing copy, exclamation marks, "Welcome back!", "Oops!" | Plain, specific, sentence-case copy (section 8) |
-| Tailwind/shadcn default look (zinc palette, `rounded-xl`, `shadow-sm` on every card) | Hand-written CSS from the tokens |
+| Tailwind default look (zinc/slate palette, `rounded-xl`, `shadow-sm` on every card) or arbitrary values (`bg-[#...]`, `p-[...]`) | Tailwind v4 with locked `@theme` (all defaults cleared with `initial`) restricted strictly to tokens from section 4; arbitrary values banned by ESLint |
 | Pill-shaped everything | Pills only for badges that represent a state |
 | Hover lift, scale-on-hover, bouncy springs | Background tint change, 100ms |
 | Decorative illustrations, hero banners inside the app | None |
@@ -52,7 +52,7 @@ If you are about to add something "to make it look nicer" and it is not in this 
 
 ## 4. Design tokens
 
-Implement in `frontend/src/styles/tokens.css` as CSS custom properties. Dark theme is the default `:root`; light overrides under `[data-theme="light"]`. Components consume tokens only.
+Implement in `frontend/src/styles/tokens.css` as CSS custom properties and configure in Tailwind v4 `@theme` (with all default color, radius, shadow, font-size, and spacing utilities cleared via `initial`). Dark theme is the default `:root`; light overrides under `[data-theme="light"]`. Components consume tokens only (either as CSS variables or as utility classes generated from the locked `@theme`). Arbitrary values (`bg-[#...]`, `p-[...]`) are strictly forbidden and enforced by ESLint.
 
 ### 4.1 Color
 

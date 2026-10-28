@@ -1,78 +1,102 @@
-import { useState, useEffect } from 'react';
-import { api, isMockMode, VersionInfo } from './api';
+import React, { useState, useEffect } from 'react';
+import { AppShell, NavRoute } from './components/AppShell';
+import { Button } from './components/Button';
+import { Styleguide } from './screens/Styleguide';
+import { useThemeStore } from './store/themeStore';
+import { t } from './i18n';
 
-function App() {
-  const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [tick, setTick] = useState<number>(0);
+export const App: React.FC = () => {
+  const [route, setRoute] = useState<NavRoute>('styleguide');
+  const { initTheme } = useThemeStore();
 
   useEffect(() => {
-    api.system
-      .version()
-      .then((info) => setVersionInfo(info))
-      .catch((err) => setError(String(err)));
+    initTheme();
+  }, [initTheme]);
 
-    const unsubscribe = api.onTick((currentTick) => {
-      setTick(currentTick);
-    });
+  const renderContent = () => {
+    switch (route) {
+      case 'overview':
+        return (
+          <div style={{ color: 'var(--text-2)' }}>
+            <p className="type-body">Overview screen scaffold ready for Phase G3.</p>
+          </div>
+        );
+      case 'activity':
+        return (
+          <div style={{ color: 'var(--text-2)' }}>
+            <p className="type-body">Activity history scaffold ready for Phase G4.</p>
+          </div>
+        );
+      case 'rules':
+        return (
+          <div style={{ color: 'var(--text-2)' }}>
+            <p className="type-body">Rules management scaffold ready for Phase G5.</p>
+          </div>
+        );
+      case 'folders':
+        return (
+          <div style={{ color: 'var(--text-2)' }}>
+            <p className="type-body">Folders management scaffold ready for Phase G5.</p>
+          </div>
+        );
+      case 'settings':
+        return (
+          <div style={{ color: 'var(--text-2)' }}>
+            <p className="type-body">Settings scaffold ready for Phase G7.</p>
+          </div>
+        );
+      case 'styleguide':
+      default:
+        return <Styleguide />;
+    }
+  };
 
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, []);
+  const getHeaderActions = () => {
+    switch (route) {
+      case 'overview':
+        return (
+          <>
+            <Button variant="primary">{t('action.organize_now')}</Button>
+            <Button variant="secondary">{t('action.pause')}</Button>
+          </>
+        );
+      case 'rules':
+        return <Button variant="primary">{t('action.new_rule')}</Button>;
+      case 'folders':
+        return <Button variant="primary">{t('action.add_folder')}</Button>;
+      default:
+        return undefined;
+    }
+  };
+
+  const getTitle = () => {
+    switch (route) {
+      case 'overview':
+        return t('title.overview');
+      case 'activity':
+        return t('title.activity');
+      case 'rules':
+        return t('title.rules');
+      case 'folders':
+        return t('title.folders');
+      case 'settings':
+        return t('title.settings');
+      case 'styleguide':
+        return t('title.styleguide');
+    }
+  };
 
   return (
-    <div style={{ padding: '24px', fontFamily: 'sans-serif', lineHeight: '1.5' }}>
-      <h1>ClutterLess GUI — Phase G0 Spike</h1>
-      <p>
-        <strong>Runtime Mode:</strong>{' '}
-        <span style={{ color: isMockMode ? 'orange' : 'green' }}>
-          {isMockMode ? 'Mock Browser (dev:mock)' : 'Wails v3 Native Runtime'}
-        </span>
-      </p>
-
-      <section style={{ marginTop: '20px', border: '1px solid #ccc', padding: '16px' }}>
-        <h2>System Service (Go Binding)</h2>
-        {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-        {versionInfo ? (
-          <ul>
-            <li>
-              <strong>Version:</strong> {versionInfo.version}
-            </li>
-            <li>
-              <strong>Commit:</strong> {versionInfo.commit}
-            </li>
-            <li>
-              <strong>Build Date:</strong> {versionInfo.buildDate}
-            </li>
-          </ul>
-        ) : (
-          <p>Loading version from Go backend...</p>
-        )}
-      </section>
-
-      <section style={{ marginTop: '20px', border: '1px solid #ccc', padding: '16px' }}>
-        <h2>Go Event Bridge (Tick Stream)</h2>
-        <p>
-          <strong>Tick Counter:</strong> {tick}
-        </p>
-      </section>
-
-      <section style={{ marginTop: '20px', border: '1px solid #ccc', padding: '16px' }}>
-        <h2>G0 Gates Checklist</h2>
-        <ul>
-          <li>a. Window & React hot-reload</li>
-          <li>b. Typed Go method call (Version)</li>
-          <li>c. Typed Go event stream (Tick)</li>
-          <li>d. System tray with Open/Quit & close-to-tray</li>
-          <li>e. Standalone executable build</li>
-          <li>f. Single-instance focus mechanism</li>
-        </ul>
-      </section>
-    </div>
+    <AppShell
+      currentRoute={route}
+      onRouteChange={setRoute}
+      headerTitle={getTitle()}
+      headerActions={getHeaderActions()}
+      isMockMode={true}
+    >
+      {renderContent()}
+    </AppShell>
   );
-}
+};
 
 export default App;
