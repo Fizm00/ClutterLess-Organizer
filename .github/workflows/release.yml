@@ -96,14 +96,10 @@ jobs:
           $TAG_NAME = $env:GITHUB_REF -replace '^refs/tags/', ''
           $VERSION = $TAG_NAME -replace '^v', ''
           New-Item -ItemType Directory -Force -Path dist, bin, cmd/cless-gui/bin | Out-Null
-          $binary = [System.IO.Path]::GetFullPath("bin/cless-gui.exe")
-          $outInstaller = [System.IO.Path]::GetFullPath("dist/cless-gui_${VERSION}_windows_amd64_installer.exe")
           Push-Location cmd/cless-gui/build/windows/nsis
-          makensis "/DARG_WAILS_AMD64_BINARY=$binary" "/DOUTPUT_INSTALLER=$outInstaller" project.nsi
+          makensis /V4 project.nsi
           Pop-Location
-          if (!(Test-Path $outInstaller)) {
-              throw "NSIS installer was not generated at $outInstaller"
-          }
+          Copy-Item "dist/cless-gui-installer.exe" "dist/cless-gui_${VERSION}_windows_amd64_installer.exe"
           Get-Item dist/*
 
       - name: Package Portable Windows Zip

@@ -15,6 +15,11 @@ Unicode true
 !define WAILS_INSTALL_SCOPE     "user"
 !define REQUEST_EXECUTION_LEVEL "user"
 
+# Default AMD64 binary path if not overridden
+!ifndef ARG_WAILS_AMD64_BINARY
+    !define ARG_WAILS_AMD64_BINARY "..\..\..\..\bin\cless-gui.exe"
+!endif
+
 ####
 ## Include the wails tools
 ####
@@ -64,7 +69,7 @@ ManifestDPIAware true
 
 Name "${INFO_PRODUCTNAME}"
 !ifndef OUTPUT_INSTALLER
-    !define OUTPUT_INSTALLER "..\..\..\bin\${INFO_PROJECTNAME}-${ARCH}-installer.exe"
+    !define OUTPUT_INSTALLER "..\..\..\..\dist\${INFO_PROJECTNAME}-installer.exe"
 !endif
 OutFile "${OUTPUT_INSTALLER}"
 !if "${WAILS_INSTALL_SCOPE}" == "user"
