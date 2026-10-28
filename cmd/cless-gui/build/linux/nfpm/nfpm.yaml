@@ -3,26 +3,26 @@
 #
 # The lines below are called `modelines`. See `:help modeline`
 
-name: "temp-react.exe"
+name: "cless-gui"
 arch: ${GOARCH}
 platform: "linux"
-version: "0.1.0"
+version: "0.3.0"
 section: "default"
 priority: "extra"
 maintainer: ${GIT_COMMITTER_NAME} <${GIT_COMMITTER_EMAIL}>
-description: "A temp-react application"
-vendor: "My Company"
-homepage: "https://wails.io"
-license: "MIT"
+description: "ClutterLess Organizer Desktop GUI"
+vendor: "ClutterLess"
+homepage: "https://github.com/Fizm00/organizer"
+license: "AGPL-3.0"
 release: "1"
 
 contents:
-  - src: "./bin/temp-react.exe"
-    dst: "/usr/local/bin/temp-react.exe"
+  - src: "./bin/cless-gui"
+    dst: "/usr/local/bin/cless-gui"
   - src: "./build/appicon.png"
-    dst: "/usr/share/icons/hicolor/128x128/apps/temp-react.exe.png"
-  - src: "./build/linux/temp-react.exe.desktop"
-    dst: "/usr/share/applications/temp-react.exe.desktop"
+    dst: "/usr/share/icons/hicolor/128x128/apps/cless-gui.png"
+  - src: "./build/linux/cless-gui.desktop"
+    dst: "/usr/share/applications/cless-gui.desktop"
 
 # Default dependencies for the GTK4 + WebKitGTK 6.0 stack (Ubuntu 24.04+ / Debian 13+)
 depends:

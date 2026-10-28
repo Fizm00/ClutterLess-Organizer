@@ -15,7 +15,7 @@
 **ClutterLess Organizer** (`cless`) is a deterministic local file organizer and background filesystem automator.<br />
 Designed for high throughput, zero data loss, and seamless day-to-day desktop hygiene.
 
-[Installation](#installation) • [Quick Start](#quick-start) • [File Categories](#file-categories--routing) • [CLI Reference](#cli-reference) • [Safety Guarantees](#safety-guarantees) • [Uninstall](#uninstallation)
+[Installation](#installation) • [Desktop GUI](#desktop-gui) • [Quick Start](#quick-start) • [File Categories](#file-categories--routing) • [CLI Reference](#cli-reference) • [Safety Guarantees](#safety-guarantees) • [Uninstall](#uninstallation)
 
 <br />
 
@@ -103,6 +103,70 @@ go install github.com/Fizm00/organizer/cmd/organizer@latest
 _(Installs as `organizer`. Symlink or copy to `cless` for the shorthand alias)._
 
 </details>
+
+---
+
+## Desktop GUI (`cless-gui`)
+
+ClutterLess Organizer includes a desktop GUI application (`cless-gui`) built with **Wails v3**, **React**, and an official neutral **shadcn/ui** interface powered by **Tailwind CSS v4**.
+
+It runs on top of the same Go engine (`internal/app`) and shares the exact same `config.yaml` and append-only `history.jsonl` files as the CLI.
+
+### GUI Installation & Packages
+
+Precompiled installers and portable archives are available on [GitHub Releases](https://github.com/Fizm00/ClutterLess-Organizer/releases/latest):
+
+| Package Type | Platform | Architecture | Details |
+| --- | --- | --- | --- |
+| **Windows Installer** | Windows 10/11 | x86_64 / amd64 | `cless-gui_0.3.0_windows_amd64_installer.exe`<br />Per-user install to `%LOCALAPPDATA%\Programs\ClutterLess`, Start Menu shortcut, WebView2 bootstrapper detection, and safe uninstaller. |
+| **Windows Portable** | Windows 10/11 | x86_64 / amd64 | `cless-gui_0.3.0_windows_amd64.zip`<br />Standalone executable with zero installation needed. |
+| **Linux Archive** | Linux (Ubuntu, Debian, Fedora, Arch) | x86_64 / amd64 | `cless-gui_0.3.0_linux_amd64.tar.gz`<br />Includes binary, desktop file, and application icon. (Requires WebKit2GTK). |
+| **macOS Archive** | macOS 12+ | Apple Silicon & Intel | `cless-gui_0.3.0_darwin_arm64.tar.gz` / `cless-gui_0.3.0_darwin_amd64.tar.gz`<br />Standalone native executable for macOS. |
+
+### Core Screens & Workflow
+
+1. **Overview:**
+   - Real-time watcher status pill with pulsing indicator (`Watching`, `Paused`, `Error`).
+   - Monitored folder tags with direct folder opener actions.
+   - Attention callout for delayed or locked files (`.crdownload`, `.tmp` write debounce).
+   - Recent activity table with middle-truncated paths, copyable paths, and quick navigation.
+   - Primary `Organize now` button triggering the interactive preview flow.
+2. **Preview & Run Sheet:**
+   - Slide-out sheet inspecting pending moves before any disk modification occurs.
+   - Categorized file list: *Will move* (with destination patterns), *Skipped* (with explicit reason), and *Unmatched*.
+   - Selective checkboxes (default all selected) with live primary button counter ("Move 5 files").
+   - Real-time execution progress counter and immediate undo toast upon completion.
+3. **Activity & Safe Undo:**
+   - Transaction batches grouped chronologically by date (*Today*, *Yesterday*, specific dates).
+   - Batch header showing unique batch ID, move count, execution timestamp, and status badges (`Applied`, `Undone`, `Partially undone`).
+   - One-click `Undo batch` rollback with safety validation: never overwrites existing target files, renames occupied destinations safely, and reports any missing files.
+   - Segmented filter (`All`, `Applied`, `Undone`) and instant search across file names and destinations.
+4. **Rules Management & Visual Tester:**
+   - Ordered rule list reflecting priority ("*First match wins*").
+   - Drag-and-drop rule reordering with accessible keyboard controls (`Alt+Up` / `Alt+Down`).
+   - Rule editor dialog with multi-condition matching (extensions, name globs, regex, size limits, age), dynamic template insertion chips (`{year}`, `{month}`, `{day}`, `{ext}`, `{name}`), and live syntax validation matching CLI error messages.
+   - Interactive rule tester to test arbitrary filenames against active rule sets in real time.
+5. **Watched Folders Management:**
+   - Visual folder cards showing path, direct folder picker button, and recursive scanning switch.
+   - Collision safeguards preventing overlapping watch hierarchies and infinite loops.
+6. **System Integration & Desktop Tray:**
+   - **System Tray:** Live monochrome status icons (active, paused, error) in the Windows notification area. Left-click brings window to focus; context menu provides status line, quick pause/resume, organize now, and quit.
+   - **Close-to-Tray:** Window close button minimizes to the system tray while keeping the file watcher active. Full application shutdown is performed via Tray -> Quit or `Ctrl+Q`.
+   - **Single Instance:** Subsequent launches focus the running instance automatically.
+   - **Opt-in Autostart:** Seamless boot-time autostart with `--hidden` flag configured without administrative rights (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`).
+   - **Desktop Notifications:** Debounced system notifications summarizing file organization events without spamming.
+7. **Settings & Themes:**
+   - Appearance mode toggle: Dark, Light, or System theme.
+   - Behavior controls for write stability delay (`stable_after_seconds`) and conflict strategy (`Rename` vs `Skip`).
+   - Direct configuration actions: Open config file, Open history log, Export config, or Reset to defaults with confirmation.
+
+### Relationship Between GUI and CLI
+
+The GUI (`cless-gui`) and CLI (`cless`) are peers built over the same shared core engine:
+
+- **Shared State:** Both access `%APPDATA%\cless\config.yaml` and `%APPDATA%\cless\history.jsonl`. Edits made in the CLI are detected by the GUI via filesystem events and reloaded automatically.
+- **Watcher Single-Owner Lock:** A process lock (`%APPDATA%\cless\watcher.lock`) ensures only one watcher daemon runs at any given time. If `cless watch` is running in a terminal, the GUI watcher transitions to locked status and displays a non-destructive guidance banner.
+- **Identical Logic:** Matching algorithms, dry-run evaluations, conflict counters, cross-volume transfers, and transaction logs behave identically in both interfaces.
 
 ---
 

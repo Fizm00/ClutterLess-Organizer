@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0] - 2026-10-28
 
 ### Added
+- **ClutterLess Desktop GUI (`cless-gui`):**
+  - Brand new cross-platform desktop application built with Wails v3, React, TypeScript, and an official neutral shadcn/ui design on Tailwind CSS v4.
+  - Interactive file organization preview sheet with per-file checkboxes, destination previews, and live run progress.
+  - Complete Activity view with transaction batches, batch-level and file-level status badges, and safe one-click undo rollback.
+  - Visual Rules editor with drag-and-drop and keyboard reordering (Alt+Up/Down), multi-criteria condition builder, dynamic path template insertion chips, and live syntax validation matching the CLI.
+  - Real-time Rule Tester for rapid evaluation of arbitrary filenames against active configurations.
+  - Watched Folders screen with folder browser dialog and recursive scanning controls.
+  - System tray integration with live watcher status dots (active, paused, error), close-to-tray mode, single instance forwarding, and native desktop notifications.
+  - Comprehensive Settings screen with Dark/Light/System theme switcher, write stability delay, conflict resolution strategy, and configuration management.
+  - Per-user Windows NSIS installer (`cless-gui_0.3.0_windows_amd64_installer.exe`) with Start Menu shortcut, WebView2 bootstrapper detection, opt-in "Start with Windows" checkbox, and clean uninstaller preserving user data unless explicitly confirmed.
+  - Multi-platform CI and GitHub release pipelines for Windows, Linux, and macOS.
 - **Uninstall Capabilities:**
   - Added native `cless uninstall` command with interactive confirmation or non-interactive `-y/--yes` flag and optional `--purge-config` flag.
   - Added dedicated one-line Windows uninstaller script (`uninstall.ps1`) that gracefully stops running instances, removes the binary directory, and removes `cless` from User `PATH`.

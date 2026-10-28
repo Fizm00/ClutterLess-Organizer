@@ -7,8 +7,48 @@ on:
     branches: [ main, master ]
 
 jobs:
+  frontend:
+    name: Frontend Quality & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: 'cmd/cless-gui/frontend/package-lock.json'
+
+      - name: Install frontend dependencies
+        run: npm --prefix cmd/cless-gui/frontend ci
+
+      - name: Run ESLint
+        run: npm --prefix cmd/cless-gui/frontend run lint
+
+      - name: Run style linter (anti-slop audit)
+        run: npm --prefix cmd/cless-gui/frontend run lint:style
+
+      - name: Run TypeScript typecheck
+        run: npm --prefix cmd/cless-gui/frontend run typecheck
+
+      - name: Run Vitest unit tests
+        run: npm --prefix cmd/cless-gui/frontend test
+
+      - name: Build frontend production bundle
+        run: npm --prefix cmd/cless-gui/frontend run build
+
+      - name: Upload frontend bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: cmd/cless-gui/frontend/dist/
+          retention-days: 2
+
   build:
     name: Build & Test (${{ matrix.os }})
+    needs: frontend
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -25,16 +65,51 @@ jobs:
           go-version: 'stable'
           check-latest: true
 
-      - name: Verify dependencies
+      - name: Download frontend bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: cmd/cless-gui/frontend/dist
+
+      - name: Install Linux GUI dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+
+      - name: Verify Go dependencies
         run: go mod verify
 
-      - name: Run go vet
-        run: go vet ./internal/... ./cmd/organizer ./cmd/cless
+      - name: Run Go vet
+        run: go vet ./internal/... ./cmd/organizer ./cmd/cless ./cmd/cless-gui
 
-      - name: Run tests
+      - name: Run Go tests
         run: go test -v ./internal/... ./cmd/organizer ./cmd/cless
 
-      - name: Build executable
+      - name: Build CLI executables
+        shell: bash
         run: |
+          mkdir -p bin
           go build -o bin/organizer ./cmd/organizer
           go build -o bin/cless ./cmd/cless
+
+      - name: Build GUI executable (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+          wails3 generate syso -arch amd64 -icon cmd/cless-gui/build/windows/icon.ico -manifest cmd/cless-gui/build/windows/wails.exe.manifest -info cmd/cless-gui/build/windows/info.json -out cmd/cless-gui/wails_windows_amd64.syso
+          go build -tags production -trimpath -ldflags "-s -w -H windowsgui -X github.com/Fizm00/organizer/internal/version.Version=0.3.0 -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui.exe ./cmd/cless-gui
+
+      - name: Build GUI executable (Linux / macOS)
+        if: matrix.os != 'windows-latest'
+        shell: bash
+        run: |
+          go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=0.3.0 -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui ./cmd/cless-gui
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.os }}
+          path: bin/
+          retention-days: 5

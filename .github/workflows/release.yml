@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   goreleaser:
-    name: Run GoReleaser
+    name: Release CLI (GoReleaser)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -30,5 +30,204 @@ jobs:
           distribution: goreleaser
           version: '~> v2'
           args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-gui-windows:
+    name: Release GUI (Windows Installer & Portable)
+    needs: goreleaser
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+          check-latest: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: 'cmd/cless-gui/frontend/package-lock.json'
+
+      - name: Install NSIS
+        run: choco install nsis -y --no-progress
+
+      - name: Build frontend
+        run: |
+          npm --prefix cmd/cless-gui/frontend ci
+          npm --prefix cmd/cless-gui/frontend run build
+
+      - name: Install Wails v3 CLI
+        shell: bash
+        run: go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+
+      - name: Generate Windows syso and WebView2 bootstrapper
+        shell: bash
+        run: |
+          wails3 generate syso -arch amd64 -icon cmd/cless-gui/build/windows/icon.ico -manifest cmd/cless-gui/build/windows/wails.exe.manifest -info cmd/cless-gui/build/windows/info.json -out cmd/cless-gui/wails_windows_amd64.syso
+          wails3 generate webview2bootstrapper -dir cmd/cless-gui/build/windows/nsis
+
+      - name: Build GUI executable
+        shell: bash
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          mkdir -p bin dist
+          go build -tags production -trimpath -ldflags "-s -w -H windowsgui -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui.exe ./cmd/cless-gui
+
+      - name: Build NSIS Installer
+        shell: bash
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          cd cmd/cless-gui/build/windows/nsis
+          makensis -DARG_WAILS_AMD64_BINARY="$(pwd)/../../../../bin/cless-gui.exe" project.nsi
+          cd ../../../..
+          cp bin/cless-gui-amd64-installer.exe "dist/cless-gui_${VERSION}_windows_amd64_installer.exe"
+
+      - name: Package Portable Windows Zip
+        shell: bash
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          7z a "dist/cless-gui_${VERSION}_windows_amd64.zip" ./bin/cless-gui.exe ./README.md ./LICENSE ./docs/AUTOSTART.md
+
+      - name: Generate Checksums
+        shell: bash
+        working-directory: dist
+        run: |
+          sha256sum cless-gui_* > checksums-windows-gui.txt
+
+      - name: Upload Windows GUI Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/cless-gui_*_windows_amd64_installer.exe
+            dist/cless-gui_*_windows_amd64.zip
+            dist/checksums-windows-gui.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-gui-linux:
+    name: Release GUI (Linux Archive)
+    needs: goreleaser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+          check-latest: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: 'cmd/cless-gui/frontend/package-lock.json'
+
+      - name: Install Linux GUI dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+
+      - name: Build frontend
+        run: |
+          npm --prefix cmd/cless-gui/frontend ci
+          npm --prefix cmd/cless-gui/frontend run build
+
+      - name: Build GUI executable
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          mkdir -p bin dist
+          go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui ./cmd/cless-gui
+
+      - name: Package Linux Archive
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          tar -czvf "dist/cless-gui_${VERSION}_linux_amd64.tar.gz" -C bin cless-gui -C ../ LICENSE README.md cmd/cless-gui/build/linux/desktop cmd/cless-gui/build/appicon.png
+
+      - name: Generate Checksums
+        working-directory: dist
+        run: |
+          sha256sum cless-gui_* > checksums-linux-gui.txt
+
+      - name: Upload Linux GUI Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/cless-gui_*_linux_amd64.tar.gz
+            dist/checksums-linux-gui.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-gui-macos:
+    name: Release GUI (macOS Archive)
+    needs: goreleaser
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+          check-latest: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: 'cmd/cless-gui/frontend/package-lock.json'
+
+      - name: Build frontend
+        run: |
+          npm --prefix cmd/cless-gui/frontend ci
+          npm --prefix cmd/cless-gui/frontend run build
+
+      - name: Build GUI executables (amd64 and arm64)
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          mkdir -p bin dist
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui-arm64 ./cmd/cless-gui
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -tags production -trimpath -ldflags "-s -w -X github.com/Fizm00/organizer/internal/version.Version=${VERSION} -X github.com/Fizm00/organizer/internal/version.Commit=${{ github.sha }} -X github.com/Fizm00/organizer/internal/version.BuildDate=$(date -u +%Y-%m-%d)" -o bin/cless-gui-amd64 ./cmd/cless-gui
+
+      - name: Package macOS Archives
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          cp bin/cless-gui-arm64 bin/cless-gui && tar -czvf "dist/cless-gui_${VERSION}_darwin_arm64.tar.gz" -C bin cless-gui -C ../ LICENSE README.md
+          cp bin/cless-gui-amd64 bin/cless-gui && tar -czvf "dist/cless-gui_${VERSION}_darwin_amd64.tar.gz" -C bin cless-gui -C ../ LICENSE README.md
+
+      - name: Generate Checksums
+        working-directory: dist
+        run: |
+          shasum -a 256 cless-gui_* > checksums-darwin-gui.txt
+
+      - name: Upload macOS GUI Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/cless-gui_*_darwin_*.tar.gz
+            dist/checksums-darwin-gui.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

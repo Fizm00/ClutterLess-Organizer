@@ -1,15 +1,30 @@
 {
 	"fixed": {
-		"file_version": "0.1.0"
+		"file_version": "0.3.0.0",
+		"product_version": "0.3.0.0"
 	},
 	"info": {
 		"0409": {
-			"ProductVersion": "0.1.0",
-			"CompanyName": "My Company",
-			"FileDescription": "A temp-react application",
-			"LegalCopyright": "© 2026, My Company",
-			"ProductName": "My Product",
-			"Comments": "This is a comment"
+			"FileVersion": "0.3.0",
+			"ProductVersion": "0.3.0",
+			"CompanyName": "ClutterLess",
+			"FileDescription": "ClutterLess Organizer Desktop GUI",
+			"LegalCopyright": "(c) 2026, Fizm00",
+			"ProductName": "ClutterLess",
+			"OriginalFilename": "cless-gui.exe",
+			"InternalName": "cless-gui",
+			"Comments": "ClutterLess Organizer"
+		},
+		"0000": {
+			"FileVersion": "0.3.0",
+			"ProductVersion": "0.3.0",
+			"CompanyName": "ClutterLess",
+			"FileDescription": "ClutterLess Organizer Desktop GUI",
+			"LegalCopyright": "(c) 2026, Fizm00",
+			"ProductName": "ClutterLess",
+			"OriginalFilename": "cless-gui.exe",
+			"InternalName": "cless-gui",
+			"Comments": "ClutterLess Organizer"
 		}
 	}
 }

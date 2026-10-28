@@ -122,4 +122,10 @@ This project depends on the third-party Go modules listed below. All dependencie
 - **URL:** https://git.sr.ht/~jackmordaunt/go-toast
 - **Description:** Windows toast notification library utilized by Wails desktop notification service.
 
+### 20. `github.com/wailsapp/wails/v3`
+- **License:** MIT License
+- **URL:** https://github.com/wailsapp/wails
+- **Description:** Cross-platform desktop application framework combining Go and web technologies with native system webview and system tray integration.
+
+
 
