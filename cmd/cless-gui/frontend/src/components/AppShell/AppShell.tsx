@@ -7,8 +7,9 @@ import {
   Settings,
   Palette,
 } from 'lucide-react';
-import { StatusDot } from '../StatusDot';
+import { StatusDot, WatcherState } from '../StatusDot';
 import { Toaster } from '../Toast';
+import { useWatchStore } from '../../state/watchStore';
 import { t } from '../../i18n';
 
 export type NavRoute = 'overview' | 'activity' | 'rules' | 'folders' | 'settings' | 'styleguide';
@@ -30,6 +31,19 @@ export const AppShell: React.FC<AppShellProps> = ({
   children,
   isMockMode = true,
 }) => {
+  const { running, folders, watcherLocked, configError } = useWatchStore();
+
+  let statusState: WatcherState = 'paused';
+  let statusLabel = t('watch.status.paused');
+
+  if (watcherLocked || configError) {
+    statusState = 'error';
+    statusLabel = t('watch.status.error');
+  } else if (running) {
+    statusState = 'watching';
+    statusLabel = t('watch.status.watching', { count: folders.length });
+  }
+
   const navItems: Array<{ route: NavRoute; label: string; icon: React.ReactNode }> = [
     { route: 'overview', label: t('nav.overview'), icon: <LayoutDashboard size={16} strokeWidth={1.5} /> },
     { route: 'activity', label: t('nav.activity'), icon: <History size={16} strokeWidth={1.5} /> },
@@ -102,7 +116,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           </button>
 
           <div className="px-4 pt-3 pb-1">
-            <StatusDot state="watching" label={t('watch.status.watching', { count: 2 })} />
+            <StatusDot state={statusState} label={statusLabel} />
           </div>
         </div>
       </aside>

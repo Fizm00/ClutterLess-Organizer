@@ -97,7 +97,9 @@ const mockBatchSummaries: BatchSummaryDTO[] = [
   },
 ];
 
-export const mockApi: Api = {
+const mockListeners = new Map<string, Set<(payload: any) => void>>();
+
+export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
   config: {
     async get(): Promise<ConfigDTO> {
       return JSON.parse(JSON.stringify(mockConfig));
@@ -251,21 +253,57 @@ export const mockApi: Api = {
         records: [
           {
             batchId: id,
-            time: summary.time,
+            time: '2026-04-18T14:27:00Z',
             source: 'C:/Users/User/Downloads/' + longFilename1,
             dest: longPath1 + '/' + longFilename1,
-            rule: 'Documents',
+            rule: 'Invoices',
             size: 4500000,
-            status: summary.allUndone ? 'undone' : 'moved',
+            status: 'moved',
           },
           {
             batchId: id,
-            time: summary.time,
-            source: 'C:/Users/User/Downloads/invoice_tech_corp_2026_04.pdf',
-            dest: 'C:/Users/User/Documents/Finance/2026-04/invoice_tech_corp_2026_04.pdf',
-            rule: 'Invoices',
-            size: 1250000,
-            status: summary.allUndone ? 'undone' : 'moved',
+            time: '2026-04-18T14:25:00Z',
+            source: 'C:/Users/User/Downloads/IMG_2041_holiday_photo_family_camera.heic',
+            dest: 'C:/Users/User/Pictures/Sorted/2026/IMG_2041.heic',
+            rule: 'Images',
+            size: 8900000,
+            status: 'moved',
+          },
+          {
+            batchId: id,
+            time: '2026-04-18T13:30:00Z',
+            source: 'C:/Users/User/Downloads/setup_v3.2_installer_x64.exe',
+            dest: 'C:/Users/User/Downloads/_Installers/setup_v3.2_installer_x64.exe',
+            rule: 'Installers',
+            size: 45000000,
+            status: 'moved',
+          },
+          {
+            batchId: id,
+            time: '2026-04-18T11:15:00Z',
+            source: 'C:/Users/User/Downloads/' + longFilename2,
+            dest: longPath2 + '/bundle.zip',
+            rule: 'Archives',
+            size: 154000000,
+            status: 'moved',
+          },
+          {
+            batchId: id,
+            time: '2026-04-17T18:00:00Z',
+            source: 'C:/Users/User/Downloads/annual_financial_statements_2025.xlsx',
+            dest: 'C:/Users/User/Documents/Finance/2025/annual_financial_statements_2025.xlsx',
+            rule: 'Documents',
+            size: 3200000,
+            status: 'moved',
+          },
+          {
+            batchId: id,
+            time: '2026-04-16T09:40:00Z',
+            source: 'C:/Users/User/Downloads/podcast_recording_raw_take_02.wav',
+            dest: 'C:/Users/User/Music/Recordings/2026/take_02.wav',
+            rule: 'Audio',
+            size: 85000000,
+            status: 'moved',
           },
         ],
       };
@@ -346,7 +384,20 @@ export const mockApi: Api = {
     },
   },
 
-  onEvent(_name: string, _callback: (payload: any) => void): () => void {
-    return () => {};
+  onEvent(name: string, callback: (payload: any) => void): () => void {
+    if (!mockListeners.has(name)) {
+      mockListeners.set(name, new Set());
+    }
+    mockListeners.get(name)!.add(callback);
+    return () => {
+      mockListeners.get(name)?.delete(callback);
+    };
+  },
+
+  emit(name: string, payload: any): void {
+    const handlers = mockListeners.get(name);
+    if (handlers) {
+      handlers.forEach(fn => fn(payload));
+    }
   },
 };

@@ -9,7 +9,37 @@ import type {} from "../github.com/wailsapp/wails/v3/internal/eventdata.js";
 import "../github.com/wailsapp/wails/v3/internal/eventcreate.js";
 
 /**
- * Name of the custom event "tick".
+ * Name of the custom event "app:error".
  */
-export const Tick = "tick";
+export const AppError = "app:error";
+
+/**
+ * Name of the custom event "config:changed".
+ */
+export const ConfigChanged = "config:changed";
+
+/**
+ * Name of the custom event "file:failed".
+ */
+export const FileFailed = "file:failed";
+
+/**
+ * Name of the custom event "file:moved".
+ */
+export const FileMoved = "file:moved";
+
+/**
+ * Name of the custom event "file:skipped".
+ */
+export const FileSkipped = "file:skipped";
+
+/**
+ * Name of the custom event "run:progress".
+ */
+export const RunProgress = "run:progress";
+
+/**
+ * Name of the custom event "watch:status".
+ */
+export const WatchStatus = "watch:status";
 

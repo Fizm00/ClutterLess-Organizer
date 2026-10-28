@@ -6,9 +6,11 @@ import (
 	"embed"
 	_ "embed"
 	"log"
-	"time"
 
 	"github.com/Fizm00/organizer/internal/app"
+	"github.com/Fizm00/organizer/internal/config"
+	"github.com/Fizm00/organizer/internal/history"
+	"github.com/Fizm00/organizer/internal/platform"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
@@ -20,21 +22,58 @@ var assets embed.FS
 var appIcon []byte
 
 func init() {
-	// Register the typed tick event.
-	application.RegisterEvent[int]("tick")
+	// Register custom events
+	application.RegisterEvent[any](app.EventWatchStatus)
+	application.RegisterEvent[any](app.EventFileMoved)
+	application.RegisterEvent[any](app.EventFileSkipped)
+	application.RegisterEvent[any](app.EventFileFailed)
+	application.RegisterEvent[any](app.EventRunProgress)
+	application.RegisterEvent[any](app.EventConfigChanged)
+	application.RegisterEvent[any](app.EventAppError)
 }
 
 func main() {
 	var mainWindow *application.WebviewWindow
 	var quitting bool
+	var wailsApp *application.App
 
+	// 1. Setup EventSink that bridges app events to Wails runtime events
+	eventSink := app.NewCallbackEventSink(func(name string, payload any) {
+		if wailsApp != nil {
+			wailsApp.Event.Emit(name, payload)
+		}
+	})
+
+	// 2. Resolve default paths for config, storage, and state
+	configPath, _ := config.DefaultConfigPath()
+	stateDir, _ := platform.DefaultStateDir()
+	storage, _ := history.NewStorage("")
+
+	// 3. Instantiate G1 services
 	systemService := app.NewSystemService()
+	systemService.SetConfigPath(configPath)
 
-	wailsApp := application.New(application.Options{
+	configService, err := app.NewConfigService(configPath, eventSink)
+	if err != nil {
+		log.Printf("Warning: initial config loading issue: %v", err)
+	}
+
+	rulesService := app.NewRulesService(configService)
+	organizeService := app.NewOrganizeService(configService, storage, eventSink)
+	historyService := app.NewHistoryService(configService, storage, eventSink)
+	watchService := app.NewWatchService(configService, storage, eventSink, stateDir)
+
+	// 4. Initialize Wails App with all services
+	wailsApp = application.New(application.Options{
 		Name:        "ClutterLess",
 		Description: "ClutterLess Organizer Desktop GUI",
 		Services: []application.Service{
 			application.NewService(systemService),
+			application.NewService(configService),
+			application.NewService(rulesService),
+			application.NewService(organizeService),
+			application.NewService(historyService),
+			application.NewService(watchService),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -50,14 +89,17 @@ func main() {
 		},
 	})
 
+	// 5. Create Main Window (DESIGN.md section 3: default 1080x700, min 880x560)
 	mainWindow = wailsApp.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title:  "ClutterLess Organizer (G0 Spike)",
-		Width:  800,
-		Height: 600,
-		URL:    "/",
+		Title:     "ClutterLess",
+		Width:     1080,
+		Height:    700,
+		MinWidth:  880,
+		MinHeight: 560,
+		URL:       "/",
 	})
 
-	// Intercept window closing to hide to tray instead of quitting.
+	// Intercept window closing to hide to tray instead of quitting
 	mainWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
 		if !quitting {
 			event.Cancel()
@@ -65,7 +107,7 @@ func main() {
 		}
 	})
 
-	// Create system tray.
+	// 6. Setup System Tray
 	tray := wailsApp.SystemTray.New()
 	if len(appIcon) > 0 {
 		tray.SetIcon(appIcon)
@@ -73,7 +115,7 @@ func main() {
 	tray.SetTooltip("ClutterLess Organizer")
 
 	trayMenu := wailsApp.NewMenu()
-	trayMenu.Add("Open").OnClick(func(ctx *application.Context) {
+	trayMenu.Add("Open ClutterLess").OnClick(func(ctx *application.Context) {
 		if mainWindow != nil {
 			mainWindow.Show()
 			mainWindow.Focus()
@@ -97,20 +139,8 @@ func main() {
 		}
 	})
 
-	// Background ticker emitting event every second.
-	go func() {
-		counter := 0
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
-		for range ticker.C {
-			counter++
-			wailsApp.Event.Emit("tick", counter)
-		}
-	}()
-
-	err := wailsApp.Run()
-	if err != nil {
+	// Run Wails application
+	if err := wailsApp.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
-

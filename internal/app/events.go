@@ -76,6 +76,24 @@ func (m *MemoryEventSink) Count(name string) int {
 }
 
 // NoopEventSink is an EventSink that discards all events.
+
+// CallbackEventSink adapts a callback function to the EventSink interface.
+type CallbackEventSink struct {
+	callback func(name string, payload any)
+}
+
+// NewCallbackEventSink creates an EventSink that delegates to a callback function.
+func NewCallbackEventSink(cb func(name string, payload any)) *CallbackEventSink {
+	return &CallbackEventSink{callback: cb}
+}
+
+// Emit invokes the underlying callback function if non-nil.
+func (c *CallbackEventSink) Emit(name string, payload any) {
+	if c.callback != nil {
+		c.callback(name, payload)
+	}
+}
+
 type NoopEventSink struct{}
 
 func (n *NoopEventSink) Emit(name string, payload any) {}

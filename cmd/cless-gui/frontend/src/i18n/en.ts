@@ -14,6 +14,21 @@ export const en = {
   'watch.status.error': 'Watcher error',
   'watch.last_moved': 'last file moved {time}',
 
+  // Overview Screen
+  'overview.status.watching_with_time': 'Watching {count} folders - last file moved {time}',
+  'overview.status.watching_idle': 'Watching {count} folders - waiting for new files',
+  'overview.status.paused': 'Watcher paused',
+  'overview.recent_activity': 'Recent activity',
+  'overview.view_all': 'View all ->',
+  'overview.needs_attention': 'Needs attention',
+  'overview.organize_disabled_hint': 'Interactive preview & organization will be enabled in Phase G4.',
+
+  // Error Banners (DESIGN.md 7.10)
+  'error.config_invalid': 'Configuration in {path} contains invalid syntax',
+  'error.config_invalid_line': 'Configuration error in {path} (line {line}): {message}',
+  'error.watcher_already_running': 'A watcher is already running (cless watch). Close it to control watching from here.',
+  'action.open_config': 'Open config',
+
   // Actions
   'action.organize_now': 'Organize now',
   'action.pause': 'Pause',

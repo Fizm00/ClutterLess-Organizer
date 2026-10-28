@@ -9,15 +9,76 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
-import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wailsio/runtime";
+import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Create } from "@wailsio/runtime";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
 /**
+ * GetAutostart returns whether autostart on system boot is enabled.
+ */
+export function GetAutostart(): $CancellablePromise<boolean> {
+    return $Call.ByID(2497035001);
+}
+
+/**
+ * OpenConfig opens the current configuration file in the system default text editor.
+ */
+export function OpenConfig(): $CancellablePromise<void> {
+    return $Call.ByID(3496533910);
+}
+
+/**
+ * PickFolder invokes the injected folder picker, if available.
+ */
+export function PickFolder(): $CancellablePromise<string> {
+    return $Call.ByID(3910469225);
+}
+
+/**
+ * RevealPath opens the operating system file manager with the specified path selected.
+ */
+export function RevealPath(path: string): $CancellablePromise<void> {
+    return $Call.ByID(892691734, path);
+}
+
+/**
+ * SetAutostart configures whether the app launches automatically on system boot.
+ */
+export function SetAutostart(enabled: boolean): $CancellablePromise<void> {
+    return $Call.ByID(1441577357, enabled);
+}
+
+/**
+ * SetAutostartManager injects a platform autostart manager implementation.
+ */
+export function SetAutostartManager(mgr: $models.AutostartManager): $CancellablePromise<void> {
+    return $Call.ByID(3532319876, mgr);
+}
+
+/**
+ * SetConfigPath sets the config path used by OpenConfig.
+ */
+export function SetConfigPath(path: string): $CancellablePromise<void> {
+    return $Call.ByID(1684934501, path);
+}
+
+/**
+ * SetFolderPicker injects a native folder picker implementation.
+ */
+export function SetFolderPicker(picker: $models.FolderPicker): $CancellablePromise<void> {
+    return $Call.ByID(256097998, picker);
+}
+
+/**
  * Version returns application version and build metadata.
  */
 export function Version(): $CancellablePromise<$models.VersionInfo> {
-    return $Call.ByID(429514620);
+    return $Call.ByID(429514620).then(($result: any) => {
+        return $$createType0($result);
+    });
 }
+
+// Private type creation functions
+const $$createType0 = $models.VersionInfo.createFrom;

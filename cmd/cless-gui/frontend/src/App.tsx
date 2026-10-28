@@ -1,47 +1,90 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 import React, { useState, useEffect } from 'react';
 import { AppShell, NavRoute } from './components/AppShell';
 import { Button } from './components/Button';
+import { toast } from './components/Toast';
+import { Overview } from './screens/Overview';
 import { Styleguide } from './screens/Styleguide';
 import { useThemeStore } from './store/themeStore';
+import { useWatchStore } from './state/watchStore';
+import { useActivityStore } from './state/activityStore';
+import { setupEventSubscriptions } from './state/events';
 import { t } from './i18n';
 
 export const App: React.FC = () => {
-  const [route, setRoute] = useState<NavRoute>('styleguide');
+  const [route, setRoute] = useState<NavRoute>('overview');
   const { initTheme } = useThemeStore();
+  const { running, start, stop } = useWatchStore();
 
   useEffect(() => {
     initTheme();
+    useWatchStore.getState().init();
+    useActivityStore.getState().init();
+    const cleanup = setupEventSubscriptions();
+
+    // Visual QA hooks for test automation
+    if (typeof window !== 'undefined') {
+      (window as any).__setEmptyOverview = () => {
+        useActivityStore.setState({ recentActivity: [], needsAttention: [] });
+        useWatchStore.setState({ configError: null, watcherLocked: false });
+      };
+      (window as any).__setErrorOverview = () => {
+        useWatchStore.setState({
+          configError: {
+            path: 'C:/Users/Administrator/.config/cless/config.yaml',
+            message: 'mapping values are not allowed in this context',
+            line: 14,
+          },
+          watcherLocked: true,
+        });
+      };
+      (window as any).__setNormalOverview = () => {
+        useWatchStore.setState({ configError: null, watcherLocked: false });
+        useWatchStore.getState().init();
+        useActivityStore.getState().init();
+      };
+    }
+
+    return () => cleanup();
   }, [initTheme]);
+
+  const handleOrganizeNow = () => {
+    toast.show(t('overview.organize_disabled_hint'));
+  };
+
+  const handleToggleWatch = async () => {
+    if (running) {
+      await stop();
+    } else {
+      await start();
+    }
+  };
 
   const renderContent = () => {
     switch (route) {
       case 'overview':
-        return (
-          <div style={{ color: 'var(--text-2)' }}>
-            <p className="type-body">Overview screen scaffold ready for Phase G3.</p>
-          </div>
-        );
+        return <Overview onNavigate={setRoute} onOrganizeNow={handleOrganizeNow} />;
       case 'activity':
         return (
-          <div style={{ color: 'var(--text-2)' }}>
+          <div className="text-text-2">
             <p className="type-body">Activity history scaffold ready for Phase G4.</p>
           </div>
         );
       case 'rules':
         return (
-          <div style={{ color: 'var(--text-2)' }}>
+          <div className="text-text-2">
             <p className="type-body">Rules management scaffold ready for Phase G5.</p>
           </div>
         );
       case 'folders':
         return (
-          <div style={{ color: 'var(--text-2)' }}>
+          <div className="text-text-2">
             <p className="type-body">Folders management scaffold ready for Phase G5.</p>
           </div>
         );
       case 'settings':
         return (
-          <div style={{ color: 'var(--text-2)' }}>
+          <div className="text-text-2">
             <p className="type-body">Settings scaffold ready for Phase G7.</p>
           </div>
         );
@@ -56,8 +99,12 @@ export const App: React.FC = () => {
       case 'overview':
         return (
           <>
-            <Button variant="primary">{t('action.organize_now')}</Button>
-            <Button variant="secondary">{t('action.pause')}</Button>
+            <Button variant="primary" onClick={handleOrganizeNow}>
+              {t('action.organize_now')}
+            </Button>
+            <Button variant="secondary" onClick={handleToggleWatch}>
+              {running ? t('action.pause') : t('action.resume')}
+            </Button>
           </>
         );
       case 'rules':

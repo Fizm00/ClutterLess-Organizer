@@ -8,7 +8,13 @@ import type { Events } from "@wailsio/runtime";
 declare module "@wailsio/runtime" {
     namespace Events {
         interface CustomEvents {
-            "tick": number;
+            "app:error": any;
+            "config:changed": any;
+            "file:failed": any;
+            "file:moved": any;
+            "file:skipped": any;
+            "run:progress": any;
+            "watch:status": any;
         }
     }
 }

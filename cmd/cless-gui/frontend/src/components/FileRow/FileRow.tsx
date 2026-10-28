@@ -7,7 +7,7 @@ export interface FileRowProps {
   destPath: string;
   ruleName?: string;
   ruleCategoryIndex?: number; // 0 to 7 mapping to --dot-1 .. --dot-8
-  timeAgo?: string;
+  timeAgo?: React.ReactNode;
   onReveal?: (path: string) => void;
   className?: string;
 }
