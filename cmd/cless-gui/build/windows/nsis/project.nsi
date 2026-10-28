@@ -63,7 +63,10 @@ ManifestDPIAware true
 !insertmacro MUI_LANGUAGE "English"
 
 Name "${INFO_PRODUCTNAME}"
-OutFile "..\..\..\bin\${INFO_PROJECTNAME}-${ARCH}-installer.exe"
+!ifndef OUTPUT_INSTALLER
+    !define OUTPUT_INSTALLER "..\..\..\bin\${INFO_PROJECTNAME}-${ARCH}-installer.exe"
+!endif
+OutFile "${OUTPUT_INSTALLER}"
 !if "${WAILS_INSTALL_SCOPE}" == "user"
     InstallDir "$LOCALAPPDATA\Programs\${INFO_PRODUCTNAME}"
 !else

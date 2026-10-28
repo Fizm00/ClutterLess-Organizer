@@ -95,11 +95,11 @@ jobs:
         run: |
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG_NAME#v}"
-          mkdir -p cmd/cless-gui/bin dist
+          mkdir -p bin dist cmd/cless-gui/bin
           cd cmd/cless-gui/build/windows/nsis
-          makensis -DARG_WAILS_AMD64_BINARY="..\..\..\..\bin\cless-gui.exe" project.nsi
+          makensis -DARG_WAILS_AMD64_BINARY="../../../../bin/cless-gui.exe" -DOUTPUT_INSTALLER="../../../../dist/cless-gui_${VERSION}_windows_amd64_installer.exe" project.nsi
           cd ../../../..
-          cp cmd/cless-gui/bin/cless-gui-amd64-installer.exe "dist/cless-gui_${VERSION}_windows_amd64_installer.exe"
+          ls -la dist/
 
       - name: Package Portable Windows Zip
         shell: bash
