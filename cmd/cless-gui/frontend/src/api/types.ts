@@ -18,6 +18,16 @@ export interface SettingsDTO {
   ignoreHidden: boolean;
   ignoreExt: string[];
   ignoreNames: string[];
+  closeToTray?: boolean;
+  notificationsEnabled?: boolean;
+  autostart?: boolean;
+  onboardingCompleted?: boolean;
+}
+
+export interface OnboardingRequest {
+  watchFolders: string[];
+  ruleSet: 'recommended' | 'empty';
+  autostart: boolean;
 }
 
 export interface MatchDTO {
@@ -178,6 +188,8 @@ export interface ConfigApi {
   path(): Promise<string>;
   resetToDefaults(): Promise<void>;
   getFolderWarnings(): Promise<FolderWarningDTO[]>;
+  isFirstRun(): Promise<boolean>;
+  completeOnboarding(req: OnboardingRequest): Promise<void>;
 }
 
 export interface RulesApi {

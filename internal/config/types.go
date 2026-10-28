@@ -12,12 +12,16 @@ type Config struct {
 
 // Settings defines global organizer settings.
 type Settings struct {
-	StableAfterSeconds int      `yaml:"stable_after_seconds"`
-	IgnoreExt          []string `yaml:"ignore_ext"`
-	IgnoreNames        []string `yaml:"ignore_names"`
-	IgnoreHidden       *bool    `yaml:"ignore_hidden"`
-	Conflict           string   `yaml:"conflict"`
-	FallbackDir        string   `yaml:"fallback_dir"`
+	StableAfterSeconds   int      `yaml:"stable_after_seconds"`
+	IgnoreExt            []string `yaml:"ignore_ext"`
+	IgnoreNames          []string `yaml:"ignore_names"`
+	IgnoreHidden         *bool    `yaml:"ignore_hidden"`
+	Conflict             string   `yaml:"conflict"`
+	FallbackDir          string   `yaml:"fallback_dir"`
+	CloseToTray          *bool    `yaml:"close_to_tray,omitempty"`
+	NotificationsEnabled bool     `yaml:"notifications_enabled,omitempty"`
+	Autostart            bool     `yaml:"autostart,omitempty"`
+	OnboardingCompleted  bool     `yaml:"onboarding_completed,omitempty"`
 }
 
 // WatchEntry defines a monitored directory.

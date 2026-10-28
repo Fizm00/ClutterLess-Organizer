@@ -99,3 +99,20 @@ Frontend: `react`, `react-dom`, `typescript`, `vite`, `@vitejs/plugin-react`, `t
 - Dev: `wails3 dev` (hot reload). Browser-only UI work: `npm run dev:mock` inside `cmd/cless-gui/frontend`.
 - Build: `wails3 build` produces `cless-gui(.exe)`. Windows installer via NSIS (Wails template) in Phase G8. CI builds the GUI on Windows, Linux, macOS; Linux needs webkit2gtk dev packages.
 - Versioning: GUI and CLI share the version number; the GUI About screen shows version, commit, build date from the same ldflags.
+
+## 10. Desktop Integration & CLI Flags
+
+The GUI executable (`cless-gui`) supports command-line flags for system integration and background startup:
+
+| Flag | Type | Description |
+|---|---|---|
+| `--hidden` | boolean | Launch the application minimized directly into the system tray without displaying the main window. Used by autostart entries. |
+| `--config <path>` | string | Specify a custom path to `config.yaml` instead of the default operating system config path. |
+
+### System Integration Summary
+- **System Tray:** Monochrome template icons (`tray_active.png`, `tray_paused.png`, `tray_error.png`) reflecting live watcher status. Left-click restores and focuses the window. Context menu provides status line, quick pause/resume, organize now, and quit.
+- **Close-to-Tray:** Window close button hides the window to the tray when enabled (default active). First-time minimize displays a discrete toast notification: *"Still running in the tray."* Real termination occurs via Tray -> Quit or `Ctrl+Q`.
+- **Single Instance:** Subsequent launches automatically forward focus to the existing window instance without spawning duplicate processes.
+- **Autostart:** Rootless per-user autostart (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run` on Windows; `~/.config/autostart/*.desktop` on Linux; `~/Library/LaunchAgents/*.plist` on macOS). Always launches with `--hidden`.
+- **Native Notifications:** Debounced notification aggregator coalesces rapid file moves into summaries (e.g. *"12 files organized from Downloads"*). Notifications are suppressed while the main window is focused.
+

@@ -19,12 +19,23 @@ type WatchEntryDTO struct {
 
 // SettingsDTO contains global configuration settings.
 type SettingsDTO struct {
-	StableAfterSeconds int      `json:"stableAfterSeconds"`
-	Conflict           string   `json:"conflict"`
-	FallbackDir        string   `json:"fallbackDir"`
-	IgnoreHidden       bool     `json:"ignoreHidden"`
-	IgnoreExt          []string `json:"ignoreExt"`
-	IgnoreNames        []string `json:"ignoreNames"`
+	StableAfterSeconds   int      `json:"stableAfterSeconds"`
+	Conflict             string   `json:"conflict"`
+	FallbackDir          string   `json:"fallbackDir"`
+	IgnoreHidden         bool     `json:"ignoreHidden"`
+	IgnoreExt            []string `json:"ignoreExt"`
+	IgnoreNames          []string `json:"ignoreNames"`
+	CloseToTray          *bool    `json:"closeToTray,omitempty"`
+	NotificationsEnabled bool     `json:"notificationsEnabled"`
+	Autostart            bool     `json:"autostart"`
+	OnboardingCompleted  bool     `json:"onboardingCompleted"`
+}
+
+// OnboardingRequestDTO contains user choices from the first-run onboarding wizard.
+type OnboardingRequestDTO struct {
+	WatchFolders []string `json:"watchFolders"`
+	RuleSet      string   `json:"ruleSet"` // "recommended" or "empty"
+	Autostart    bool     `json:"autostart"`
 }
 
 // MatchDTO contains rule conditions with JSON-friendly types.

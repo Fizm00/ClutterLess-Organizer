@@ -69,8 +69,8 @@ func Validate(c *Config) error {
 	}
 
 	// 4. Rules validation
-	if len(c.Rules) == 0 {
-		addErr("rules: at least one rule is required")
+	if c.Rules == nil {
+		addErr("rules: required field")
 	}
 
 	seenNames := make(map[string]int) // name -> index

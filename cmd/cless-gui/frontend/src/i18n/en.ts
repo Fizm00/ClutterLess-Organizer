@@ -184,6 +184,43 @@ export const en = {
   'folders.remove_title': 'Stop watching {path}?',
   'folders.remove_desc': 'This folder will no longer be monitored. Existing files will remain in place.',
   'folders.warn_recursive_dest': 'Warning: Rule "{rule}" destination ({dest}) is inside this recursive folder.',
+
+  // Phase G6: Onboarding (DESIGN.md 7.8)
+  'onboarding.step_indicator': 'Step {current} of {total}',
+  'onboarding.step1_title': 'Welcome to ClutterLess',
+  'onboarding.step1_desc': 'Select which folders to watch for incoming files. You can change this at any time in Folders.',
+  'onboarding.step1_downloads': 'Downloads',
+  'onboarding.step1_downloads_desc': 'Organizes incoming browser and app downloads.',
+  'onboarding.step1_desktop': 'Desktop',
+  'onboarding.step1_desktop_desc': 'Keeps your desktop tidy by sorting clutter into folders.',
+  'onboarding.step2_title': 'Choose your rules',
+  'onboarding.step2_desc': 'Decide how incoming files should be organized, or create your own rules from scratch.',
+  'onboarding.ruleset_recommended': 'Recommended defaults',
+  'onboarding.ruleset_recommended_desc': 'Sorts files into Pictures, Documents, Music, Videos, and Archives by type and date.',
+  'onboarding.ruleset_empty': 'Start empty',
+  'onboarding.ruleset_empty_desc': 'No preconfigured rules. Build your own organization patterns from scratch in the Rules screen.',
+  'onboarding.step3_title': 'Ready to organize',
+  'onboarding.step3_desc': 'Here is what ClutterLess will do with files currently in your selected folders.',
+  'onboarding.preview_summary': '{count} files ready to organize',
+  'onboarding.preview_empty': 'No files to organize right now. New files will be organized automatically as they arrive.',
+  'onboarding.autostart_option': 'Start ClutterLess automatically on login',
+  'onboarding.btn_continue': 'Continue',
+  'onboarding.btn_back': 'Back',
+  'onboarding.btn_skip': 'Skip',
+  'onboarding.btn_skip_step': 'Skip this step',
+  'onboarding.btn_organize_now': 'Organize files',
+  'onboarding.btn_skip_for_now': 'Skip for now',
+  'onboarding.done_toast': 'Setup completed. Watching started.',
+
+  // Phase G6: System integration & Tray (DESIGN.md 7.7, 7.9)
+  'toast.close_to_tray': 'Still running in the tray.',
+  'settings.system_title': 'System',
+  'settings.autostart': 'Start on login',
+  'settings.autostart_desc': 'Launch ClutterLess minimized to the system tray at login',
+  'settings.notifications': 'Show notifications',
+  'settings.notifications_desc': 'Display summary alerts when batches of files are organized',
+  'settings.close_to_tray': 'Close button hides to tray',
+  'settings.close_to_tray_desc': 'Keep running in the background when the window is closed',
 } as const;
 
 export type TranslationKey = keyof typeof en;

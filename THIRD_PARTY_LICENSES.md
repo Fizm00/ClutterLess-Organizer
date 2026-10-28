@@ -92,4 +92,9 @@ This project depends on the third-party Go modules listed below. All dependencie
 - **URL:** https://github.com/clauderic/dnd-kit
 - **Description:** Lightweight, modular drag and drop toolkit for React with accessible keyboard reordering.
 
+### 14. `git.sr.ht/~jackmordaunt/go-toast/v2`
+- **License:** MIT License
+- **URL:** https://git.sr.ht/~jackmordaunt/go-toast
+- **Description:** Windows toast notification library utilized by Wails desktop notification service.
+
 

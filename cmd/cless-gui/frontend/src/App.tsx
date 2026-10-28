@@ -10,11 +10,14 @@ import { Folders } from './screens/Folders';
 import { PreviewSheet } from './screens/Preview';
 import { UndoDialog } from './components/UndoDialog';
 import { Styleguide } from './screens/Styleguide';
+import { Onboarding } from './screens/Onboarding';
+import { SystemSettings } from './screens/Settings';
 import { useThemeStore } from './store/themeStore';
 import { useWatchStore } from './state/watchStore';
 import { useActivityStore } from './state/activityStore';
 import { useRulesStore } from './state/rulesStore';
 import { useFoldersStore } from './state/foldersStore';
+import { useOnboardingStore } from './state/onboardingStore';
 import { setupEventSubscriptions } from './state/events';
 import { t } from './i18n';
 
@@ -22,11 +25,14 @@ export const App: React.FC = () => {
   const [route, setRoute] = useState<NavRoute>('overview');
   const [previewOpen, setPreviewOpen] = useState(false);
   const [undoBatchId, setUndoBatchId] = useState<string | null>(null);
+  const [closeToTrayToast, setCloseToTrayToast] = useState(false);
   const { initTheme } = useThemeStore();
   const { running, start, stop } = useWatchStore();
+  const { isFirstRun } = useOnboardingStore();
 
   useEffect(() => {
     initTheme();
+    useOnboardingStore.getState().checkFirstRun();
     useWatchStore.getState().init();
     useActivityStore.getState().init();
     const cleanup = setupEventSubscriptions();
@@ -154,6 +160,15 @@ export const App: React.FC = () => {
           },
         });
       };
+      (window as any).__showOnboardingStep = (step: 1 | 2 | 3) => {
+        useOnboardingStore.setState({ isFirstRun: true, step });
+      };
+      (window as any).__hideOnboarding = () => {
+        useOnboardingStore.setState({ isFirstRun: false });
+      };
+      (window as any).__showCloseToTrayToast = () => {
+        setCloseToTrayToast(true);
+      };
     }
 
     return () => {
@@ -185,11 +200,7 @@ export const App: React.FC = () => {
       case 'folders':
         return <Folders />;
       case 'settings':
-        return (
-          <div className="text-text-2">
-            <p className="type-body">Settings scaffold ready for Phase G7.</p>
-          </div>
-        );
+        return <SystemSettings />;
       case 'styleguide':
       default:
         return <Styleguide />;
@@ -263,6 +274,10 @@ export const App: React.FC = () => {
     }
   };
 
+  if (isFirstRun) {
+    return <Onboarding />;
+  }
+
   return (
     <>
       <AppShell
@@ -290,6 +305,24 @@ export const App: React.FC = () => {
           if (!open) setUndoBatchId(null);
         }}
       />
+
+      {/* Close-to-tray reminder toast preview (DESIGN.md 7.9) */}
+      {closeToTrayToast && (
+        <div
+          className="fixed bottom-4 right-4 z-50 bg-bg-surface border border-border shadow-elevation rounded-sm p-3 flex items-center gap-3 text-small text-text-1 animate-in fade-in slide-in-from-bottom-2"
+          data-testid="close-to-tray-toast"
+        >
+          <div className="w-2 h-2 rounded-full bg-accent" />
+          <span>{t('toast.close_to_tray')}</span>
+          <button
+            type="button"
+            onClick={() => setCloseToTrayToast(false)}
+            className="text-text-3 hover:text-text-1 ml-2 cursor-pointer text-caption"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
     </>
   );
 };

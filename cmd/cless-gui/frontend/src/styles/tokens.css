@@ -211,6 +211,7 @@
   --spacing-dialog: 480px;
   --spacing-dialog-wide: 640px;
   --spacing-sheet: 560px;
+  --spacing-onboarding: 520px;
 
   /* Typography */
   --font-sans: var(--font-sans);

@@ -8,6 +8,7 @@ import {
   FolderWarningDTO,
   HistoryFilterDTO,
   MoveResultDTO,
+  OnboardingRequest,
   PlanDTO,
   PreviewOptionsDTO,
   RuleDTO,
@@ -34,6 +35,10 @@ let mockConfig: ConfigDTO = {
     ignoreHidden: true,
     ignoreExt: ['crdownload', 'part', 'tmp', 'download'],
     ignoreNames: ['desktop.ini', 'thumbs.db', '.DS_Store'],
+    closeToTray: true,
+    notificationsEnabled: false,
+    autostart: false,
+    onboardingCompleted: true,
   },
   watch: [
     { path: '~/Downloads', recursive: false },
@@ -125,6 +130,18 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
     },
     async resetToDefaults(): Promise<void> {
       // resets to default
+    },
+    async isFirstRun(): Promise<boolean> {
+      return !mockConfig.settings.onboardingCompleted;
+    },
+    async completeOnboarding(req: OnboardingRequest): Promise<void> {
+      mockConfig.watch = req.watchFolders.map(p => ({ path: p, recursive: false }));
+      if (req.ruleSet === 'empty') {
+        mockConfig.rules = [];
+      }
+      mockConfig.settings.onboardingCompleted = true;
+      mockConfig.settings.autostart = req.autostart;
+      mockConfig.settings.closeToTray = true;
     },
     async getFolderWarnings(): Promise<FolderWarningDTO[]> {
       const warnings: FolderWarningDTO[] = [];

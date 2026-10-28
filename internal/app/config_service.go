@@ -29,6 +29,7 @@ type ConfigService struct {
 	stopWatcher     chan struct{}
 	lastWrittenHash [32]byte
 	recentHashes    map[[32]byte]time.Time
+	isFirstRun      bool
 }
 
 // NewConfigService creates and initializes a ConfigService.
@@ -62,13 +63,18 @@ func NewConfigService(configPath string, sink EventSink) (*ConfigService, error)
 	}
 
 	if _, statErr := os.Stat(expandedPath); os.IsNotExist(statErr) {
+		cs.isFirstRun = true
 		cfg = config.Default()
+		cfg.Settings.OnboardingCompleted = false
 	} else {
 		loadedCfg, loadErr := config.Load(expandedPath)
 		if loadErr != nil {
 			return nil, NewAppError(ErrConfigInvalid, "Failed to load config", "Check YAML syntax in config.yaml", loadErr.Error())
 		}
 		cfg = loadedCfg
+		if !cfg.Settings.OnboardingCompleted {
+			cs.isFirstRun = true
+		}
 	}
 	cs.currentCfg = cfg
 
@@ -95,6 +101,91 @@ func (cs *ConfigService) GetConfig() *config.Config {
 	cs.mu.RLock()
 	defer cs.mu.RUnlock()
 	return cs.currentCfg
+}
+
+// IsFirstRun reports whether the application is running without prior onboarding completion.
+func (cs *ConfigService) IsFirstRun() bool {
+	cs.mu.RLock()
+	defer cs.mu.RUnlock()
+	if cs.isFirstRun {
+		return true
+	}
+	if cs.currentCfg != nil && !cs.currentCfg.Settings.OnboardingCompleted {
+		return true
+	}
+	return false
+}
+
+// CompleteOnboarding applies the initial configuration choices from the onboarding wizard.
+func (cs *ConfigService) CompleteOnboarding(req OnboardingRequestDTO) error {
+	defaultCfg := config.Default()
+	var watchEntries []WatchEntryDTO
+	for _, folder := range req.WatchFolders {
+		trimmed := strings.TrimSpace(folder)
+		if trimmed != "" {
+			watchEntries = append(watchEntries, WatchEntryDTO{
+				Path:      trimmed,
+				Recursive: false,
+			})
+		}
+	}
+	if len(watchEntries) == 0 {
+		for _, w := range defaultCfg.Watch {
+			watchEntries = append(watchEntries, WatchEntryDTO{
+				Path:      w.Path,
+				Recursive: w.Recursive,
+			})
+		}
+	}
+
+	var rules []RuleDTO
+	if req.RuleSet == "recommended" || req.RuleSet == "" {
+		for _, r := range defaultCfg.Rules {
+			rules = append(rules, RuleDTO{
+				Name:     r.Name,
+				Disabled: r.Disabled,
+				MoveTo:   r.MoveTo,
+				Match: MatchDTO{
+					Ext:       r.Match.Ext,
+					NameGlob:  r.Match.NameGlob,
+					NameRegex: r.Match.NameRegex,
+					MinSize:   r.Match.MinSize,
+					MaxSize:   r.Match.MaxSize,
+					OlderThan: r.Match.OlderThan,
+				},
+			})
+		}
+	} else {
+		// "empty" rule set starts with an empty list
+		rules = []RuleDTO{}
+	}
+
+	closeToTray := true
+	dto := ConfigDTO{
+		Settings: SettingsDTO{
+			StableAfterSeconds:   defaultCfg.Settings.StableAfterSeconds,
+			Conflict:             defaultCfg.Settings.Conflict,
+			FallbackDir:          "",
+			IgnoreHidden:         true,
+			IgnoreExt:            defaultCfg.Settings.IgnoreExt,
+			IgnoreNames:          defaultCfg.Settings.IgnoreNames,
+			CloseToTray:          &closeToTray,
+			NotificationsEnabled: false,
+			Autostart:            req.Autostart,
+			OnboardingCompleted:  true,
+		},
+		Watch: watchEntries,
+		Rules: rules,
+	}
+
+	if err := cs.Save(dto); err != nil {
+		return err
+	}
+
+	cs.mu.Lock()
+	cs.isFirstRun = false
+	cs.mu.Unlock()
+	return nil
 }
 
 // Validate checks whether the provided ConfigDTO satisfies all configuration rules.
@@ -404,12 +495,16 @@ func ConfigToDTO(cfg *config.Config) ConfigDTO {
 
 	return ConfigDTO{
 		Settings: SettingsDTO{
-			StableAfterSeconds: cfg.Settings.StableAfterSeconds,
-			Conflict:           cfg.Settings.Conflict,
-			FallbackDir:        cfg.Settings.FallbackDir,
-			IgnoreHidden:       ignoreHidden,
-			IgnoreExt:          cfg.Settings.IgnoreExt,
-			IgnoreNames:        cfg.Settings.IgnoreNames,
+			StableAfterSeconds:   cfg.Settings.StableAfterSeconds,
+			Conflict:             cfg.Settings.Conflict,
+			FallbackDir:          cfg.Settings.FallbackDir,
+			IgnoreHidden:         ignoreHidden,
+			IgnoreExt:            cfg.Settings.IgnoreExt,
+			IgnoreNames:          cfg.Settings.IgnoreNames,
+			CloseToTray:          cfg.Settings.CloseToTray,
+			NotificationsEnabled: cfg.Settings.NotificationsEnabled,
+			Autostart:            cfg.Settings.Autostart,
+			OnboardingCompleted:  cfg.Settings.OnboardingCompleted,
 		},
 		Watch: watch,
 		Rules: rules,
@@ -417,7 +512,7 @@ func ConfigToDTO(cfg *config.Config) ConfigDTO {
 }
 
 func DTOToConfig(dto ConfigDTO) (*config.Config, error) {
-	var watch []config.WatchEntry
+	watch := make([]config.WatchEntry, 0, len(dto.Watch))
 	for _, w := range dto.Watch {
 		watch = append(watch, config.WatchEntry{
 			Path:      w.Path,
@@ -425,7 +520,7 @@ func DTOToConfig(dto ConfigDTO) (*config.Config, error) {
 		})
 	}
 
-	var rules []config.RuleConfig
+	rules := make([]config.RuleConfig, 0, len(dto.Rules))
 	for _, r := range dto.Rules {
 		rules = append(rules, config.RuleConfig{
 			Name:     r.Name,
@@ -447,12 +542,16 @@ func DTOToConfig(dto ConfigDTO) (*config.Config, error) {
 	return &config.Config{
 		Version: 1,
 		Settings: config.Settings{
-			StableAfterSeconds: dto.Settings.StableAfterSeconds,
-			Conflict:           dto.Settings.Conflict,
-			FallbackDir:        dto.Settings.FallbackDir,
-			IgnoreHidden:       &ignoreHidden,
-			IgnoreExt:          dto.Settings.IgnoreExt,
-			IgnoreNames:        dto.Settings.IgnoreNames,
+			StableAfterSeconds:   dto.Settings.StableAfterSeconds,
+			Conflict:             dto.Settings.Conflict,
+			FallbackDir:          dto.Settings.FallbackDir,
+			IgnoreHidden:         &ignoreHidden,
+			IgnoreExt:            dto.Settings.IgnoreExt,
+			IgnoreNames:          dto.Settings.IgnoreNames,
+			CloseToTray:          dto.Settings.CloseToTray,
+			NotificationsEnabled: dto.Settings.NotificationsEnabled,
+			Autostart:            dto.Settings.Autostart,
+			OnboardingCompleted:  dto.Settings.OnboardingCompleted,
 		},
 		Watch: watch,
 		Rules: rules,

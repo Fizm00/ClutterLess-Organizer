@@ -33,6 +33,20 @@ export const wailsApi: Api = {
       }
       return mockApi.config.getFolderWarnings();
     },
+    async isFirstRun() {
+      const cfg: any = ConfigService;
+      if (typeof cfg?.IsFirstRun === 'function') {
+        return (await cfg.IsFirstRun()) as boolean;
+      }
+      return mockApi.config.isFirstRun();
+    },
+    async completeOnboarding(req) {
+      const cfg: any = ConfigService;
+      if (typeof cfg?.CompleteOnboarding === 'function') {
+        return cfg.CompleteOnboarding(req as any);
+      }
+      return mockApi.config.completeOnboarding(req);
+    },
   },
   rules: {
     async list() {

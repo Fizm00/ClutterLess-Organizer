@@ -3,5 +3,6 @@ export * from './watchStore';
 export * from './activityStore';
 export * from './rulesStore';
 export * from './foldersStore';
+export * from './onboardingStore';
 export * from './events';
 

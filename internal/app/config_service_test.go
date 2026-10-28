@@ -204,3 +204,85 @@ func TestCheckFolderWarnings(t *testing.T) {
 		t.Errorf("expected 0 warnings when folder is non-recursive, got %d", len(warnings))
 	}
 }
+
+func TestConfigService_Onboarding(t *testing.T) {
+	tempDir := t.TempDir()
+	configPath := filepath.Join(tempDir, "config.yaml")
+	sink := NewMemoryEventSink()
+
+	cs, err := NewConfigService(configPath, sink)
+	if err != nil {
+		t.Fatalf("failed to create ConfigService: %v", err)
+	}
+	defer cs.Close()
+
+	if !cs.IsFirstRun() {
+		t.Errorf("expected clean profile to report IsFirstRun() == true")
+	}
+
+	// 1. Complete onboarding with recommended rules
+	req := OnboardingRequestDTO{
+		WatchFolders: []string{"~/Downloads", "~/Desktop"},
+		RuleSet:      "recommended",
+		Autostart:    true,
+	}
+
+	if err := cs.CompleteOnboarding(req); err != nil {
+		t.Fatalf("failed to complete onboarding: %v", err)
+	}
+
+	if cs.IsFirstRun() {
+		t.Errorf("expected IsFirstRun() to be false after onboarding")
+	}
+
+	cfg := cs.Get()
+	if !cfg.Settings.OnboardingCompleted {
+		t.Errorf("expected Settings.OnboardingCompleted to be true")
+	}
+	if !cfg.Settings.Autostart {
+		t.Errorf("expected Settings.Autostart to be true")
+	}
+	if cfg.Settings.CloseToTray == nil || !*cfg.Settings.CloseToTray {
+		t.Errorf("expected CloseToTray to default to true")
+	}
+	if len(cfg.Watch) != 2 {
+		t.Errorf("expected 2 watched folders, got %d", len(cfg.Watch))
+	}
+	if len(cfg.Rules) == 0 {
+		t.Errorf("expected recommended rules to be populated")
+	}
+
+	// Validate resulting config passes validator
+	valErrs := cs.Validate(cfg)
+	if len(valErrs) != 0 {
+		t.Errorf("expected 0 validation errors, got %d: %+v", len(valErrs), valErrs)
+	}
+
+	// 2. Complete onboarding with empty rule set
+	tempDir2 := t.TempDir()
+	configPath2 := filepath.Join(tempDir2, "config.yaml")
+	cs2, err := NewConfigService(configPath2, sink)
+	if err != nil {
+		t.Fatalf("failed to create second ConfigService: %v", err)
+	}
+	defer cs2.Close()
+
+	reqEmpty := OnboardingRequestDTO{
+		WatchFolders: []string{"~/Downloads"},
+		RuleSet:      "empty",
+		Autostart:    false,
+	}
+
+	if err := cs2.CompleteOnboarding(reqEmpty); err != nil {
+		t.Fatalf("failed to complete empty onboarding: %v", err)
+	}
+
+	cfgEmpty := cs2.Get()
+	if len(cfgEmpty.Rules) != 0 {
+		t.Errorf("expected 0 rules for empty rule set, got %d", len(cfgEmpty.Rules))
+	}
+	valErrsEmpty := cs2.Validate(cfgEmpty)
+	if len(valErrsEmpty) != 0 {
+		t.Errorf("expected empty rule set to pass validation, got %d errors: %+v", len(valErrsEmpty), valErrsEmpty)
+	}
+}
