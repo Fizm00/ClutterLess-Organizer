@@ -2,8 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, FolderSync, Plus, FolderPlus } from 'lucide-react';
 import { AppShell, NavRoute } from './components/AppShell';
-import { Button } from './components/Button';
-import { Tooltip } from './components/Tooltip';
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Kbd } from './components/Kbd';
 import { Overview } from './screens/Overview';
 import { Activity } from './screens/Activity';
@@ -22,12 +27,20 @@ import { useFoldersStore } from './state/foldersStore';
 import { useOnboardingStore } from './state/onboardingStore';
 import { setupEventSubscriptions } from './state/events';
 import { useLocaleStore, t } from './i18n';
+import { toast } from 'sonner';
 
 export const App: React.FC = () => {
-  const [route, setRoute] = useState<NavRoute>('overview');
+  const [route, setRoute] = useState<NavRoute>(() => {
+    if (
+      typeof window !== 'undefined' &&
+      (window.location.pathname === '/styleguide' || window.location.hash === '#/styleguide')
+    ) {
+      return 'styleguide';
+    }
+    return 'overview';
+  });
   const [previewOpen, setPreviewOpen] = useState(false);
   const [undoBatchId, setUndoBatchId] = useState<string | null>(null);
-  const [closeToTrayToast, setCloseToTrayToast] = useState(false);
   const { initTheme } = useThemeStore();
   useLocaleStore(s => s.locale);
   const { running, start, stop } = useWatchStore();
@@ -42,19 +55,16 @@ export const App: React.FC = () => {
 
     // Global keyboard shortcuts (DESIGN.md section 9)
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+Shift+O: Organize now
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'O' || e.key === 'o')) {
         e.preventDefault();
         setPreviewOpen(true);
         return;
       }
-      // Ctrl+,: Settings
       if ((e.ctrlKey || e.metaKey) && e.key === ',') {
         e.preventDefault();
         setRoute('settings');
         return;
       }
-      // Ctrl+Z on Activity: Undo last batch
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z') && route === 'activity') {
         const batches = useActivityStore.getState().batches;
         const lastActiveBatch = batches.find(b => !b.allUndone);
@@ -69,6 +79,7 @@ export const App: React.FC = () => {
 
     // Visual QA hooks for test automation
     if (typeof window !== 'undefined') {
+      (window as any).__setRoute = (r: NavRoute) => setRoute(r);
       (window as any).__setEmptyOverview = () => {
         useActivityStore.setState({ recentActivity: [], needsAttention: [] });
         useWatchStore.setState({ configError: null, watcherLocked: false });
@@ -170,7 +181,7 @@ export const App: React.FC = () => {
         useOnboardingStore.setState({ isFirstRun: false });
       };
       (window as any).__showCloseToTrayToast = () => {
-        setCloseToTrayToast(true);
+        toast(t('toast.close_to_tray'));
       };
     }
 
@@ -214,72 +225,79 @@ export const App: React.FC = () => {
     switch (route) {
       case 'overview':
         return (
-          <>
-            <Tooltip
-              content={
-                <span className="flex items-center gap-1.5">
-                  {t('action.organize_now')} <Kbd>Ctrl+Shift+O</Kbd>
-                </span>
-              }
-            >
-              <Button
-                variant="primary"
-                onClick={handleOrganizeNow}
-                aria-label={t('action.organize_now')}
-              >
-                <FolderSync size={14} strokeWidth={1.75} />
-                <span>{t('action.organize_now')}</span>
-              </Button>
-            </Tooltip>
+          <TooltipProvider delayDuration={300}>
             <Button
-              variant="secondary"
+              variant="outline"
+              size="sm"
               onClick={handleToggleWatch}
               aria-label={running ? t('action.pause') : t('action.resume')}
             >
               {running ? (
                 <>
-                  <Pause size={14} strokeWidth={1.75} />
+                  <Pause className="size-4 text-muted-foreground" />
                   <span>{t('action.pause')}</span>
                 </>
               ) : (
                 <>
-                  <Play size={14} strokeWidth={1.75} />
+                  <Play className="size-4 text-muted-foreground" />
                   <span>{t('action.resume')}</span>
                 </>
               )}
             </Button>
-          </>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleOrganizeNow}
+                  aria-label={t('action.organize_now')}
+                >
+                  <FolderSync className="size-4" />
+                  <span>{t('action.organize_now')}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <span className="inline-flex items-center gap-1.5">
+                  {t('action.organize_now')} <Kbd>Ctrl+Shift+O</Kbd>
+                </span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         );
       case 'activity':
         return (
-          <Tooltip
-            content={
-              <span className="flex items-center gap-1.5">
-                {t('action.organize_now')} <Kbd>Ctrl+Shift+O</Kbd>
-              </span>
-            }
-          >
-            <Button
-              variant="secondary"
-              onClick={handleOrganizeNow}
-              aria-label={t('action.organize_now')}
-            >
-              <FolderSync size={14} strokeWidth={1.75} />
-              <span>{t('action.organize_now')}</span>
-            </Button>
-          </Tooltip>
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleOrganizeNow}
+                  aria-label={t('action.organize_now')}
+                >
+                  <FolderSync className="size-4 text-muted-foreground" />
+                  <span>{t('action.organize_now')}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <span className="inline-flex items-center gap-1.5">
+                  {t('action.organize_now')} <Kbd>Ctrl+Shift+O</Kbd>
+                </span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         );
       case 'rules':
         return (
-          <Button variant="primary" size="sm" onClick={() => useRulesStore.getState().openEditor()}>
-            <Plus className="h-3.5 w-3.5 mr-1" />
+          <Button variant="default" size="sm" onClick={() => useRulesStore.getState().openEditor()}>
+            <Plus className="size-4" />
             <span>{t('action.new_rule')}</span>
           </Button>
         );
       case 'folders':
         return (
-          <Button variant="primary" size="sm" onClick={() => void useFoldersStore.getState().addFolder()}>
-            <FolderPlus className="h-3.5 w-3.5 mr-1" />
+          <Button variant="default" size="sm" onClick={() => void useFoldersStore.getState().addFolder()}>
+            <FolderPlus className="size-4" />
             <span>{t('action.add_folder')}</span>
           </Button>
         );
@@ -310,25 +328,22 @@ export const App: React.FC = () => {
   }
 
   return (
-    <>
+    <TooltipProvider delayDuration={300}>
       <AppShell
         currentRoute={route}
         onRouteChange={setRoute}
         headerTitle={getTitle()}
         headerActions={getHeaderActions()}
-        isMockMode={true}
       >
         {renderContent()}
       </AppShell>
 
-      {/* Preview Sheet (DESIGN.md 7.3) */}
       <PreviewSheet
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         onUndoRequest={batchId => setUndoBatchId(batchId)}
       />
 
-      {/* Undo Confirmation Dialog (DESIGN.md 7.2) */}
       <UndoDialog
         batchId={undoBatchId}
         open={!!undoBatchId}
@@ -336,25 +351,7 @@ export const App: React.FC = () => {
           if (!open) setUndoBatchId(null);
         }}
       />
-
-      {/* Close-to-tray reminder toast preview (DESIGN.md 7.9) */}
-      {closeToTrayToast && (
-        <div
-          className="fixed bottom-4 right-4 z-50 bg-bg-surface border border-border shadow-elevation rounded-sm p-3 flex items-center gap-3 text-small text-text-1 animate-in fade-in slide-in-from-bottom-2"
-          data-testid="close-to-tray-toast"
-        >
-          <div className="w-2 h-2 rounded-full bg-accent" />
-          <span>{t('toast.close_to_tray')}</span>
-          <button
-            type="button"
-            onClick={() => setCloseToTrayToast(false)}
-            className="text-text-3 hover:text-text-1 ml-2 cursor-pointer text-caption"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-    </>
+    </TooltipProvider>
   );
 };
 

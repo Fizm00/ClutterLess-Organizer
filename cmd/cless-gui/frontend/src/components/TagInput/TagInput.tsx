@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import React, { useState, KeyboardEvent } from 'react';
 import { X } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export interface TagInputProps {
   tags: string[];
@@ -53,8 +54,8 @@ export const TagInput: React.FC<TagInputProps> = ({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center gap-1.5 min-h-9 w-full rounded-sm border border-border bg-bg-surface px-2.5 py-1 text-sm transition-colors',
-        'focus-within:outline-none focus-within:ring-2 focus-within:ring-accent focus-within:border-transparent',
+        'flex flex-wrap items-center gap-1.5 min-h-9 w-full rounded-md border border-input bg-transparent px-2.5 py-1 text-sm shadow-xs transition-colors',
+        'focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50',
         disabled && 'cursor-not-allowed opacity-50',
         className
       )}
@@ -64,10 +65,7 @@ export const TagInput: React.FC<TagInputProps> = ({
       }}
     >
       {tags.map((tag, idx) => (
-        <span
-          key={`${tag}-${idx}`}
-          className="inline-flex items-center gap-1 rounded-xs bg-bg-raised border border-border px-1.5 py-0.5 text-xs font-mono text-text-primary"
-        >
+        <Badge key={`${tag}-${idx}`} variant="secondary" className="gap-1 font-mono text-xs">
           <span>.{tag}</span>
           {!disabled && (
             <button
@@ -76,13 +74,13 @@ export const TagInput: React.FC<TagInputProps> = ({
                 e.stopPropagation();
                 removeTag(idx);
               }}
-              className="text-text-muted hover:text-text-primary rounded-xs p-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+              className="text-muted-foreground hover:text-foreground rounded-xs p-0.5 focus-visible:outline-none"
               aria-label={`Remove extension ${tag}`}
             >
-              <X className="h-3 w-3" strokeWidth={2} />
+              <X className="size-3" />
             </button>
           )}
-        </span>
+        </Badge>
       ))}
       <input
         type="text"
@@ -93,7 +91,7 @@ export const TagInput: React.FC<TagInputProps> = ({
         placeholder={tags.length === 0 ? placeholder : ''}
         disabled={disabled}
         aria-label={ariaLabel || 'Tag input'}
-        className="flex-1 min-w-24 bg-transparent text-sm font-mono text-text-primary placeholder:text-text-muted outline-none disabled:cursor-not-allowed"
+        className="flex-1 min-w-24 bg-transparent text-xs font-mono text-foreground placeholder:text-muted-foreground outline-none disabled:cursor-not-allowed"
       />
     </div>
   );

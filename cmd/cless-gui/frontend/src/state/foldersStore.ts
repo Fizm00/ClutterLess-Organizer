@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { api } from '../api';
 import type { WatchEntryDTO, FolderWarningDTO } from '../api/types';
-import { toast } from '../components/Toast';
+import { toast } from 'sonner';
 import { t } from '../i18n';
 
 interface FoldersState {
@@ -82,17 +82,17 @@ export const useFoldersStore = create<FoldersState>((set, get) => ({
       const cfg = await api.config.get();
       const exists = cfg.watch.some(w => w.path.toLowerCase() === selected.toLowerCase());
       if (exists) {
-        toast.show('Folder is already in the watch list.');
+        toast('Folder is already in the watch list.');
         return selected;
       }
 
       const updatedWatch = [...cfg.watch, { path: selected, recursive: false }];
       await api.config.save({ ...cfg, watch: updatedWatch });
-      toast.show(t('toast.folder_added'));
+      toast(t('toast.folder_added'));
       await get().fetchFolders();
       return selected;
     } catch (err: any) {
-      toast.show('Failed to add folder: ' + (err?.message || ''));
+      toast('Failed to add folder: ' + (err?.message || ''));
       return null;
     }
   },
@@ -102,11 +102,11 @@ export const useFoldersStore = create<FoldersState>((set, get) => ({
       const cfg = await api.config.get();
       const updatedWatch = cfg.watch.filter(w => w.path.toLowerCase() !== path.toLowerCase());
       await api.config.save({ ...cfg, watch: updatedWatch });
-      toast.show(t('toast.folder_removed'));
+      toast(t('toast.folder_removed'));
       await get().fetchFolders();
       return true;
     } catch (err: any) {
-      toast.show('Failed to remove folder: ' + (err?.message || ''));
+      toast('Failed to remove folder: ' + (err?.message || ''));
       return false;
     }
   },
@@ -123,7 +123,7 @@ export const useFoldersStore = create<FoldersState>((set, get) => ({
       await api.config.save({ ...cfg, watch: updatedWatch });
       await get().fetchFolders();
     } catch (err: any) {
-      toast.show('Failed to update folder setting: ' + (err?.message || ''));
+      toast('Failed to update folder setting: ' + (err?.message || ''));
     }
   },
 
@@ -131,7 +131,7 @@ export const useFoldersStore = create<FoldersState>((set, get) => ({
     try {
       await api.system.revealPath(path);
     } catch (err: any) {
-      toast.show('Failed to open folder: ' + (err?.message || ''));
+      toast('Failed to open folder: ' + (err?.message || ''));
     }
   },
 }));

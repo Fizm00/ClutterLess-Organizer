@@ -28,7 +28,9 @@ Update the Status column at the end of every phase. The CLI roadmap (`docs/ROADM
 - CLI behavior and tests unchanged.
 
 ### G2
-- `tokens.css` matches `DESIGN.md` section 4 exactly; both themes.
+> **Note (shadcn/ui Redesign):** Earlier references to `tokens.css`, custom CSS Modules, cyan primary buttons, and rule category dots in G2–G7 have been superseded by the official **shadcn/ui (`neutral` base color, Tailwind CSS v4, `src/index.css`, `src/components/ui/`)** specification in `DESIGN.md` and `docs/GUI_ARCHITECTURE.md`.
+
+- `src/index.css` matches `DESIGN.md` section 4 (`neutral` shadcn/ui CSS variables in both themes).
 - Components in section 6 implemented with keyboard and focus behavior; `/styleguide` route (mock build only) shows all components and states in both themes.
 - App shell (sidebar, header, content) matches section 5. Visual QA checklist passes; screenshots committed.
 

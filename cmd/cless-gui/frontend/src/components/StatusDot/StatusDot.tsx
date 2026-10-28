@@ -1,6 +1,7 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 
-export type WatcherState = 'watching' | 'paused' | 'error';
+export type WatcherState = 'watching' | 'paused' | 'error' | 'warning';
 
 export interface StatusDotProps {
   state: WatcherState;
@@ -9,20 +10,21 @@ export interface StatusDotProps {
 }
 
 const stateStyles: Record<WatcherState, string> = {
-  watching: 'bg-success motion-safe:animate-pulse',
-  paused: 'bg-text-3',
-  error: 'bg-danger',
+  watching: 'bg-status-watching motion-safe:animate-pulse',
+  warning: 'bg-status-warning',
+  paused: 'bg-muted-foreground',
+  error: 'bg-destructive',
 };
 
-export const StatusDot: React.FC<StatusDotProps> = ({ state, label, className = '' }) => {
+export const StatusDot: React.FC<StatusDotProps> = ({ state, label, className }) => {
   return (
     <div
       role="status"
       aria-live="polite"
-      className={`inline-flex items-center gap-2 select-none ${className}`}
+      className={cn('inline-flex items-center gap-2 select-none', className)}
     >
-      <span className={`w-2 h-2 rounded-full shrink-0 ${stateStyles[state]}`} aria-hidden="true" />
-      {label && <span className="font-sans text-small text-text-2">{label}</span>}
+      <span className={cn('size-2 rounded-full shrink-0', stateStyles[state])} aria-hidden="true" />
+      {label && <span className="text-sm text-muted-foreground">{label}</span>}
     </div>
   );
 };

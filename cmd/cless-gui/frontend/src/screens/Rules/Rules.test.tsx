@@ -33,7 +33,7 @@ describe('Rules Component', () => {
 
   it('renders rules list with caption and priority ordering', () => {
     render(<Rules />);
-    expect(screen.getByText('First match wins.')).toBeDefined();
+    expect(screen.getByText('Rules run top to bottom. The first match wins.')).toBeDefined();
     expect(screen.getByText('Invoices')).toBeDefined();
     expect(screen.getByText('Images')).toBeDefined();
   });

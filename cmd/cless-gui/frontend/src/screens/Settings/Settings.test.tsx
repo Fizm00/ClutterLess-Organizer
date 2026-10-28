@@ -36,7 +36,8 @@ describe('Settings Screen', () => {
     });
 
     // Switch to Bahasa Indonesia
-    const idButton = screen.getByRole('radio', { name: 'Bahasa Indonesia' });
+    const idButton = screen.getByRole('tab', { name: 'Bahasa Indonesia' });
+    fireEvent.mouseDown(idButton, { button: 0 });
     fireEvent.click(idButton);
 
     await waitFor(() => {
@@ -46,7 +47,8 @@ describe('Settings Screen', () => {
     });
 
     // Switch back to English
-    const enButton = screen.getByRole('radio', { name: 'English' });
+    const enButton = screen.getByRole('tab', { name: 'English' });
+    fireEvent.mouseDown(enButton, { button: 0 });
     fireEvent.click(enButton);
 
     await waitFor(() => {

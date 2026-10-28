@@ -87,12 +87,37 @@ This project depends on the third-party Go modules listed below. All dependencie
 - **URL:** https://github.com/lukeed/clsx, https://github.com/dcastil/tailwind-merge, https://github.com/joe-bell/cva
 - **Description:** Class name composition and variant management utilities used by shadcn/ui components.
 
-### 13. `@dnd-kit` (`@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`)
+### 13. `tailwindcss`, `@tailwindcss/vite`, `tw-animate-css`
+- **License:** MIT License
+- **URL:** https://github.com/tailwindlabs/tailwindcss, https://github.com/Wombosvideo/tw-animate-css
+- **Description:** Utility-first CSS framework (v4) and CSS animation utilities for shadcn/ui components.
+
+### 14. `@radix-ui/react-*` (`accordion`, `checkbox`, `dialog`, `dropdown-menu`, `label`, `popover`, `scroll-area`, `select`, `separator`, `slot`, `switch`, `tabs`, `tooltip`)
+- **License:** MIT License
+- **URL:** https://github.com/radix-ui/primitives
+- **Description:** Unstyled, accessible UI primitives powering official shadcn/ui components.
+
+### 15. `sonner`
+- **License:** MIT License
+- **URL:** https://github.com/emilkowalski/sonner
+- **Description:** Accessible toast notification component used by shadcn/ui (`ui/sonner.tsx`).
+
+### 16. `lucide-react`
+- **License:** ISC License
+- **URL:** https://github.com/lucide-icons/lucide
+- **Description:** Clean, consistent vector icon library used across the GUI.
+
+### 17. `zustand`
+- **License:** MIT License
+- **URL:** https://github.com/pmndrs/zustand
+- **Description:** Small, fast state management library for React.
+
+### 18. `@dnd-kit` (`@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`)
 - **License:** MIT License
 - **URL:** https://github.com/clauderic/dnd-kit
 - **Description:** Lightweight, modular drag and drop toolkit for React with accessible keyboard reordering.
 
-### 14. `git.sr.ht/~jackmordaunt/go-toast/v2`
+### 19. `git.sr.ht/~jackmordaunt/go-toast/v2`
 - **License:** MIT License
 - **URL:** https://git.sr.ht/~jackmordaunt/go-toast
 - **Description:** Windows toast notification library utilized by Wails desktop notification service.

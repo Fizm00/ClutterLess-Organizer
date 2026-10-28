@@ -1,14 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Trash2, AlertTriangle, FileCode } from 'lucide-react';
-import { Dialog } from '../Dialog';
-import { Button } from '../Button';
-import { Input } from '../Input';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { TagInput } from '../TagInput';
 import { RuleTester } from '../RuleTester';
-import { useRulesStore } from '../../state/rulesStore';
-import type { RuleDTO } from '../../api/types';
-import { t } from '../../i18n';
+import { useRulesStore } from '@/state/rulesStore';
+import type { RuleDTO } from '@/api/types';
+import { t } from '@/i18n';
 
 const TEMPLATE_VARS = ['{year}', '{month}', '{day}', '{ext}', '{name}'] as const;
 
@@ -55,7 +64,6 @@ export const RuleEditor: React.FC = () => {
     }
   }, [editingRule]);
 
-  // Live validation on draft change using Go Validate
   useEffect(() => {
     if (draft) {
       const timer = setTimeout(() => {
@@ -81,7 +89,6 @@ export const RuleEditor: React.FC = () => {
     return ALL_CONDITIONS.filter(c => !activeConditionTypes.includes(c.type));
   }, [activeConditionTypes]);
 
-  // Sample destination preview
   const resolvedSampleDest = useMemo(() => {
     if (!draft || !draft.moveTo) return '';
     const now = new Date();
@@ -101,7 +108,6 @@ export const RuleEditor: React.FC = () => {
     return `${rendered}/${name}.${ext}`;
   }, [draft]);
 
-  // Convert draft to YAML representation for read-only view
   const yamlRepresentation = useMemo(() => {
     if (!draft) return '';
     const lines = [`- name: ${draft.name || 'Untitled'}`];
@@ -217,7 +223,6 @@ export const RuleEditor: React.FC = () => {
     }
   };
 
-  // Find validation error matching specific fields
   const nameError = validationErrors.find(
     e => e.field.includes('name') || e.message.toLowerCase().includes('rule name')
   );
@@ -225,7 +230,10 @@ export const RuleEditor: React.FC = () => {
     e => e.message.toLowerCase().includes('condition') || e.message.toLowerCase().includes('regex')
   );
   const destError = validationErrors.find(
-    e => e.field.includes('move_to') || e.message.toLowerCase().includes('move_to') || e.message.includes('template')
+    e =>
+      e.field.includes('move_to') ||
+      e.message.toLowerCase().includes('move_to') ||
+      e.message.includes('template')
   );
 
   return (
@@ -234,95 +242,65 @@ export const RuleEditor: React.FC = () => {
       onOpenChange={open => {
         if (!open) closeEditor();
       }}
-      title={isNewRule ? t('editor.title_new') : t('editor.title_edit')}
-      width="wide"
-      footer={
-        <div className="flex items-center justify-between w-full">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowTester(!showTester)}
-            className="text-xs"
-          >
-            {t('editor.test_button')}
-          </Button>
-
-          <div className="flex items-center gap-2">
-            <Button type="button" variant="secondary" size="default" onClick={closeEditor}>
-              {t('action.cancel')}
-            </Button>
-            <Button
-              type="button"
-              variant="primary"
-              size="default"
-              onClick={handleSave}
-              disabled={saving || !draft.name.trim() || !draft.moveTo.trim()}
-            >
-              {saving ? 'Saving...' : t('action.save_rule')}
-            </Button>
-          </div>
-        </div>
-      }
     >
-      <div className="flex flex-col gap-4">
-        {/* Top actions: YAML toggle */}
-        <div className="flex items-center justify-end">
+      <DialogContent className="sm:max-w-xl">
+        <DialogHeader className="flex flex-row items-center justify-between pr-6">
+          <DialogTitle>{isNewRule ? t('editor.title_new') : t('editor.title_edit')}</DialogTitle>
           <Button
             type="button"
             variant={showYaml ? 'secondary' : 'ghost'}
-            size="sm"
+            size="xs"
             onClick={() => setShowYaml(!showYaml)}
-            className="text-xs h-7 gap-1.5"
             aria-label="Toggle YAML View"
           >
-            <FileCode className="h-3.5 w-3.5" />
+            <FileCode className="size-4 text-muted-foreground" />
             <span>{t('editor.yaml_toggle')}</span>
           </Button>
-        </div>
+        </DialogHeader>
 
-        {externalChangeDetected && (
-          <div className="p-3 rounded-sm bg-danger/10 border-l-2 border-danger flex items-start gap-2.5 text-xs text-danger">
-            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-            <div>{t('editor.external_change_warning')}</div>
-          </div>
-        )}
+        <div className="flex flex-col gap-4">
+          {externalChangeDetected && (
+            <Alert variant="destructive">
+              <AlertTriangle className="size-4" />
+              <AlertDescription>{t('editor.external_change_warning')}</AlertDescription>
+            </Alert>
+          )}
 
-        {showYaml ? (
-          <div className="rounded-sm border border-border bg-bg-raised p-4 font-mono text-xs text-text-primary whitespace-pre overflow-x-auto select-all">
-            {yamlRepresentation}
-          </div>
-        ) : (
-          <form onSubmit={handleSave} className="flex flex-col gap-4">
-            {/* Rule Name */}
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="rule-name-input" className="text-xs font-medium text-text-secondary">
-                {t('editor.name_label')}
-              </label>
-              <Input
-                id="rule-name-input"
-                value={draft.name}
-                onChange={e => setDraft({ ...draft, name: e.target.value })}
-                placeholder={t('editor.name_placeholder')}
-                error={nameError?.message}
-                autoFocus={isNewRule}
-              />
+          {showYaml ? (
+            <div className="rounded-lg border bg-muted/50 p-4 font-mono text-xs text-foreground whitespace-pre overflow-x-auto select-all">
+              {yamlRepresentation}
             </div>
+          ) : (
+            <form onSubmit={handleSave} className="flex flex-col gap-4">
+              {/* Rule Name */}
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="rule-name-input">{t('editor.name_label')}</Label>
+                <Input
+                  id="rule-name-input"
+                  value={draft.name}
+                  onChange={e => setDraft({ ...draft, name: e.target.value })}
+                  placeholder={t('editor.name_placeholder')}
+                  aria-invalid={Boolean(nameError)}
+                  autoFocus={isNewRule}
+                />
+                {nameError && (
+                  <span className="text-xs text-destructive">{nameError.message}</span>
+                )}
+              </div>
 
-            {/* Match Conditions */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-xs font-medium text-text-secondary">
-                    {t('editor.match_header')}
-                  </label>
-                  <div className="text-caption text-text-muted">{t('editor.match_and_notice')}</div>
-                </div>
+              {/* Match Conditions */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-0.5">
+                    <Label>{t('editor.match_header')}</Label>
+                    <span className="text-xs text-muted-foreground">
+                      {t('editor.match_and_notice')}
+                    </span>
+                  </div>
 
-                {availableConditions.length > 0 && (
-                  <div className="flex items-center gap-1.5">
+                  {availableConditions.length > 0 && (
                     <select
-                      className="h-7 rounded-sm border border-border bg-bg-surface px-2 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                      className="h-8 rounded-md border border-input bg-transparent px-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
                       onChange={e => {
                         if (e.target.value) {
                           addCondition(e.target.value as ConditionType);
@@ -341,170 +319,197 @@ export const RuleEditor: React.FC = () => {
                         </option>
                       ))}
                     </select>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              <div className="flex flex-col gap-2 rounded-sm border border-border bg-bg-surface p-3">
-                {activeConditionTypes.length === 0 ? (
-                  <div className="text-xs text-text-muted py-2 text-center">
-                    No match conditions added yet. Select &quot;Add condition&quot; above.
-                  </div>
-                ) : (
-                  activeConditionTypes.map(type => (
-                    <div key={type} className="flex items-start gap-2 pt-1 pb-1">
-                      <span className="w-28 shrink-0 text-xs text-text-secondary pt-2 font-medium">
-                        {ALL_CONDITIONS.find(c => c.type === type)?.label}:
-                      </span>
-
-                      <div className="flex-1 min-w-0">
-                        {type === 'ext' && (
-                          <TagInput
-                            tags={draft.match.ext || []}
-                            onChange={tags => setDraft({ ...draft, match: { ...draft.match, ext: tags } })}
-                            placeholder="e.g. pdf, docx, xlsx"
-                          />
-                        )}
-                        {type === 'nameGlob' && (
-                          <Input
-                            value={(draft.match.nameGlob || []).join(', ')}
-                            onChange={e =>
-                              setDraft({
-                                ...draft,
-                                match: {
-                                  ...draft.match,
-                                  nameGlob: e.target.value
-                                    .split(',')
-                                    .map(s => s.trim())
-                                    .filter(Boolean),
-                                },
-                              })
-                            }
-                            placeholder="e.g. *.pdf, report_*"
-                            className="font-mono text-xs"
-                          />
-                        )}
-                        {type === 'nameRegex' && (
-                          <Input
-                            value={draft.match.nameRegex || ''}
-                            onChange={e =>
-                              setDraft({
-                                ...draft,
-                                match: { ...draft.match, nameRegex: e.target.value },
-                              })
-                            }
-                            placeholder="e.g. (?i)(invoice|receipt|faktur)"
-                            className="font-mono text-xs"
-                          />
-                        )}
-                        {type === 'minSize' && (
-                          <Input
-                            value={draft.match.minSize || ''}
-                            onChange={e =>
-                              setDraft({
-                                ...draft,
-                                match: { ...draft.match, minSize: e.target.value },
-                              })
-                            }
-                            placeholder="e.g. 500KB, 1MB, 2GB"
-                            className="font-mono text-xs"
-                          />
-                        )}
-                        {type === 'maxSize' && (
-                          <Input
-                            value={draft.match.maxSize || ''}
-                            onChange={e =>
-                              setDraft({
-                                ...draft,
-                                match: { ...draft.match, maxSize: e.target.value },
-                              })
-                            }
-                            placeholder="e.g. 100MB, 5GB"
-                            className="font-mono text-xs"
-                          />
-                        )}
-                        {type === 'olderThan' && (
-                          <Input
-                            value={draft.match.olderThan || ''}
-                            onChange={e =>
-                              setDraft({
-                                ...draft,
-                                match: { ...draft.match, olderThan: e.target.value },
-                              })
-                            }
-                            placeholder="e.g. 30d, 12h, 2w"
-                            className="font-mono text-xs"
-                          />
-                        )}
-                      </div>
-
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeCondition(type)}
-                        className="text-text-muted hover:text-danger h-8 w-8 p-0"
-                        aria-label={`Remove condition ${type}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                <div className="flex flex-col gap-2 rounded-lg border p-3">
+                  {activeConditionTypes.length === 0 ? (
+                    <div className="text-xs text-muted-foreground py-2">
+                      No match conditions added yet. Select &quot;Add condition&quot; above.
                     </div>
-                  ))
+                  ) : (
+                    activeConditionTypes.map(type => (
+                      <div key={type} className="flex items-start gap-2 py-1">
+                        <span className="w-28 shrink-0 text-xs text-muted-foreground pt-2 font-medium">
+                          {ALL_CONDITIONS.find(c => c.type === type)?.label}:
+                        </span>
+
+                        <div className="flex-1 min-w-0">
+                          {type === 'ext' && (
+                            <TagInput
+                              tags={draft.match.ext || []}
+                              onChange={tags =>
+                                setDraft({ ...draft, match: { ...draft.match, ext: tags } })
+                              }
+                              placeholder="e.g. pdf, docx, xlsx"
+                            />
+                          )}
+                          {type === 'nameGlob' && (
+                            <Input
+                              value={(draft.match.nameGlob || []).join(', ')}
+                              onChange={e =>
+                                setDraft({
+                                  ...draft,
+                                  match: {
+                                    ...draft.match,
+                                    nameGlob: e.target.value
+                                      .split(',')
+                                      .map(s => s.trim())
+                                      .filter(Boolean),
+                                  },
+                                })
+                              }
+                              placeholder="e.g. *.pdf, report_*"
+                              className="font-mono text-xs"
+                            />
+                          )}
+                          {type === 'nameRegex' && (
+                            <Input
+                              value={draft.match.nameRegex || ''}
+                              onChange={e =>
+                                setDraft({
+                                  ...draft,
+                                  match: { ...draft.match, nameRegex: e.target.value },
+                                })
+                              }
+                              placeholder="e.g. (?i)(invoice|receipt|faktur)"
+                              className="font-mono text-xs"
+                            />
+                          )}
+                          {type === 'minSize' && (
+                            <Input
+                              value={draft.match.minSize || ''}
+                              onChange={e =>
+                                setDraft({
+                                  ...draft,
+                                  match: { ...draft.match, minSize: e.target.value },
+                                })
+                              }
+                              placeholder="e.g. 500KB, 1MB, 2GB"
+                              className="font-mono text-xs"
+                            />
+                          )}
+                          {type === 'maxSize' && (
+                            <Input
+                              value={draft.match.maxSize || ''}
+                              onChange={e =>
+                                setDraft({
+                                  ...draft,
+                                  match: { ...draft.match, maxSize: e.target.value },
+                                })
+                              }
+                              placeholder="e.g. 100MB, 5GB"
+                              className="font-mono text-xs"
+                            />
+                          )}
+                          {type === 'olderThan' && (
+                            <Input
+                              value={draft.match.olderThan || ''}
+                              onChange={e =>
+                                setDraft({
+                                  ...draft,
+                                  match: { ...draft.match, olderThan: e.target.value },
+                                })
+                              }
+                              placeholder="e.g. 30d, 12h, 2w"
+                              className="font-mono text-xs"
+                            />
+                          )}
+                        </div>
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => removeCondition(type)}
+                          aria-label={`Remove condition ${type}`}
+                        >
+                          <Trash2 className="size-4 text-muted-foreground" />
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {matchError && (
+                  <span className="text-xs text-destructive">{matchError.message}</span>
                 )}
               </div>
 
-              {matchError && (
-                <span className="text-xs text-danger font-medium">{matchError.message}</span>
-              )}
-            </div>
+              {/* Destination */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="destination-input">{t('editor.dest_label')}</Label>
+                <Input
+                  id="destination-input"
+                  ref={destInputRef}
+                  value={draft.moveTo}
+                  onChange={e => setDraft({ ...draft, moveTo: e.target.value })}
+                  placeholder={t('editor.dest_placeholder')}
+                  aria-invalid={Boolean(destError)}
+                  className="font-mono text-xs"
+                />
+                {destError && (
+                  <span className="text-xs text-destructive">{destError.message}</span>
+                )}
 
-            {/* Destination */}
-            <div className="flex flex-col gap-2">
-              <label htmlFor="destination-input" className="text-xs font-medium text-text-secondary">
-                {t('editor.dest_label')}
-              </label>
-              <Input
-                id="destination-input"
-                ref={destInputRef}
-                value={draft.moveTo}
-                onChange={e => setDraft({ ...draft, moveTo: e.target.value })}
-                placeholder={t('editor.dest_placeholder')}
-                error={destError?.message}
-                className="font-mono text-xs"
-              />
+                {/* Template chips */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs text-muted-foreground">Insert template:</span>
+                  {TEMPLATE_VARS.map(v => (
+                    <Badge
+                      key={v}
+                      variant="outline"
+                      asChild
+                      className="cursor-pointer font-mono text-xs hover:bg-accent"
+                    >
+                      <button type="button" onClick={() => insertTemplateVar(v)}>
+                        {v}
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
 
-              {/* Template chips */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-caption text-text-muted">Insert template:</span>
-                {TEMPLATE_VARS.map(v => (
-                  <button
-                    key={v}
-                    type="button"
-                    onClick={() => insertTemplateVar(v)}
-                    className="rounded-xs border border-border bg-bg-surface px-1.5 py-0.5 text-xs font-mono text-accent hover:bg-bg-raised hover:border-accent/40 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
-                  >
-                    {v}
-                  </button>
-                ))}
+                {resolvedSampleDest && (
+                  <div className="text-xs text-muted-foreground truncate">
+                    Sample preview:{' '}
+                    <span className="font-mono text-foreground">{resolvedSampleDest}</span>
+                  </div>
+                )}
               </div>
 
-              {/* Live sample preview */}
-              {resolvedSampleDest && (
-                <div className="text-caption text-text-muted font-mono truncate bg-bg-raised/50 rounded-xs p-1.5 border border-border/50">
-                  Sample preview: <span className="text-text-primary">{resolvedSampleDest}</span>
+              {showTester && (
+                <div className="pt-2 border-t">
+                  <RuleTester targetRule={draft} onClose={() => setShowTester(false)} />
                 </div>
               )}
-            </div>
+            </form>
+          )}
+        </div>
 
-            {/* Tester Inline within Dialog */}
-            {showTester && (
-              <div className="pt-2 border-t border-border">
-                <RuleTester targetRule={draft} onClose={() => setShowTester(false)} />
-              </div>
-            )}
-          </form>
-        )}
-      </div>
+        <DialogFooter className="flex items-center justify-between sm:justify-between w-full">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowTester(!showTester)}
+          >
+            {t('editor.test_button')}
+          </Button>
+
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" onClick={closeEditor}>
+              {t('action.cancel')}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => void handleSave()}
+              disabled={saving || !draft.name.trim() || !draft.moveTo.trim()}
+            >
+              {saving ? 'Saving...' : t('action.save_rule')}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

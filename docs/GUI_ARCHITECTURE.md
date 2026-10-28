@@ -18,11 +18,13 @@ cmd/cless-gui/
 ├── frontend/                 # React + TS + Vite app (embedded at build)
 │   ├── src/
 │   │   ├── api/              # typed wrapper over generated bindings + mock implementation
-│   │   ├── components/       # design-system components (DESIGN.md section 6)
+│   │   ├── components/
+│   │   │   ├── ui/           # official shadcn/ui primitives (neutral base color, CSS variables)
+│   │   │   └── ...           # project components (FileRow, Path, StatusDot, EmptyState, etc.)
 │   │   ├── screens/          # Overview, Activity, Rules, Folders, Settings, Onboarding
 │   │   ├── state/            # Zustand stores, event subscriptions
-│   │   ├── i18n/             # en.ts (id.ts later)
-│   │   └── styles/           # tokens.css, base.css, fonts
+│   │   ├── i18n/             # en.ts, id.ts
+│   │   └── index.css         # Tailwind CSS v4 + shadcn/ui neutral CSS variables + font imports
 │   └── package.json
 ├── build/                    # icons, installer assets, platform manifests
 internal/app/                 # service layer (no Wails imports)
@@ -84,7 +86,7 @@ All service errors return a typed `AppError{Code, Message, Hint, Details}` seria
 
 - `api/` is the only place that imports generated bindings. It exports a typed `api` object. A **mock implementation** (`api/mock.ts`, realistic sample data including edge cases like 70-char filenames) is selected when running the frontend in a plain browser (`npm run dev:mock`), so screens can be built and screenshot-tested without the Go runtime.
 - State: Zustand stores per domain (`watchStore`, `activityStore`, `rulesStore`, `settingsStore`). No global mutable singletons outside stores.
-- Styling: Tailwind CSS v4 with a locked `@theme` block where all defaults are cleared (`--color-*: initial`, `--radius-*: initial`, etc.) and populated strictly with `DESIGN.md` and shadcn/ui semantic tokens. Arbitrary values (`bg-[#...]`, `p-[...]`) are strictly forbidden and enforced by ESLint. Component primitives in `frontend/src/components/` follow the **shadcn/ui ("New York" style)** pattern (Radix headless primitives + `class-variance-authority` + `cn()` helper in `src/lib/utils.ts`); screens only compose them. Heavy monolithic component kits (MUI, Chakra, Mantine) remain strictly banned.
+- Styling: Tailwind CSS v4 (`@tailwindcss/vite`) with official **shadcn/ui** (`neutral` base color, CSS variables in `src/index.css`, primitives in `src/components/ui/`). Screens compose shadcn primitives (`Button`, `Table`, `Tabs`, `Dialog`, `Sheet`, `DropdownMenu`, `Select`, `Switch`, `Checkbox`, `Badge`, `Alert`, `Separator`, `Tooltip`, `Sonner`) and project components (`FileRow`, `Path`, `StatusDot`, `EmptyState`, `Kbd`) using at most one level of bordered container (`rounded-lg border`) per section. `npm run lint:style` and ESLint enforce zero `uppercase`, `tracking-wide*`, arbitrary Tailwind values, raw color palettes (`cyan-*`, `emerald-*`, etc.), gradients, or blurs outside `src/components/ui/`. Heavy monolithic component kits (MUI, AntD, Chakra, Mantine) remain strictly banned.
 - Components are presentational; screens compose them and talk to stores.
 - Tests: Vitest + Testing Library for components and stores; Go tests for `internal/app`; Playwright (dev dependency) against the mock build for screenshots and keyboard-navigation checks.
 
@@ -92,7 +94,7 @@ All service errors return a typed `AppError{Code, Message, Hint, Details}` seria
 
 Go: `github.com/wailsapp/wails/v3` (and its transitive deps). Anything else: ask first.
 
-Frontend: `react`, `react-dom`, `typescript`, `vite`, `@vitejs/plugin-react`, `tailwindcss`, `@tailwindcss/vite`, `clsx`, `tailwind-merge`, `class-variance-authority`, `zustand`, `lucide-react`, `@radix-ui/react-dialog`, `-dropdown-menu`, `-tooltip`, `-switch`, `-tabs`, `-popover`, `-select`, `-checkbox`, `@dnd-kit/core`, `@dnd-kit/sortable` (Phase G5 only), `@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono`; dev: `vitest`, `@testing-library/react`, `jsdom`, `playwright`, `eslint`, `prettier`. Anything else: ask first. Heavy monolithic component kits (MUI, Chakra, Mantine), CSS-in-JS runtimes, or animation libraries remain strictly banned.
+Frontend: `react`, `react-dom`, `typescript`, `vite`, `@vitejs/plugin-react`, `tailwindcss`, `@tailwindcss/vite`, `tw-animate-css`, `clsx`, `tailwind-merge`, `class-variance-authority`, `zustand`, `lucide-react`, `sonner`, `@radix-ui/react-accordion`, `-checkbox`, `-dialog`, `-dropdown-menu`, `-label`, `-popover`, `-scroll-area`, `-select`, `-separator`, `-slot`, `-switch`, `-tabs`, `-tooltip`, `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` (Phase G5 only), `@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono`; dev: `vitest`, `@testing-library/react`, `jsdom`, `playwright`, `@axe-core/playwright`, `eslint`, `prettier`. Anything else: ask first. Heavy monolithic component kits (MUI, AntD, Chakra, Mantine) or CSS-in-JS runtimes remain strictly banned.
 
 ## 9. Build and release notes
 

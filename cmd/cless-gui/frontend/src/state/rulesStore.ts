@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { api } from '../api';
 import type { RuleDTO, ValidationErrorDTO, RuleTestResultDTO } from '../api/types';
-import { toast } from '../components/Toast';
+import { toast } from 'sonner';
 import { t } from '../i18n';
 
 interface RulesState {
@@ -119,13 +119,13 @@ export const useRulesStore = create<RulesState>((set, get) => ({
   saveRule: async (rule: RuleDTO) => {
     try {
       await api.rules.upsert(rule);
-      toast.show(t('toast.rule_saved'));
+      toast(t('toast.rule_saved'));
       get().closeEditor();
       await get().fetchRules();
       return true;
     } catch (err: any) {
       const msg = err?.message || 'Failed to save rule';
-      toast.show('Config invalid: ' + msg);
+      toast('Config invalid: ' + msg);
       return false;
     }
   },
@@ -133,11 +133,11 @@ export const useRulesStore = create<RulesState>((set, get) => ({
   deleteRule: async (name: string) => {
     try {
       await api.rules.delete(name);
-      toast.show(t('toast.rule_deleted'));
+      toast(t('toast.rule_deleted'));
       await get().fetchRules();
       return true;
     } catch (err: any) {
-      toast.show('Failed to delete rule: ' + (err?.message || ''));
+      toast('Failed to delete rule: ' + (err?.message || ''));
       return false;
     }
   },
@@ -170,7 +170,7 @@ export const useRulesStore = create<RulesState>((set, get) => ({
       await api.rules.upsert(updated);
       await get().fetchRules();
     } catch (err: any) {
-      toast.show('Failed to update rule: ' + (err?.message || ''));
+      toast('Failed to update rule: ' + (err?.message || ''));
     }
   },
 
@@ -193,7 +193,7 @@ export const useRulesStore = create<RulesState>((set, get) => ({
     try {
       await api.rules.reorder(names);
     } catch (err: any) {
-      toast.show('Failed to reorder rules: ' + (err?.message || ''));
+      toast('Failed to reorder rules: ' + (err?.message || ''));
       await get().fetchRules();
     }
   },

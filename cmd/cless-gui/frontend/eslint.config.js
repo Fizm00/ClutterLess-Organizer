@@ -42,7 +42,7 @@ const noArbitraryTailwindRule = {
 
 export default [
   {
-    ignores: ['dist/**', 'bindings/**', 'node_modules/**'],
+    ignores: ['dist/**', 'bindings/**', 'node_modules/**', 'src/components/ui/**'],
   },
   {
     files: ['src/**/*.{ts,tsx}'],

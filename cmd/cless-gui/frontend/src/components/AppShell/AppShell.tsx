@@ -5,20 +5,16 @@ import {
   SlidersHorizontal,
   Folder,
   Settings,
-  Palette,
   Layers,
-  Sun,
-  Moon,
-  ChevronRight,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Toaster } from '@/components/ui/sonner';
 import { StatusDot, WatcherState } from '../StatusDot';
-import { Toaster } from '../Toast';
 import { Kbd } from '../Kbd';
-import { IconButton } from '../IconButton';
-import { useWatchStore } from '../../state/watchStore';
-import { useThemeStore } from '../../store/themeStore';
-import { cn } from '../../lib/utils';
-import { t } from '../../i18n';
+import { useWatchStore } from '@/state/watchStore';
+import { cn } from '@/lib/utils';
+import { t } from '@/i18n';
 
 export type NavRoute = 'overview' | 'activity' | 'rules' | 'folders' | 'settings' | 'styleguide';
 
@@ -37,10 +33,8 @@ export const AppShell: React.FC<AppShellProps> = ({
   headerTitle,
   headerActions,
   children,
-  isMockMode = true,
 }) => {
   const { running, folders, watcherLocked, configError } = useWatchStore();
-  const { resolvedTheme, setMode } = useThemeStore();
 
   let statusState: WatcherState = 'paused';
   let statusLabel = t('watch.status.paused');
@@ -53,206 +47,113 @@ export const AppShell: React.FC<AppShellProps> = ({
     statusLabel = t('watch.status.watching', { count: folders.length });
   }
 
-  const navItems: Array<{ route: NavRoute; label: string; icon: React.ReactNode; badge?: number }> = [
+  const navItems: Array<{ route: NavRoute; label: string; icon: React.ReactNode }> = [
     {
       route: 'overview',
       label: t('nav.overview'),
-      icon: <LayoutDashboard size={15} strokeWidth={1.75} />,
+      icon: <LayoutDashboard className="size-4 text-muted-foreground" />,
     },
     {
       route: 'activity',
       label: t('nav.activity'),
-      icon: <History size={15} strokeWidth={1.75} />,
+      icon: <History className="size-4 text-muted-foreground" />,
     },
     {
       route: 'rules',
       label: t('nav.rules'),
-      icon: <SlidersHorizontal size={15} strokeWidth={1.75} />,
+      icon: <SlidersHorizontal className="size-4 text-muted-foreground" />,
     },
     {
       route: 'folders',
       label: t('nav.folders'),
-      icon: <Folder size={15} strokeWidth={1.75} />,
-      badge: folders.length,
+      icon: <Folder className="size-4 text-muted-foreground" />,
     },
   ];
 
-  const toggleQuickTheme = () => {
-    setMode(resolvedTheme === 'dark' ? 'light' : 'dark');
-  };
-
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-bg-sidebar text-foreground p-2 gap-1">
-      {/* Shadcn Inset Sidebar */}
-      <aside className="w-sidebar min-w-sidebar max-w-sidebar h-full bg-bg-sidebar flex flex-col shrink-0 select-none px-1.5">
-        {/* Sidebar Brand Card */}
-        <div className="h-12 px-2.5 mb-2 rounded-lg flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground shadow-sm shrink-0">
-              <Layers size={16} strokeWidth={2.25} />
-            </span>
-            <div className="flex flex-col">
-              <span className="font-sans text-body font-semibold tracking-tight text-foreground leading-none">
-                {t('nav.brand')}
-              </span>
-              <span className="font-mono text-caption text-text-3 mt-0.5 leading-none">
-                Desktop Organizer
-              </span>
-            </div>
+    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
+      {/* Narrow Sidebar built from shadcn Button ghost primitives */}
+      <aside className="w-52 shrink-0 border-r bg-sidebar text-sidebar-foreground flex flex-col select-none">
+        {/* Brand Header: Logo (only place with cyan brand color) + Name */}
+        <div className="flex items-center gap-2.5 h-14 px-4 shrink-0">
+          <Layers className="size-4 text-brand shrink-0" />
+          <span className="text-sm font-semibold tracking-tight text-foreground">
+            {t('nav.brand')}
+          </span>
+        </div>
+
+        {/* Primary Navigation */}
+        <nav className="flex flex-col flex-1 px-2 py-1 gap-0.5" aria-label="Main Navigation">
+          {navItems.map(item => {
+            const isSelected = currentRoute === item.route;
+            return (
+              <Button
+                key={item.route}
+                type="button"
+                variant="ghost"
+                size="sm"
+                data-testid={`nav-${item.route}`}
+                className={cn(
+                  'w-full justify-start gap-2.5 px-2.5 font-normal',
+                  isSelected
+                    ? 'bg-accent text-accent-foreground font-medium'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                onClick={() => onRouteChange(item.route)}
+                aria-current={isSelected ? 'page' : undefined}
+              >
+                {item.icon}
+                <span className="truncate">{item.label}</span>
+              </Button>
+            );
+          })}
+        </nav>
+
+        {/* Sidebar Footer: Watcher Status Line + Settings */}
+        <div className="flex flex-col gap-1 p-2 border-t">
+          <div className="px-2.5 py-1.5">
+            <StatusDot state={statusState} label={statusLabel} />
           </div>
-          <span className="font-mono text-caption text-accent bg-accent/10 px-1.5 py-0.5 rounded-md border border-accent/25">
-            v1.0
-          </span>
-        </div>
 
-        {/* Workspace Navigation */}
-        <div className="flex flex-col flex-1 py-1 gap-1">
-          <span className="px-2.5 pb-1 font-sans text-caption font-semibold uppercase tracking-wider text-text-3">
-            Workspace
-          </span>
-          <nav className="flex flex-col gap-0.5" aria-label="Main Navigation">
-            {navItems.map(item => {
-              const isSelected = currentRoute === item.route;
-              return (
-                <button
-                  key={item.route}
-                  type="button"
-                  data-testid={`nav-${item.route}`}
-                  className={cn(
-                    'relative flex items-center justify-between gap-2.5 h-9 px-2.5 rounded-lg border font-sans text-body cursor-pointer text-left transition-all duration-fast ease w-full',
-                    isSelected
-                      ? 'bg-card text-foreground font-semibold border-border shadow-xs'
-                      : 'bg-transparent text-muted-foreground font-regular border-transparent hover:bg-card/50 hover:text-foreground'
-                  )}
-                  onClick={() => onRouteChange(item.route)}
-                  aria-current={isSelected ? 'page' : undefined}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className={cn('flex items-center shrink-0', isSelected ? 'text-accent' : 'text-text-3')}>
-                      {item.icon}
-                    </span>
-                    <span className="whitespace-nowrap overflow-hidden text-ellipsis">{item.label}</span>
-                  </div>
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span
-                      className={cn(
-                        'font-mono text-caption px-1.5 py-0.2 rounded-md border text-xs',
-                        isSelected
-                          ? 'bg-accent/15 text-accent border-accent/30'
-                          : 'bg-muted text-text-3 border-border-subtle'
-                      )}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* System Footer & Watcher Status Card */}
-        <div className="flex flex-col gap-1 pt-2 pb-1 border-t border-border-subtle">
-          <span className="px-2.5 pb-0.5 font-sans text-caption font-semibold uppercase tracking-wider text-text-3">
-            System
-          </span>
-          {isMockMode && (
-            <button
-              type="button"
-              className={cn(
-                'relative flex items-center gap-2.5 h-8.5 px-2.5 rounded-lg border font-sans text-body cursor-pointer text-left transition-all duration-fast ease w-full',
-                currentRoute === 'styleguide'
-                  ? 'bg-card text-foreground font-semibold border-border shadow-xs'
-                  : 'bg-transparent text-muted-foreground font-regular border-transparent hover:bg-card/50 hover:text-foreground'
-              )}
-              onClick={() => onRouteChange('styleguide')}
-              aria-current={currentRoute === 'styleguide' ? 'page' : undefined}
-            >
-              <span className={cn('flex items-center shrink-0', currentRoute === 'styleguide' ? 'text-accent' : 'text-text-3')}>
-                <Palette size={15} strokeWidth={1.75} />
-              </span>
-              <span className="whitespace-nowrap overflow-hidden text-ellipsis">Styleguide</span>
-            </button>
-          )}
-
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             data-testid="nav-settings"
             className={cn(
-              'relative flex items-center justify-between gap-2.5 h-8.5 px-2.5 rounded-lg border font-sans text-body cursor-pointer text-left transition-all duration-fast ease w-full',
+              'w-full justify-between px-2.5 font-normal',
               currentRoute === 'settings'
-                ? 'bg-card text-foreground font-semibold border-border shadow-xs'
-                : 'bg-transparent text-muted-foreground font-regular border-transparent hover:bg-card/50 hover:text-foreground'
+                ? 'bg-accent text-accent-foreground font-medium'
+                : 'text-muted-foreground hover:text-foreground'
             )}
             onClick={() => onRouteChange('settings')}
             aria-current={currentRoute === 'settings' ? 'page' : undefined}
           >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span className={cn('flex items-center shrink-0', currentRoute === 'settings' ? 'text-accent' : 'text-text-3')}>
-                <Settings size={15} strokeWidth={1.75} />
-              </span>
-              <span className="whitespace-nowrap overflow-hidden text-ellipsis">{t('nav.settings')}</span>
-            </div>
-            <Kbd className="opacity-75">Ctrl+,</Kbd>
-          </button>
-
-          {/* Rich Watcher Status Card */}
-          <div className="mt-1.5 p-2.5 rounded-xl bg-card border border-border shadow-xs flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-caption uppercase tracking-wider text-text-3">
-                Background Engine
-              </span>
-              <span
-                className={cn(
-                  'font-mono text-caption px-1.5 rounded-sm',
-                  statusState === 'watching'
-                    ? 'text-success bg-success/10'
-                    : statusState === 'error'
-                    ? 'text-danger bg-danger/10'
-                    : 'text-text-3 bg-muted'
-                )}
-              >
-                {statusState === 'watching' ? 'LIVE' : statusState === 'error' ? 'ERR' : 'IDLE'}
-              </span>
-            </div>
-            <StatusDot state={statusState} label={statusLabel} />
-          </div>
+            <span className="flex items-center gap-2.5 truncate">
+              <Settings className="size-4 text-muted-foreground shrink-0" />
+              <span className="truncate">{t('nav.settings')}</span>
+            </span>
+            <Kbd>Ctrl+,</Kbd>
+          </Button>
         </div>
       </aside>
 
-      {/* Shadcn Inset Main Content Panel (Rounded-xl Elevated Surface) */}
-      <main className="flex flex-col flex-1 h-full min-w-0 overflow-hidden bg-background rounded-xl border border-border shadow-elevation">
-        <header className="flex items-center justify-between px-7 h-14 border-b border-border-subtle bg-card/60 backdrop-blur-md shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="font-sans text-small text-text-3 hidden sm:inline">Workspace</span>
-            <ChevronRight size={13} className="text-text-3 hidden sm:inline" aria-hidden="true" />
-            <h1 className="font-sans text-subtitle font-semibold tracking-tight text-foreground">
-              {headerTitle}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2.5">
-            {headerActions && <div className="flex items-center gap-2">{headerActions}</div>}
-            <div className="h-4 w-px bg-border-subtle mx-0.5" aria-hidden="true" />
-            <IconButton
-              icon={
-                resolvedTheme === 'dark' ? (
-                  <Sun size={15} strokeWidth={1.75} />
-                ) : (
-                  <Moon size={15} strokeWidth={1.75} />
-                )
-              }
-              label={t('settings.theme')}
-              onClick={toggleQuickTheme}
-            />
-          </div>
+      {/* Main Content Area */}
+      <main className="flex flex-col flex-1 h-full min-w-0 overflow-hidden bg-background">
+        <header className="flex items-center justify-between px-6 h-14 shrink-0">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            {headerTitle}
+          </h1>
+          {headerActions && <div className="flex items-center gap-2">{headerActions}</div>}
         </header>
+        <Separator />
 
-        <section className="flex-1 overflow-y-auto px-7 py-6 flex flex-col items-start min-w-0">
+        <section className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 items-start min-w-0">
           {children}
         </section>
       </main>
 
-      <Toaster />
+      <Toaster position="bottom-right" />
     </div>
   );
 };

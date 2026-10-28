@@ -206,7 +206,7 @@ export const id: Record<TranslationKey, string> = {
   'toast.settings_saved': 'Pengaturan disimpan.',
 
   // Rules (DESIGN.md 7.4)
-  'rules.caption': 'Aturan pertama yang cocok akan dieksekusi.',
+  'rules.caption': 'Aturan dijalankan dari atas ke bawah. Aturan pertama yang cocok akan menang.',
   'rules.reordered': 'Aturan {name} dipindahkan ke urutan {position} dari {total}',
   'rules.empty_title': 'Belum ada aturan yang ditentukan',
   'rules.empty_desc': 'Buat aturan untuk mengelompokkan dan memindahkan berkas masuk secara otomatis.',

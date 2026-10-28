@@ -46,7 +46,8 @@ describe('Activity Component', () => {
     render(<Activity />);
 
     // Click 'Undone' filter
-    const undoneSegment = screen.getByRole('radio', { name: 'Undone' });
+    const undoneSegment = screen.getByRole('tab', { name: 'Undone' });
+    fireEvent.mouseDown(undoneSegment, { button: 0 });
     fireEvent.click(undoneSegment);
 
     await waitFor(() => {
@@ -55,7 +56,8 @@ describe('Activity Component', () => {
     });
 
     // Click 'Applied' filter
-    const appliedSegment = screen.getByRole('radio', { name: 'Applied' });
+    const appliedSegment = screen.getByRole('tab', { name: 'Applied' });
+    fireEvent.mouseDown(appliedSegment, { button: 0 });
     fireEvent.click(appliedSegment);
 
     await waitFor(() => {

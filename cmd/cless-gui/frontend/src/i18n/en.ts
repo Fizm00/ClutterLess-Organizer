@@ -204,7 +204,7 @@ export const en = {
   'toast.settings_saved': 'Settings saved.',
 
   // Rules (DESIGN.md 7.4)
-  'rules.caption': 'First match wins.',
+  'rules.caption': 'Rules run top to bottom. The first match wins.',
   'rules.reordered': 'Rule {name} moved to position {position} of {total}',
   'rules.empty_title': 'No rules defined',
   'rules.empty_desc': 'Create rules to automatically categorize and move incoming files.',

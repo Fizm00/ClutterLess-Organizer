@@ -4,7 +4,7 @@ import { useWatchStore } from './watchStore';
 import { useActivityStore } from './activityStore';
 import { useRulesStore } from './rulesStore';
 import { useFoldersStore } from './foldersStore';
-import { toast } from '../components/Toast';
+import { toast } from 'sonner';
 import { t } from '../i18n';
 
 let cleanupFn: (() => void) | null = null;
@@ -40,7 +40,7 @@ export function setupEventSubscriptions(): () => void {
   });
 
   const unsubConfig = api.onEvent('config:changed', _payload => {
-    toast.show(t('toast.config_reloaded'));
+    toast(t('toast.config_reloaded'));
     useWatchStore.getState().init();
     useRulesStore.getState().fetchRules();
     useFoldersStore.getState().fetchFolders();
