@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 256 256" fill="none">
+  <!-- Squircle Container -->
+  <rect x="12" y="12" width="232" height="232" rx="54" fill="#09090B" />
+  <rect x="14" y="14" width="228" height="228" rx="52" stroke="#27272A" stroke-width="4" />
+
+  <!-- Subtle inner surface glow -->
+  <rect x="16" y="16" width="224" height="224" rx="50" fill="url(#bgGrad)" />
+
+  <!-- Outer Folder "C" Spine (represents the target organized folder & the letter C) -->
+  <path
+    d="M154 64H118L102 48H74C59.6406 48 48 59.6406 48 74V182C48 196.359 59.6406 208 74 208H154"
+    stroke="#FAFAFA"
+    stroke-width="22"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Sorted File Bars centered vertically inside the Folder-C opening (y=64..208, center=136) -->
+  <!-- Top active file bar: Cyan accent, sliding into alignment -->
+  <rect x="108" y="94" width="98" height="20" rx="10" fill="#22D3EE" />
+  <!-- Middle sorted file bar -->
+  <rect x="94" y="126" width="94" height="20" rx="10" fill="#E4E4E7" />
+  <!-- Bottom sorted file bar -->
+  <rect x="94" y="158" width="72" height="20" rx="10" fill="#71717A" />
+
+  <defs>
+    <linearGradient id="bgGrad" x1="128" y1="16" x2="128" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#18181B" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+</svg>

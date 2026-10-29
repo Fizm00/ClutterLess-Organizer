@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import React from 'react';
 import { Folder, Check, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ClutterLessLogo } from '@/components/ClutterLessLogo';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
@@ -48,9 +49,12 @@ export const Onboarding: React.FC = () => {
       >
         {/* Step Indicator Header */}
         <div className="px-6 pt-5 pb-4 border-b flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground">
-            {t('onboarding.step_indicator', { current: step, total: 3 })}
-          </span>
+          <div className="flex items-center gap-2">
+            <ClutterLessLogo className="size-5 shrink-0" />
+            <span className="text-xs font-medium text-muted-foreground">
+              {t('onboarding.step_indicator', { current: step, total: 3 })}
+            </span>
+          </div>
           <div className="flex items-center gap-1.5" aria-hidden="true">
             <div className={cn('h-1.5 w-6 rounded-full transition-colors', step >= 1 ? 'bg-primary' : 'bg-border')} />
             <div className={cn('h-1.5 w-6 rounded-full transition-colors', step >= 2 ? 'bg-primary' : 'bg-border')} />

@@ -5,11 +5,11 @@ import {
   SlidersHorizontal,
   Folder,
   Settings,
-  Layers,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
+import { ClutterLessLogo } from '../ClutterLessLogo';
 import { StatusDot, WatcherState } from '../StatusDot';
 import { Kbd } from '../Kbd';
 import { useWatchStore } from '@/state/watchStore';
@@ -74,9 +74,9 @@ export const AppShell: React.FC<AppShellProps> = ({
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
       {/* Narrow Sidebar built from shadcn Button ghost primitives */}
       <aside className="w-52 shrink-0 border-r bg-sidebar text-sidebar-foreground flex flex-col select-none">
-        {/* Brand Header: Logo (only place with cyan brand color) + Name */}
+        {/* Brand Header: Custom ClutterLess Logo + Name */}
         <div className="flex items-center gap-2.5 h-14 px-4 shrink-0">
-          <Layers className="size-4 text-brand shrink-0" />
+          <ClutterLessLogo className="size-5 shrink-0" />
           <span className="text-sm font-semibold tracking-tight text-foreground">
             {t('nav.brand')}
           </span>

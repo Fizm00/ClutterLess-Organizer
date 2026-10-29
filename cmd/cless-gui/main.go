@@ -232,6 +232,7 @@ func main() {
 	wailsApp = application.New(application.Options{
 		Name:        "ClutterLess",
 		Description: "ClutterLess Organizer Desktop GUI",
+		Icon:        appIcon,
 		Services: []application.Service{
 			application.NewService(systemService),
 			application.NewService(configService),

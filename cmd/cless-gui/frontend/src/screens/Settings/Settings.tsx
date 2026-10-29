@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { TagInput } from '@/components/TagInput';
+import { ClutterLessLogo } from '@/components/ClutterLessLogo';
 import { toast } from 'sonner';
 import { api } from '@/api';
 import { ConfigDTO, VersionInfo } from '@/api/types';
@@ -497,11 +498,14 @@ export const Settings: React.FC = () => {
 
       {/* 5. About Section */}
       <section className="flex flex-col gap-2" aria-labelledby="heading-about">
-        <div className="flex flex-col gap-0.5">
-          <h2 id="heading-about" className="text-sm font-medium text-foreground">
-            {t('settings.about')}
-          </h2>
-          <p className="text-xs text-muted-foreground">{t('settings.about_desc')}</p>
+        <div className="flex items-center gap-3">
+          <ClutterLessLogo className="size-8 shrink-0" />
+          <div className="flex flex-col gap-0.5">
+            <h2 id="heading-about" className="text-sm font-medium text-foreground">
+              {t('settings.about')}
+            </h2>
+            <p className="text-xs text-muted-foreground">{t('settings.about_desc')}</p>
+          </div>
         </div>
 
         <div className="flex flex-col divide-y border-t mt-1 text-sm">
