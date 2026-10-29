@@ -52,7 +52,7 @@ export const useWatchStore = create<WatchState>((set, get) => ({
 
       set({
         running: status.running,
-        folders: status.folders?.length ? status.folders : initialFolders,
+        folders: initialFolders.length > 0 ? initialFolders : status.folders || [],
         error: isLocked ? null : status.error || null,
         watcherLocked: isLocked,
         isLoading: false,
@@ -78,7 +78,7 @@ export const useWatchStore = create<WatchState>((set, get) => ({
       const status = await api.watch.status();
       set({
         running: status.running,
-        folders: status.folders,
+        folders: Array.isArray(status.folders) ? status.folders : get().folders,
         error: null,
         watcherLocked: false,
         isLoading: false,
@@ -123,7 +123,7 @@ export const useWatchStore = create<WatchState>((set, get) => ({
           configError: null,
           folders: cfg?.watch?.map(w => w.path) || get().folders,
         });
-      } catch (err: any) {
+      } catch {
         // Still invalid
         return;
       }
@@ -148,7 +148,7 @@ export const useWatchStore = create<WatchState>((set, get) => ({
 
     set(state => ({
       running: status.running,
-      folders: status.folders?.length ? status.folders : state.folders,
+      folders: Array.isArray(status.folders) ? status.folders : state.folders,
       error: isLocked ? null : status.error || null,
       watcherLocked: isLocked,
     }));
@@ -166,4 +166,3 @@ export const useWatchStore = create<WatchState>((set, get) => ({
     set({ watcherLocked: locked });
   },
 }));
-

@@ -72,9 +72,7 @@ func NewConfigService(configPath string, sink EventSink) (*ConfigService, error)
 			return nil, NewAppError(ErrConfigInvalid, "Failed to load config", "Check YAML syntax in config.yaml", loadErr.Error())
 		}
 		cfg = loadedCfg
-		if !cfg.Settings.OnboardingCompleted {
-			cs.isFirstRun = true
-		}
+		cs.isFirstRun = false
 	}
 	cs.currentCfg = cfg
 
@@ -107,13 +105,7 @@ func (cs *ConfigService) GetConfig() *config.Config {
 func (cs *ConfigService) IsFirstRun() bool {
 	cs.mu.RLock()
 	defer cs.mu.RUnlock()
-	if cs.isFirstRun {
-		return true
-	}
-	if cs.currentCfg != nil && !cs.currentCfg.Settings.OnboardingCompleted {
-		return true
-	}
-	return false
+	return cs.isFirstRun
 }
 
 // CompleteOnboarding applies the initial configuration choices from the onboarding wizard.
@@ -271,7 +263,8 @@ func (cs *ConfigService) Save(dto ConfigDTO) error {
 		}
 	}
 	cs.currentCfg = cfg
-	cs.eventSink.Emit(EventConfigChanged, ConfigChangedPayload{Path: cs.configPath})
+	internalChange := false
+	cs.eventSink.Emit(EventConfigChanged, ConfigChangedPayload{Path: cs.configPath, External: &internalChange})
 
 	return nil
 }
@@ -279,6 +272,7 @@ func (cs *ConfigService) Save(dto ConfigDTO) error {
 // ResetToDefaults resets the in-memory and on-disk config to application default values.
 func (cs *ConfigService) ResetToDefaults() error {
 	defaultCfg := config.Default()
+	defaultCfg.Settings.OnboardingCompleted = true
 	return cs.Save(ConfigToDTO(defaultCfg))
 }
 
@@ -372,7 +366,8 @@ func (cs *ConfigService) handleDiskFileChanged() {
 	cs.lastWrittenHash = sha256.Sum256(rawBytes)
 	cs.mu.Unlock()
 
-	cs.eventSink.Emit(EventConfigChanged, ConfigChangedPayload{Path: cs.configPath})
+	externalChange := true
+	cs.eventSink.Emit(EventConfigChanged, ConfigChangedPayload{Path: cs.configPath, External: &externalChange})
 }
 
 // copyFileAtomic copies src to dst.

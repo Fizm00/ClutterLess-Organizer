@@ -123,6 +123,7 @@ func main() {
 	var mainWindow *application.WebviewWindow
 	var quitting bool
 	var wailsApp *application.App
+	var configService *app.ConfigService
 	var watchService *app.WatchService
 	var statusItem *application.MenuItem
 	var pauseResumeItem *application.MenuItem
@@ -189,7 +190,10 @@ func main() {
 			}
 
 		case app.EventConfigChanged:
-			if watchService != nil && watchService.Status().Running {
+			if configService != nil && notificationAggregator != nil {
+				notificationAggregator.SetEnabled(configService.Get().Settings.NotificationsEnabled)
+			}
+			if watchService != nil {
 				go func() {
 					_ = watchService.Reload()
 				}()
@@ -208,9 +212,11 @@ func main() {
 	// 3. Instantiate services
 	systemService := app.NewSystemService()
 	systemService.SetConfigPath(configPath)
-	systemService.SetHistoryPath(filepath.Join(stateDir, "history.jsonl"))
+	historyPath, _ := history.DefaultHistoryPath()
+	systemService.SetHistoryPath(historyPath)
 
-	configService, err := app.NewConfigService(configPath, eventSink)
+	var err error
+	configService, err = app.NewConfigService(configPath, eventSink)
 	if err != nil {
 		log.Printf("Warning: initial config loading issue: %v", err)
 	}
@@ -364,6 +370,11 @@ func main() {
 			}
 		}
 	})
+
+	// Auto-start background watcher if onboarding is already completed
+	if configService != nil && !configService.IsFirstRun() {
+		_ = watchService.Start()
+	}
 
 	// If not launched with --hidden, show the main window immediately
 	if !hiddenFlag {

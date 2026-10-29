@@ -16,6 +16,13 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 import * as $models from "./models.js";
 
 /**
+ * CountFiles returns the count of regular files directly inside the given directory without blocking.
+ */
+export function CountFiles(folderPath: string): $CancellablePromise<number> {
+    return $Call.ByID(1754583046, folderPath);
+}
+
+/**
  * GetAutostart returns whether autostart on system boot is enabled.
  */
 export function GetAutostart(): $CancellablePromise<boolean> {
@@ -27,6 +34,13 @@ export function GetAutostart(): $CancellablePromise<boolean> {
  */
 export function OpenConfig(): $CancellablePromise<void> {
     return $Call.ByID(3496533910);
+}
+
+/**
+ * OpenHistory opens the history log file in the system default text editor.
+ */
+export function OpenHistory(): $CancellablePromise<void> {
+    return $Call.ByID(1515113728);
 }
 
 /**
@@ -69,6 +83,13 @@ export function SetConfigPath(path: string): $CancellablePromise<void> {
  */
 export function SetFolderPicker(picker: $models.FolderPicker): $CancellablePromise<void> {
     return $Call.ByID(256097998, picker);
+}
+
+/**
+ * SetHistoryPath sets the history log path used by OpenHistory.
+ */
+export function SetHistoryPath(path: string): $CancellablePromise<void> {
+    return $Call.ByID(3187769103, path);
 }
 
 /**

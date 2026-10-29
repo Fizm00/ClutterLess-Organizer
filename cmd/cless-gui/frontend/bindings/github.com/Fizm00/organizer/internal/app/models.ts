@@ -95,6 +95,46 @@ export class BatchSummaryDTO {
 }
 
 /**
+ * ConditionEvaluationDTO describes the evaluation outcome for an individual rule condition.
+ */
+export class ConditionEvaluationDTO {
+    /**
+     * "ext", "name_glob", "name_regex", "min_size", "max_size", "older_than"
+     */
+    "type": string;
+
+    /**
+     * human-readable pattern e.g. "[jpg, png]" or "(?i)(invoice)"
+     */
+    "pattern": string;
+    "passed": boolean;
+    "details"?: string;
+
+    /** Creates a new ConditionEvaluationDTO instance. */
+    constructor($$source: Partial<ConditionEvaluationDTO> = {}) {
+        if (!("type" in $$source)) {
+            this["type"] = "";
+        }
+        if (!("pattern" in $$source)) {
+            this["pattern"] = "";
+        }
+        if (!("passed" in $$source)) {
+            this["passed"] = false;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new ConditionEvaluationDTO instance from a string or object.
+     */
+    static createFrom($$source: any = {}): ConditionEvaluationDTO {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new ConditionEvaluationDTO($$parsedSource as Partial<ConditionEvaluationDTO>);
+    }
+}
+
+/**
  * ConfigDTO represents full application configuration serializable to frontend.
  */
 export class ConfigDTO {
@@ -142,6 +182,42 @@ export class ConfigDTO {
  * FolderPicker defines the interface for native folder selection dialogs (implemented in bootstrap/G6).
  */
 export type FolderPicker = any;
+
+/**
+ * FolderWarningDTO describes a warning condition for a watched folder.
+ */
+export class FolderWarningDTO {
+    "folderPath": string;
+    "ruleName": string;
+    "moveTo": string;
+    "message": string;
+
+    /** Creates a new FolderWarningDTO instance. */
+    constructor($$source: Partial<FolderWarningDTO> = {}) {
+        if (!("folderPath" in $$source)) {
+            this["folderPath"] = "";
+        }
+        if (!("ruleName" in $$source)) {
+            this["ruleName"] = "";
+        }
+        if (!("moveTo" in $$source)) {
+            this["moveTo"] = "";
+        }
+        if (!("message" in $$source)) {
+            this["message"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new FolderWarningDTO instance from a string or object.
+     */
+    static createFrom($$source: any = {}): FolderWarningDTO {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new FolderWarningDTO($$parsedSource as Partial<FolderWarningDTO>);
+    }
+}
 
 /**
  * HistoryFilterDTO contains filtering criteria for history batch queries.
@@ -277,6 +353,46 @@ export class MoveResultDTO {
     static createFrom($$source: any = {}): MoveResultDTO {
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         return new MoveResultDTO($$parsedSource as Partial<MoveResultDTO>);
+    }
+}
+
+/**
+ * OnboardingRequestDTO contains user choices from the first-run onboarding wizard.
+ */
+export class OnboardingRequestDTO {
+    "watchFolders": string[];
+
+    /**
+     * "recommended" or "empty"
+     */
+    "ruleSet": string;
+    "autostart": boolean;
+
+    /** Creates a new OnboardingRequestDTO instance. */
+    constructor($$source: Partial<OnboardingRequestDTO> = {}) {
+        if (!("watchFolders" in $$source)) {
+            this["watchFolders"] = [];
+        }
+        if (!("ruleSet" in $$source)) {
+            this["ruleSet"] = "";
+        }
+        if (!("autostart" in $$source)) {
+            this["autostart"] = false;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new OnboardingRequestDTO instance from a string or object.
+     */
+    static createFrom($$source: any = {}): OnboardingRequestDTO {
+        const $$createField0_0 = $$createType8;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("watchFolders" in $$parsedSource) {
+            $$parsedSource["watchFolders"] = $$createField0_0($$parsedSource["watchFolders"]);
+        }
+        return new OnboardingRequestDTO($$parsedSource as Partial<OnboardingRequestDTO>);
     }
 }
 
@@ -449,6 +565,7 @@ export class RecordDTO {
  */
 export class RuleDTO {
     "name": string;
+    "disabled"?: boolean;
     "moveTo": string;
     "match": MatchDTO;
 
@@ -471,10 +588,10 @@ export class RuleDTO {
      * Creates a new RuleDTO instance from a string or object.
      */
     static createFrom($$source: any = {}): RuleDTO {
-        const $$createField2_0 = $$createType11;
+        const $$createField3_0 = $$createType11;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("match" in $$parsedSource) {
-            $$parsedSource["match"] = $$createField2_0($$parsedSource["match"]);
+            $$parsedSource["match"] = $$createField3_0($$parsedSource["match"]);
         }
         return new RuleDTO($$parsedSource as Partial<RuleDTO>);
     }
@@ -488,6 +605,7 @@ export class RuleTestResultDTO {
     "ruleName"?: string;
     "destination"?: string;
     "reason": string;
+    "conditions"?: ConditionEvaluationDTO[];
 
     /** Creates a new RuleTestResultDTO instance. */
     constructor($$source: Partial<RuleTestResultDTO> = {}) {
@@ -505,7 +623,11 @@ export class RuleTestResultDTO {
      * Creates a new RuleTestResultDTO instance from a string or object.
      */
     static createFrom($$source: any = {}): RuleTestResultDTO {
+        const $$createField4_0 = $$createType13;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("conditions" in $$parsedSource) {
+            $$parsedSource["conditions"] = $$createField4_0($$parsedSource["conditions"]);
+        }
         return new RuleTestResultDTO($$parsedSource as Partial<RuleTestResultDTO>);
     }
 }
@@ -580,7 +702,7 @@ export class RunResultDTO {
      * Creates a new RunResultDTO instance from a string or object.
      */
     static createFrom($$source: any = {}): RunResultDTO {
-        const $$createField1_0 = $$createType13;
+        const $$createField1_0 = $$createType15;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("moves" in $$parsedSource) {
             $$parsedSource["moves"] = $$createField1_0($$parsedSource["moves"]);
@@ -599,6 +721,10 @@ export class SettingsDTO {
     "ignoreHidden": boolean;
     "ignoreExt": string[];
     "ignoreNames": string[];
+    "closeToTray"?: boolean | null;
+    "notificationsEnabled": boolean;
+    "autostart": boolean;
+    "onboardingCompleted": boolean;
 
     /** Creates a new SettingsDTO instance. */
     constructor($$source: Partial<SettingsDTO> = {}) {
@@ -619,6 +745,15 @@ export class SettingsDTO {
         }
         if (!("ignoreNames" in $$source)) {
             this["ignoreNames"] = [];
+        }
+        if (!("notificationsEnabled" in $$source)) {
+            this["notificationsEnabled"] = false;
+        }
+        if (!("autostart" in $$source)) {
+            this["autostart"] = false;
+        }
+        if (!("onboardingCompleted" in $$source)) {
+            this["onboardingCompleted"] = false;
         }
 
         Object.assign(this, $$source);
@@ -721,7 +856,7 @@ export class UndoResultDTO {
      * Creates a new UndoResultDTO instance from a string or object.
      */
     static createFrom($$source: any = {}): UndoResultDTO {
-        const $$createField1_0 = $$createType15;
+        const $$createField1_0 = $$createType17;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("moves" in $$parsedSource) {
             $$parsedSource["moves"] = $$createField1_0($$parsedSource["moves"]);
@@ -864,7 +999,9 @@ const $$createType8 = $Create.Array($Create.Any);
 const $$createType9 = PlanItemDTO.createFrom;
 const $$createType10 = $Create.Array($$createType9);
 const $$createType11 = MatchDTO.createFrom;
-const $$createType12 = MoveResultDTO.createFrom;
+const $$createType12 = ConditionEvaluationDTO.createFrom;
 const $$createType13 = $Create.Array($$createType12);
-const $$createType14 = UndoMoveResultDTO.createFrom;
+const $$createType14 = MoveResultDTO.createFrom;
 const $$createType15 = $Create.Array($$createType14);
+const $$createType16 = UndoMoveResultDTO.createFrom;
+const $$createType17 = $Create.Array($$createType16);

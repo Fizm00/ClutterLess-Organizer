@@ -20,8 +20,10 @@ type WatchService struct {
 
 	mu         sync.Mutex
 	running    bool
+	runID      uint64
 	lock       *WatcherLock
 	cancelFunc context.CancelFunc
+	doneCh     chan struct{}
 	errText    string
 }
 
@@ -58,7 +60,11 @@ func (ws *WatchService) Start() error {
 
 	// 2. Prepare context and channels
 	ctx, cancel := context.WithCancel(context.Background())
+	doneCh := make(chan struct{})
+	ws.runID++
+	myRunID := ws.runID
 	ws.cancelFunc = cancel
+	ws.doneCh = doneCh
 	ws.running = true
 	ws.errText = ""
 
@@ -97,21 +103,26 @@ func (ws *WatchService) Start() error {
 	// 3. Launch watcher in background goroutine
 	go func() {
 		defer func() {
+			defer close(doneCh)
 			ws.mu.Lock()
-			ws.running = false
-			if ws.lock != nil {
-				_ = ws.lock.Release()
-				ws.lock = nil
+			if ws.runID == myRunID {
+				ws.running = false
+				if ws.lock != nil {
+					_ = ws.lock.Release()
+					ws.lock = nil
+				}
+				ws.emitStatusLocked()
 			}
-			ws.emitStatusLocked()
 			ws.mu.Unlock()
 		}()
 
 		_, watchErr := organizer.Watch(ctx, opts)
 		if watchErr != nil && ctx.Err() == nil {
 			ws.mu.Lock()
-			ws.errText = watchErr.Error()
-			ws.eventSink.Emit(EventAppError, NewAppError(ErrWatcherStartFailed, "Watcher encountered error", "", watchErr.Error()))
+			if ws.runID == myRunID {
+				ws.errText = watchErr.Error()
+				ws.eventSink.Emit(EventAppError, NewAppError(ErrWatcherStartFailed, "Watcher encountered error", "", watchErr.Error()))
+			}
 			ws.mu.Unlock()
 		}
 	}()
@@ -123,12 +134,14 @@ func (ws *WatchService) Start() error {
 // Stop terminates the active watcher and releases the lock.
 func (ws *WatchService) Stop() error {
 	ws.mu.Lock()
-	defer ws.mu.Unlock()
-
 	if !ws.running {
+		ws.mu.Unlock()
 		return nil
 	}
 
+	ws.runID++
+	doneCh := ws.doneCh
+	ws.doneCh = nil
 	if ws.cancelFunc != nil {
 		ws.cancelFunc()
 		ws.cancelFunc = nil
@@ -139,6 +152,14 @@ func (ws *WatchService) Stop() error {
 	}
 	ws.running = false
 	ws.emitStatusLocked()
+	ws.mu.Unlock()
+
+	if doneCh != nil {
+		select {
+		case <-doneCh:
+		case <-time.After(500 * time.Millisecond):
+		}
+	}
 	return nil
 }
 
@@ -146,19 +167,15 @@ func (ws *WatchService) Stop() error {
 func (ws *WatchService) Reload() error {
 	ws.mu.Lock()
 	if !ws.running {
+		ws.emitStatusLocked()
 		ws.mu.Unlock()
 		return nil
 	}
-	// Stop existing worker loop
-	if ws.cancelFunc != nil {
-		ws.cancelFunc()
-	}
-	ws.running = false
 	ws.mu.Unlock()
 
-	// Wait briefly for previous watcher to exit
-	time.Sleep(100 * time.Millisecond)
-
+	if err := ws.Stop(); err != nil {
+		return err
+	}
 	return ws.Start()
 }
 
@@ -170,11 +187,9 @@ func (ws *WatchService) Status() WatchStatusDTO {
 }
 
 func (ws *WatchService) statusLocked() WatchStatusDTO {
-	var folders []string
-	if ws.running {
-		for _, w := range ws.configService.Get().Watch {
-			folders = append(folders, w.Path)
-		}
+	folders := make([]string, 0)
+	for _, w := range ws.configService.Get().Watch {
+		folders = append(folders, w.Path)
 	}
 	return WatchStatusDTO{
 		Running: ws.running,

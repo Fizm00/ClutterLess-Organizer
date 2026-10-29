@@ -27,6 +27,13 @@ export function Close(): $CancellablePromise<void> {
 }
 
 /**
+ * CompleteOnboarding applies the initial configuration choices from the onboarding wizard.
+ */
+export function CompleteOnboarding(req: $models.OnboardingRequestDTO): $CancellablePromise<void> {
+    return $Call.ByID(698787025, req);
+}
+
+/**
  * Get returns the current configuration formatted as a JSON-friendly DTO.
  */
 export function Get(): $CancellablePromise<$models.ConfigDTO> {
@@ -42,6 +49,22 @@ export function GetConfig(): $CancellablePromise<config$0.Config | null> {
     return $Call.ByID(3225932527).then(($result: any) => {
         return $$createType2($result);
     });
+}
+
+/**
+ * GetFolderWarnings returns recursive folder warnings for the current configuration.
+ */
+export function GetFolderWarnings(): $CancellablePromise<$models.FolderWarningDTO[]> {
+    return $Call.ByID(1859141028).then(($result: any) => {
+        return $$createType4($result);
+    });
+}
+
+/**
+ * IsFirstRun reports whether the application is running without prior onboarding completion.
+ */
+export function IsFirstRun(): $CancellablePromise<boolean> {
+    return $Call.ByID(2694780068);
 }
 
 /**
@@ -71,7 +94,7 @@ export function Save(dto: $models.ConfigDTO): $CancellablePromise<void> {
  */
 export function Validate(dto: $models.ConfigDTO): $CancellablePromise<$models.ValidationErrorDTO[]> {
     return $Call.ByID(1787537453, dto).then(($result: any) => {
-        return $$createType4($result);
+        return $$createType6($result);
     });
 }
 
@@ -79,5 +102,7 @@ export function Validate(dto: $models.ConfigDTO): $CancellablePromise<$models.Va
 const $$createType0 = $models.ConfigDTO.createFrom;
 const $$createType1 = config$0.Config.createFrom;
 const $$createType2 = $Create.Nullable($$createType1);
-const $$createType3 = $models.ValidationErrorDTO.createFrom;
+const $$createType3 = $models.FolderWarningDTO.createFrom;
 const $$createType4 = $Create.Array($$createType3);
+const $$createType5 = $models.ValidationErrorDTO.createFrom;
+const $$createType6 = $Create.Array($$createType5);

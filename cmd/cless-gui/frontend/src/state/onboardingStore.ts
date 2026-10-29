@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { create } from 'zustand';
-import { api } from '../api';
+import { api, isMockMode } from '../api';
+import { useWatchStore } from './watchStore';
+import { useFoldersStore } from './foldersStore';
+import { useRulesStore } from './rulesStore';
+import { useActivityStore } from './activityStore';
 
 export interface PreviewItem {
   name: string;
@@ -68,7 +72,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   setStep: (step: 1 | 2 | 3) => {
     set({ step });
     if (step === 3) {
-      get().fetchPreview();
+      void get().fetchPreview();
     }
   },
 
@@ -76,21 +80,25 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
     set({ loading: true });
     try {
       const plan = await api.organize.preview();
-      const items: PreviewItem[] = (plan.items || []).slice(0, 5).map(m => ({
-        name: m.source.split(/[\\/]/).pop() || m.source,
-        dest: m.dest,
-        rule: m.ruleName,
-        size: '1.2 MB',
-      }));
+      const items: PreviewItem[] = (plan.items || [])
+        .filter(m => !m.skipped)
+        .slice(0, 5)
+        .map(m => ({
+          name: m.source.split(/[\\/]/).pop() || m.source,
+          dest: m.dest,
+          rule: m.ruleName,
+          size: '',
+        }));
       set({ previewFiles: items, loading: false });
     } catch {
-      // Fallback preview samples
       set({
-        previewFiles: [
-          { name: 'Financial_Report_Q1.pdf', dest: '~/Documents/Inbox/pdf', rule: 'Documents', size: '2.4 MB' },
-          { name: 'Screenshot_2026-04-18.png', dest: '~/Pictures/Sorted/2026', rule: 'Images', size: '1.1 MB' },
-          { name: 'Project_Archive.zip', dest: '~/Downloads/_Archives', rule: 'Archives', size: '14.8 MB' },
-        ],
+        previewFiles: isMockMode
+          ? [
+              { name: 'Financial_Report_Q1.pdf', dest: '~/Documents/Inbox/pdf', rule: 'Documents', size: '2.4 MB' },
+              { name: 'Screenshot_2026-04-18.png', dest: '~/Pictures/Sorted/2026', rule: 'Images', size: '1.1 MB' },
+              { name: 'Project_Archive.zip', dest: '~/Downloads/_Archives', rule: 'Archives', size: '14.8 MB' },
+            ]
+          : [],
         loading: false,
       });
     }
@@ -115,7 +123,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       // 3. If Organize Now is requested, trigger initial run
       if (organizeNow) {
         try {
-          await api.organize.run({ planId: 'initial', selectedIds: [] });
+          await api.organize.run({ selectedIds: [] });
         } catch {
           // non-blocking
         }
@@ -127,6 +135,13 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       } catch {
         // non-blocking
       }
+
+      await Promise.all([
+        useWatchStore.getState().init(),
+        useFoldersStore.getState().fetchFolders(),
+        useRulesStore.getState().fetchRules(),
+        useActivityStore.getState().init(),
+      ]);
 
       set({ isFirstRun: false, loading: false });
     } catch (err) {
@@ -143,6 +158,17 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
         ruleSet: 'recommended',
         autostart: false,
       });
+      try {
+        await api.watch.start();
+      } catch {
+        // non-blocking
+      }
+      await Promise.all([
+        useWatchStore.getState().init(),
+        useFoldersStore.getState().fetchFolders(),
+        useRulesStore.getState().fetchRules(),
+        useActivityStore.getState().init(),
+      ]);
       set({ isFirstRun: false, loading: false });
     } catch {
       set({ isFirstRun: false, loading: false });

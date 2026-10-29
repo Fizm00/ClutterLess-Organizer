@@ -110,6 +110,7 @@ export class MatchConfig {
  */
 export class RuleConfig {
     "Name": string;
+    "Disabled": boolean;
     "Match": MatchConfig;
     "MoveTo": string;
 
@@ -117,6 +118,9 @@ export class RuleConfig {
     constructor($$source: Partial<RuleConfig> = {}) {
         if (!("Name" in $$source)) {
             this["Name"] = "";
+        }
+        if (!("Disabled" in $$source)) {
+            this["Disabled"] = false;
         }
         if (!("Match" in $$source)) {
             this["Match"] = (new MatchConfig());
@@ -132,10 +136,10 @@ export class RuleConfig {
      * Creates a new RuleConfig instance from a string or object.
      */
     static createFrom($$source: any = {}): RuleConfig {
-        const $$createField1_0 = $$createType6;
+        const $$createField2_0 = $$createType6;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("Match" in $$parsedSource) {
-            $$parsedSource["Match"] = $$createField1_0($$parsedSource["Match"]);
+            $$parsedSource["Match"] = $$createField2_0($$parsedSource["Match"]);
         }
         return new RuleConfig($$parsedSource as Partial<RuleConfig>);
     }
@@ -151,6 +155,10 @@ export class Settings {
     "IgnoreHidden": boolean | null;
     "Conflict": string;
     "FallbackDir": string;
+    "CloseToTray": boolean | null;
+    "NotificationsEnabled": boolean;
+    "Autostart": boolean;
+    "OnboardingCompleted": boolean;
 
     /** Creates a new Settings instance. */
     constructor($$source: Partial<Settings> = {}) {
@@ -171,6 +179,18 @@ export class Settings {
         }
         if (!("FallbackDir" in $$source)) {
             this["FallbackDir"] = "";
+        }
+        if (!("CloseToTray" in $$source)) {
+            this["CloseToTray"] = null;
+        }
+        if (!("NotificationsEnabled" in $$source)) {
+            this["NotificationsEnabled"] = false;
+        }
+        if (!("Autostart" in $$source)) {
+            this["Autostart"] = false;
+        }
+        if (!("OnboardingCompleted" in $$source)) {
+            this["OnboardingCompleted"] = false;
         }
 
         Object.assign(this, $$source);

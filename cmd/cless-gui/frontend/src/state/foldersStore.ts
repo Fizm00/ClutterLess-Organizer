@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { api } from '../api';
 import type { WatchEntryDTO, FolderWarningDTO } from '../api/types';
+import { useWatchStore } from './watchStore';
 import { toast } from 'sonner';
 import { t } from '../i18n';
 
@@ -90,6 +91,7 @@ export const useFoldersStore = create<FoldersState>((set, get) => ({
       await api.config.save({ ...cfg, watch: updatedWatch });
       toast(t('toast.folder_added'));
       await get().fetchFolders();
+      await useWatchStore.getState().init();
       return selected;
     } catch (err: any) {
       toast('Failed to add folder: ' + (err?.message || ''));
@@ -104,6 +106,7 @@ export const useFoldersStore = create<FoldersState>((set, get) => ({
       await api.config.save({ ...cfg, watch: updatedWatch });
       toast(t('toast.folder_removed'));
       await get().fetchFolders();
+      await useWatchStore.getState().init();
       return true;
     } catch (err: any) {
       toast('Failed to remove folder: ' + (err?.message || ''));
@@ -122,6 +125,7 @@ export const useFoldersStore = create<FoldersState>((set, get) => ({
       });
       await api.config.save({ ...cfg, watch: updatedWatch });
       await get().fetchFolders();
+      await useWatchStore.getState().init();
     } catch (err: any) {
       toast('Failed to update folder setting: ' + (err?.message || ''));
     }

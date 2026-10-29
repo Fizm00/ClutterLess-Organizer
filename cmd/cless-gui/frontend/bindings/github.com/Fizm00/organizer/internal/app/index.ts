@@ -19,10 +19,13 @@ export {
 export {
     BatchDetailDTO,
     BatchSummaryDTO,
+    ConditionEvaluationDTO,
     ConfigDTO,
+    FolderWarningDTO,
     HistoryFilterDTO,
     MatchDTO,
     MoveResultDTO,
+    OnboardingRequestDTO,
     PlanDTO,
     PlanItemDTO,
     PreviewOptionsDTO,

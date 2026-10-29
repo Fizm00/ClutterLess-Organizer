@@ -124,12 +124,13 @@ type FileFailedPayload struct {
 
 // RunProgressPayload is emitted as items are processed during an organization run.
 type RunProgressPayload struct {
-	Done  int  `json:"done"`
-	Total int  `json:"total"`
+	Done  int            `json:"done"`
+	Total int            `json:"total"`
 	Item  *MoveResultDTO `json:"item,omitempty"`
 }
 
 // ConfigChangedPayload is emitted when the configuration file changes or is reloaded.
 type ConfigChangedPayload struct {
-	Path string `json:"path"`
+	Path     string `json:"path"`
+	External *bool  `json:"external,omitempty"`
 }

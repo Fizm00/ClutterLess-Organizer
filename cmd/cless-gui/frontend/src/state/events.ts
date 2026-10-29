@@ -39,12 +39,15 @@ export function setupEventSubscriptions(): () => void {
     }
   });
 
-  const unsubConfig = api.onEvent('config:changed', _payload => {
-    toast(t('toast.config_reloaded'));
-    useWatchStore.getState().init();
-    useRulesStore.getState().fetchRules();
-    useFoldersStore.getState().fetchFolders();
-    if (useRulesStore.getState().editingRule) {
+  const unsubConfig = api.onEvent('config:changed', payload => {
+    const isExternal = !payload || payload.external !== false;
+    if (isExternal) {
+      toast(t('toast.config_reloaded'));
+    }
+    void useWatchStore.getState().init();
+    void useRulesStore.getState().fetchRules();
+    void useFoldersStore.getState().fetchFolders();
+    if (isExternal && useRulesStore.getState().editingRule) {
       useRulesStore.getState().setExternalChangeDetected(true);
     }
   });
@@ -82,4 +85,3 @@ export function setupEventSubscriptions(): () => void {
 
   return cleanupFn;
 }
-

@@ -24,14 +24,24 @@ export function Preview(opts: $models.PreviewOptionsDTO): $CancellablePromise<$m
 }
 
 /**
+ * RetryFile re-evaluates rules and attempts to move an individual file that previously failed or needs retry.
+ */
+export function RetryFile(sourcePath: string): $CancellablePromise<$models.MoveResultDTO> {
+    return $Call.ByID(810854832, sourcePath).then(($result: any) => {
+        return $$createType1($result);
+    });
+}
+
+/**
  * Run executes the proposed organization moves, respecting selected IDs and reporting live progress.
  */
 export function Run(req: $models.RunRequestDTO): $CancellablePromise<$models.RunResultDTO> {
     return $Call.ByID(3247411561, req).then(($result: any) => {
-        return $$createType1($result);
+        return $$createType2($result);
     });
 }
 
 // Private type creation functions
 const $$createType0 = $models.PlanDTO.createFrom;
-const $$createType1 = $models.RunResultDTO.createFrom;
+const $$createType1 = $models.MoveResultDTO.createFrom;
+const $$createType2 = $models.RunResultDTO.createFrom;

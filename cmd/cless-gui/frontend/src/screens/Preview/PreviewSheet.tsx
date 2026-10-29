@@ -43,6 +43,7 @@ export const PreviewSheet: React.FC<PreviewSheetProps> = ({
       setPlan(null);
       setRunning(false);
       setProgressText(null);
+      setUnmatchedExpanded(false);
       return;
     }
 
@@ -55,11 +56,19 @@ export const PreviewSheet: React.FC<PreviewSheetProps> = ({
         if (!isMounted) return;
         setPlan(p);
         const initialSelected: Record<string, boolean> = {};
+        let moveItemsCount = 0;
+        let unmatchedCount = 0;
         p.items.forEach(item => {
           if (!item.skipped) {
             initialSelected[item.id] = true;
+            moveItemsCount++;
+          } else if (item.reason === 'unmatched') {
+            unmatchedCount++;
           }
         });
+        if (moveItemsCount === 0 && unmatchedCount > 0) {
+          setUnmatchedExpanded(true);
+        }
         setSelectedIds(initialSelected);
         setLoading(false);
       })
@@ -133,7 +142,7 @@ export const PreviewSheet: React.FC<PreviewSheetProps> = ({
       setRunning(false);
       onOpenChange(false);
 
-      useActivityStore.getState().init();
+      void useActivityStore.getState().init();
 
       toast(t('toast.files_moved', { count: result.moved }), {
         action: {
@@ -202,7 +211,7 @@ export const PreviewSheet: React.FC<PreviewSheetProps> = ({
                       onCheckedChange={val => handleToggleAll(Boolean(val))}
                       id="select-all-preview"
                       aria-label="Select all files"
-                      disabled={running}
+                      disabled={running || willMoveItems.length === 0}
                     />
                     <h3 className="text-sm font-medium text-foreground">
                       {t('preview.section.will_move', { count: willMoveItems.length })}
@@ -213,35 +222,41 @@ export const PreviewSheet: React.FC<PreviewSheetProps> = ({
                   </span>
                 </div>
 
-                <div className="flex flex-col rounded-lg border overflow-hidden w-full divide-y">
-                  {willMoveItems.map(item => {
-                    const isChecked = !!selectedIds[item.id];
-                    return (
-                      <div
-                        key={item.id}
-                        className={cn(
-                          'flex items-center h-10 pl-3 gap-2 transition-colors',
-                          isChecked ? 'hover:bg-muted/50' : 'opacity-50'
-                        )}
-                      >
-                        <Checkbox
-                          checked={isChecked}
-                          onCheckedChange={() => handleToggleItem(item.id)}
-                          disabled={running}
-                          aria-label={`Select ${item.source}`}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <FileRow
-                            filename={item.source.split(/[/\\]/).pop() || item.source}
-                            destPath={item.dest}
-                            ruleName={item.ruleName}
-                            onReveal={p => api.system.revealPath(p)}
+                {willMoveItems.length === 0 ? (
+                  <div className="rounded-lg border px-4 py-6 text-center text-xs text-muted-foreground">
+                    {t('preview.empty_desc')}
+                  </div>
+                ) : (
+                  <div className="flex flex-col rounded-lg border overflow-hidden w-full divide-y">
+                    {willMoveItems.map(item => {
+                      const isChecked = !!selectedIds[item.id];
+                      return (
+                        <div
+                          key={item.id}
+                          className={cn(
+                            'flex items-center h-10 pl-3 gap-2 transition-colors',
+                            isChecked ? 'hover:bg-muted/50' : 'opacity-50'
+                          )}
+                        >
+                          <Checkbox
+                            checked={isChecked}
+                            onCheckedChange={() => handleToggleItem(item.id)}
+                            disabled={running}
+                            aria-label={`Select ${item.source}`}
                           />
+                          <div className="flex-1 min-w-0">
+                            <FileRow
+                              filename={item.source.split(/[/\\]/).pop() || item.source}
+                              destPath={item.dest}
+                              ruleName={item.ruleName}
+                              onReveal={p => api.system.revealPath(p)}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* 2. Skipped Group */}
@@ -264,7 +279,7 @@ export const PreviewSheet: React.FC<PreviewSheetProps> = ({
                 </div>
               )}
 
-              {/* 3. Unmatched Group (Collapsed by default) */}
+              {/* 3. Unmatched Group (Collapsed by default, auto-expanded if 0 will move) */}
               {unmatchedItems.length > 0 && (
                 <div className="flex flex-col gap-2 w-full">
                   <button

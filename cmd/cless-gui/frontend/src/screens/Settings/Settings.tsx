@@ -529,7 +529,7 @@ export const Settings: React.FC = () => {
             <span className="text-muted-foreground">{t('settings.links')}</span>
             <div className="flex items-center gap-4">
               <a
-                href="https://github.com/aifrak/clutterless"
+                href="https://github.com/Fizm00/ClutterLess-Organizer"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 text-foreground underline-offset-4 hover:underline"

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { create } from 'zustand';
-import { api } from '../api';
+import { api, isMockMode } from '../api';
 import { BatchDetailDTO, BatchSummaryDTO, HistoryFilterDTO } from '../api/types';
 import { useWatchStore } from './watchStore';
 
@@ -97,16 +97,18 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
               ...state.batchDetails,
               [batches[0].id]: detail,
             },
-            needsAttention: [
-              {
-                id: 'skip-sample-1',
-                filename: 'video_screencast_recording.crdownload',
-                sourcePath: 'C:/Users/User/Downloads/video_screencast_recording.crdownload',
-                reason: 'still writing',
-                type: 'skipped',
-                timestamp: new Date().toISOString(),
-              },
-            ],
+            needsAttention: isMockMode
+              ? [
+                  {
+                    id: 'skip-sample-1',
+                    filename: 'video_screencast_recording.crdownload',
+                    sourcePath: 'C:/Users/User/Downloads/video_screencast_recording.crdownload',
+                    reason: 'still writing',
+                    type: 'skipped',
+                    timestamp: new Date().toISOString(),
+                  },
+                ]
+              : state.needsAttention,
             isLoading: false,
           }));
 
@@ -207,7 +209,7 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
     }));
 
     // Refresh batch list
-    get().loadBatches();
+    void get().loadBatches();
   },
 
   addFileSkipped: payload => {

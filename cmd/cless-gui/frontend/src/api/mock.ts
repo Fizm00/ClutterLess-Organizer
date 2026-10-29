@@ -124,6 +124,7 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
     },
     async save(dto: ConfigDTO): Promise<void> {
       mockConfig = JSON.parse(JSON.stringify(dto));
+      mockWatchStatus.folders = (mockConfig.watch || []).map(w => w.path);
     },
     async path(): Promise<string> {
       return 'C:/Users/User/.config/clutterless/config.yaml';
@@ -170,6 +171,7 @@ export const mockApi: Api & { emit: (name: string, payload: any) => void } = {
     },
     async completeOnboarding(req: OnboardingRequest): Promise<void> {
       mockConfig.watch = req.watchFolders.map(p => ({ path: p, recursive: false }));
+      mockWatchStatus.folders = [...req.watchFolders];
       if (req.ruleSet === 'empty') {
         mockConfig.rules = [];
       }

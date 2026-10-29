@@ -186,8 +186,10 @@ func TestRulesCommands(t *testing.T) {
 func TestRunCommand(t *testing.T) {
 	tempDir := t.TempDir()
 	cfgPath := filepath.Join(tempDir, "config.yaml")
+	histFile := filepath.Join(tempDir, "history.jsonl")
 
-	if err := os.WriteFile(cfgPath, []byte(config.DefaultYAML()), 0600); err != nil {
+	yamlStr := strings.ReplaceAll(config.DefaultYAML(), "~/Pictures/Sorted/{year}", filepath.ToSlash(filepath.Join(tempDir, "Sorted")))
+	if err := os.WriteFile(cfgPath, []byte(yamlStr), 0600); err != nil {
 		t.Fatalf("failed to write config: %v", err)
 	}
 
@@ -201,7 +203,7 @@ func TestRunCommand(t *testing.T) {
 	_ = os.WriteFile(testPart, []byte("part bytes"), 0600)
 
 	t.Run("dry-run does not move file", func(t *testing.T) {
-		out, err := executeCommand("run", "--dry-run", "--dir", workDir, "--config", cfgPath)
+		out, err := executeCommand("run", "--dry-run", "--dir", workDir, "--config", cfgPath, "--history-file", histFile)
 		if err != nil {
 			t.Fatalf("unexpected dry-run error: %v, output: %s", err, out)
 		}
@@ -216,7 +218,7 @@ func TestRunCommand(t *testing.T) {
 	})
 
 	t.Run("real run moves file", func(t *testing.T) {
-		out, err := executeCommand("run", "--dir", workDir, "--config", cfgPath)
+		out, err := executeCommand("run", "--dir", workDir, "--config", cfgPath, "--history-file", histFile)
 		if err != nil {
 			t.Fatalf("unexpected real run error: %v, output: %s", err, out)
 		}

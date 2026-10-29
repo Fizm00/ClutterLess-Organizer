@@ -7,7 +7,6 @@ import * as OrganizeService from '../../bindings/github.com/Fizm00/organizer/int
 import * as HistoryService from '../../bindings/github.com/Fizm00/organizer/internal/app/historyservice';
 import * as WatchService from '../../bindings/github.com/Fizm00/organizer/internal/app/watchservice';
 import type { Api } from './types';
-import { mockApi } from './mock';
 
 export const wailsApi: Api = {
   config: {
@@ -27,25 +26,13 @@ export const wailsApi: Api = {
       return ConfigService.ResetToDefaults();
     },
     async getFolderWarnings() {
-      const cfg: any = ConfigService;
-      if (typeof cfg?.GetFolderWarnings === 'function') {
-        return (await cfg.GetFolderWarnings()) as any;
-      }
-      return mockApi.config.getFolderWarnings();
+      return (await ConfigService.GetFolderWarnings()) as any;
     },
     async isFirstRun() {
-      const cfg: any = ConfigService;
-      if (typeof cfg?.IsFirstRun === 'function') {
-        return (await cfg.IsFirstRun()) as boolean;
-      }
-      return mockApi.config.isFirstRun();
+      return ConfigService.IsFirstRun();
     },
     async completeOnboarding(req) {
-      const cfg: any = ConfigService;
-      if (typeof cfg?.CompleteOnboarding === 'function') {
-        return cfg.CompleteOnboarding(req as any);
-      }
-      return mockApi.config.completeOnboarding(req);
+      return ConfigService.CompleteOnboarding(req as any);
     },
   },
   rules: {
@@ -65,11 +52,7 @@ export const wailsApi: Api = {
       return (await RulesService.Test(filename)) as any;
     },
     async testRule(rule, filename) {
-      const rs: any = RulesService;
-      if (typeof rs?.TestRule === 'function') {
-        return (await rs.TestRule(rule as any, filename)) as any;
-      }
-      return mockApi.rules.testRule(rule, filename);
+      return (await RulesService.TestRule(rule as any, filename)) as any;
     },
   },
   organize: {
@@ -80,11 +63,7 @@ export const wailsApi: Api = {
       return (await OrganizeService.Run(req as any)) as any;
     },
     async retryFile(sourcePath) {
-      const org: any = OrganizeService;
-      if (typeof org?.RetryFile === 'function') {
-        return (await org.RetryFile(sourcePath)) as any;
-      }
-      return mockApi.organize.retryFile(sourcePath);
+      return (await OrganizeService.RetryFile(sourcePath)) as any;
     },
   },
   history: {
@@ -117,16 +96,12 @@ export const wailsApi: Api = {
   },
   system: {
     async version() {
-      try {
-        const res = await SystemService.Version();
-        return {
-          version: res.version,
-          commit: res.commit,
-          buildDate: res.buildDate,
-        };
-      } catch {
-        return mockApi.system.version();
-      }
+      const res = await SystemService.Version();
+      return {
+        version: res.version,
+        commit: res.commit,
+        buildDate: res.buildDate,
+      };
     },
     async revealPath(path: string) {
       return SystemService.RevealPath(path);
@@ -135,28 +110,21 @@ export const wailsApi: Api = {
       return SystemService.OpenConfig();
     },
     async openHistory() {
-      const sys: any = SystemService;
-      if (typeof sys?.OpenHistory === 'function') {
-        return sys.OpenHistory();
-      }
-      return mockApi.system.openHistory();
+      return SystemService.OpenHistory();
     },
     async pickFolder() {
-      const sys: any = SystemService;
-      if (typeof sys?.PickFolder === 'function') {
-        return (await sys.PickFolder()) as any;
-      }
-      return mockApi.system.pickFolder();
+      const selected = await SystemService.PickFolder();
+      return selected || null;
     },
     async countFiles(folderPath: string) {
-      const sys: any = SystemService;
-      if (typeof sys?.CountFiles === 'function') {
-        return (await sys.CountFiles(folderPath)) as any;
-      }
-      return mockApi.system.countFiles(folderPath);
+      return SystemService.CountFiles(folderPath);
     },
-    setAutostart: mockApi.system.setAutostart,
-    getAutostart: mockApi.system.getAutostart,
+    async setAutostart(enabled: boolean) {
+      return SystemService.SetAutostart(enabled);
+    },
+    async getAutostart() {
+      return SystemService.GetAutostart();
+    },
   },
   onEvent(name: string, callback: (payload: any) => void): () => void {
     return Events.On(name, (event: any) => {

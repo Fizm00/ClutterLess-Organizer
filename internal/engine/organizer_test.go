@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Fizm00/organizer/internal/config"
+	"github.com/Fizm00/organizer/internal/history"
 )
 
 // takeDirSnapshot records file paths, sizes, and directory structures.
@@ -62,6 +63,7 @@ func TestOrganizer_DryRun_ZeroSideEffects(t *testing.T) {
 	setRuleMoveTo(cfg, "Documents", filepath.Join(destDir, "Docs"))
 
 	organizer := NewOrganizer(cfg)
+	organizer.History, _ = history.NewStorage(filepath.Join(tempDir, "history.jsonl"))
 
 	// Snapshot before
 	before := takeDirSnapshot(t, tempDir)
@@ -107,6 +109,7 @@ func TestOrganizer_RealRun_MovesFiles(t *testing.T) {
 	setRuleMoveTo(cfg, "Documents", filepath.Join(destDir, "Docs")) // Documents rule
 
 	organizer := NewOrganizer(cfg)
+	organizer.History, _ = history.NewStorage(filepath.Join(tempDir, "history.jsonl"))
 
 	res, err := organizer.Run(context.Background(), RunOptions{
 		Dir:    tempDir,
@@ -149,6 +152,7 @@ func TestOrganizer_FallbackDir(t *testing.T) {
 	cfg.Settings.FallbackDir = fallbackDir
 
 	organizer := NewOrganizer(cfg)
+	organizer.History, _ = history.NewStorage(filepath.Join(tempDir, "history.jsonl"))
 
 	res, err := organizer.Run(context.Background(), RunOptions{
 		Dir:    tempDir,
@@ -199,6 +203,7 @@ func TestOrganizer_RecursiveScan_ExcludesDestDir(t *testing.T) {
 	config.ApplyDefaults(cfg)
 
 	organizer := NewOrganizer(cfg)
+	organizer.History, _ = history.NewStorage(filepath.Join(tempDir, "history.jsonl"))
 
 	res, err := organizer.Run(context.Background(), RunOptions{
 		DryRun: false,

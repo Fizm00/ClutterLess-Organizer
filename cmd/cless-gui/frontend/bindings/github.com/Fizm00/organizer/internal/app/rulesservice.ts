@@ -47,6 +47,15 @@ export function Test(filename: string): $CancellablePromise<$models.RuleTestResu
 }
 
 /**
+ * TestRule evaluates a virtual filename specifically against a given (e.g. draft) rule.
+ */
+export function TestRule(rule: $models.RuleDTO, filename: string): $CancellablePromise<$models.RuleTestResultDTO> {
+    return $Call.ByID(2760827360, rule, filename).then(($result: any) => {
+        return $$createType2($result);
+    });
+}
+
+/**
  * Upsert adds a new rule or updates an existing rule with the same name.
  */
 export function Upsert(rule: $models.RuleDTO): $CancellablePromise<void> {
